@@ -9,6 +9,7 @@ namespace test
     {
         static void Main(string[] args)
         {
+            string salut;
         }
     }
 }
