@@ -70,7 +70,7 @@ namespace MiniCube
                         device.VertexDeclaration = VertexDec3;
                         device.SetTexture(0, Texture_ressource);
                         device.SetStreamSource(0, vertices, 0, Utilities.SizeOf<Vertex>());
-                        //Matrix.RotationX(x + y * 10)*;
+                        //231231Matrix.RotationX(x + y * 10)*;
                         device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
                     }
                 }
