@@ -32,15 +32,15 @@ namespace MiniCube
             Console.WriteLine(Utilities.SizeOf<Vertex>());
             /******* ICI ******/
             //FileStream fichier = File.Open("earth.bmp", FileMode.Open);
-            Texture Texture_ressource = SharpDX.Direct3D9.Texture.FromFile(device, "earth.bmp");
+            Texture Texture_ressource = SharpDX.Direct3D9.Texture.FromFile(device, @"C:\Users\Arys\Documents\GitHub\Underground\Game v0\earth.bmp");
             /*device.SetSamplerState(0, SamplerState.MinFilter, 2);
             device.SetSamplerState(0, SamplerState.MagFilter, 2);
             device.SetRenderState(RenderState.Lighting, false);*/
             /******* END **********/
-            
-            
 
-            
+
+
+
 
 
             RenderLoop.Run(form, () =>
@@ -74,7 +74,7 @@ namespace MiniCube
                         device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
                     }
                 }
-            
+
                 device.EndScene();
                 device.Present();
             });
