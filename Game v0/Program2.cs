@@ -131,7 +131,7 @@ namespace MiniCube
                         b = b * 10 + (temp - Convert.ToInt32('0'));
                     }
                     c = 0;
-                    for (int temp = fichier.ReadByte(); temp != Convert.ToInt32('\n'); temp = fichier.ReadByte())
+                    for (int temp = fichier.ReadByte(); temp >= Convert.ToInt32('0') && temp <= Convert.ToInt32('9'); temp = fichier.ReadByte())
                     {
                         c = c * 10 + (temp - Convert.ToInt32('0'));
                     }
@@ -165,7 +165,7 @@ namespace MiniCube
             position[2] = 0;
             //string path = "untitled.obj";
             //string path = "FilmNoirTriangl.obj";
-            string path = "ressource.obj";
+            string path = "Tuture.obj";
             //string path = "FilmNoirTriangl.obj";
             var form = new RenderForm("SharpDX - MiniCube Direct3D9 Sample");
             var direct3D = new Direct3D();
@@ -217,8 +217,9 @@ namespace MiniCube
                 effect.Technique = technique;
                 effect.Begin();
                 effect.BeginPass(0);
-                var worldViewProj = Matrix.Translation(new Vector3(10+time, -20, 0)) * Matrix.RotationX(-(float)Math.PI / 6)  * viewProj;
+                //var worldViewProj = Matrix.Translation(new Vector3(10+time, -20, 0)) * Matrix.RotationX(-(float)Math.PI / 6)  * viewProj;
                 //var worldViewProj = Matrix.Translation(new Vector3(position[0],position[1],position[2])) * Matrix.RotationX(time) * Matrix.RotationY(time * 2) * Matrix.RotationZ(time * .7f) * viewProj;
+                var worldViewProj = Matrix.RotationY(time * 2) * viewProj;
                 effect.SetValue("worldViewProj", worldViewProj);
 
                 device.DrawPrimitives(PrimitiveType.TriangleList, 0, nbfaces);
