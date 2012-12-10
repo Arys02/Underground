@@ -26,10 +26,9 @@ namespace MiniCube
 
         private static void Main()
         {
-            int[] position = new int[3];
-            position[0] = 0;
-            position[1] = 0;
-            position[2] = 0;
+            Vector3 position = new Vector3(0, 0, 0);
+            Vector3 angle = new Vector3(0, 0, 0);
+
             //string path = "untitled.obj";
             string path = @"C:\Users\Arys\Documents\informatique\Projet\test\underground\Underground\Underground\FilmNoirTriangl.obj";
             //string path = "Tuture.obj";
@@ -108,32 +107,58 @@ namespace MiniCube
                 
 
                 /////////camera/////////////
-                
-                if (input.KeysDown.Contains(Keys.Up) || input.KeysDown.Contains(Keys.W))      
+                if (input.KeysDown.Contains(Keys.W))
                 {
-                    Console.WriteLine("up");
-                    worldViewProj = Matrix.Translation(0, 0, time2) * viewProj;
-                    time2 += -0.1f;
-                }
-                if (input.KeysDown.Contains(Keys.Down) || input.KeysDown.Contains(Keys.W))
-                {
-                    Console.WriteLine("Down");
-                    worldViewProj = Matrix.Translation(0, 0, time2) * viewProj;
-                    time2 += 0.1f;
+                    position.Y -= 0.1f;
+                    Console.WriteLine("Vers le haut !");
                 }
 
-                if (input.KeysDown.Contains(Keys.Right) || input.KeysDown.Contains(Keys.W))
+                if (input.KeysDown.Contains(Keys.A))
                 {
-                    Console.WriteLine("Right");
-                    worldViewProj = Matrix.RotationY(time) * viewProj;
-                    time += -0.01f;
+                    position.Y += 0.1f;
+                    Console.WriteLine("Vers le bas !");
                 }
-                if (input.KeysDown.Contains(Keys.Left) || input.KeysDown.Contains(Keys.W))
+
+                if (input.KeysDown.Contains(Keys.Up) || input.KeysDown.Contains(Keys.Z))
                 {
+                    position.Z -= 0.1f;
+                    Console.WriteLine("En avant !");
+                }
+                if (input.KeysDown.Contains(Keys.Down) || input.KeysDown.Contains(Keys.S))
+                {
+                    position.Z += 0.1f;
+                    Console.WriteLine("En arrière !");
+                }
+
+                if (input.KeysDown.Contains(Keys.Right))
+                {
+                    angle.Y -= 0.01f;
+                    Console.WriteLine("A tribord !");
+                }
+                if (input.KeysDown.Contains(Keys.Left))
+                {
+                    angle.Y += 0.01f;
+                    Console.WriteLine("A babord !");
+                }
+                if (input.KeysDown.Contains(Keys.Q))
+                {
+                    position.X += 0.1f;
                     Console.WriteLine("Left");
-                    worldViewProj = Matrix.RotationY(time)*viewProj;
-                    time += 0.01f;
                 }
+                if (input.KeysDown.Contains(Keys.D))
+                {
+                    position.X -= 0.1f;
+                    Console.WriteLine("Right");
+                }
+
+                worldViewProj =
+                    Matrix.Translation(position.X, position.Y, position.Z) *
+                    Matrix.RotationX(angle.X) *
+                    Matrix.RotationY(angle.Y) *
+                    Matrix.RotationZ(angle.Z) *
+                    viewProj;
+
+                
                
                  //fin camera//  
 
