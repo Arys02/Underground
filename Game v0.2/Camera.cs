@@ -22,8 +22,12 @@ namespace MiniCube
     {
         static public void orient_camera(ref Input input, ref Vector3 position, ref Vector3 angle)
         {
-            float[] VitesseRotation = new float[3] { 0.005f, 0.005f, 0.005f };
-            float[] VitesseTranslation = new float[3] { 0.01f, 0.01f, 0.01f };
+            float[] VitesseRotation = new float[3] { .005f, 0.005f, 0.005f };
+            float[] VitesseTranslation = new float[3] { 
+                Convert.ToSingle(Math.Sqrt(.001f)),
+                Convert.ToSingle(Math.Sqrt(.001f)),
+                Convert.ToSingle(Math.Sqrt(.001f)),
+            };
             double produit_scalaire;
             if (input.KeysDown.Contains(Keys.W))
             {
@@ -39,14 +43,12 @@ namespace MiniCube
 
             if (input.KeysDown.Contains(Keys.Up) || input.KeysDown.Contains(Keys.Z))
             {
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * VitesseTranslation[2]);
-                if (produit_scalaire > 0) position.Z -= Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.Z += Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2]);
+                position.Z -= Convert.ToSingle(produit_scalaire);
                 
 
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * VitesseTranslation[2]);
-                if (produit_scalaire > 0) position.X += Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.X -= Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2]);
+                position.X += Convert.ToSingle(produit_scalaire);
 
 
                 Console.WriteLine("En avant !");
@@ -54,14 +56,12 @@ namespace MiniCube
             if (input.KeysDown.Contains(Keys.Down) || input.KeysDown.Contains(Keys.S))
             {
 
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * VitesseTranslation[2]);
-                if (produit_scalaire > 0) position.Z += Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.Z -= Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2]);
+                position.Z += Convert.ToSingle(produit_scalaire);
 
 
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * VitesseTranslation[2]);
-                if (produit_scalaire > 0) position.X -= Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.X += Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2]);
+                position.X -= Convert.ToSingle(produit_scalaire);
                 Console.WriteLine("En arrière !");
             }
 
@@ -80,26 +80,22 @@ namespace MiniCube
             {
                 //position.X += VitesseTranslation[0];
 
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0] * VitesseTranslation[0]);
-                if (produit_scalaire > 0) position.Z += Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.Z -= Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0]);
+                position.Z += Convert.ToSingle(produit_scalaire);
 
 
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0] * VitesseTranslation[0]);
-                if (produit_scalaire > 0) position.X += Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.X -= Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0]);
+                position.X += Convert.ToSingle(produit_scalaire);
                 Console.WriteLine("Left");
             }
             if (input.KeysDown.Contains(Keys.D))
             {
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0] * VitesseTranslation[0]);
-                if (produit_scalaire > 0) position.Z -= Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.Z += Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0]);
+                position.Z -= Convert.ToSingle(produit_scalaire);
 
 
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0] * VitesseTranslation[0]);
-                if (produit_scalaire > 0) position.X -= Convert.ToSingle(Math.Sqrt(produit_scalaire));
-                else position.X += Convert.ToSingle(Math.Sqrt(-produit_scalaire));
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0]);
+                position.X -= Convert.ToSingle(produit_scalaire);
                 Console.WriteLine("Right");
             }
             angle.X = Convert.ToSingle(angle.X % (Math.PI * 2));
