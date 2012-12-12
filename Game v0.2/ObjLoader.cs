@@ -81,13 +81,11 @@ namespace MiniCube
             FileStream fichier = File.Open(path, FileMode.Open);
             fichier.Seek(0, SeekOrigin.Begin);
 
-            Color3[] couleur = new Color3[3];
-            couleur[0] = Color.White.ToColor3();
-            couleur[1] = Color.Green.ToColor3();
-            couleur[2] = Color.Green.ToColor3();
-            /*int nbsommets = 0;
-            int a, b, c, compteur = 0;
-            bool est_positif;*/
+            Color3[] couleur = new Color3[3] { 
+                Color.White.ToColor3(),
+                Color.Green.ToColor3(),
+                Color.Green.ToColor3()
+            };
 
             int carac_Lu = fichier.ReadByte();
             int count;

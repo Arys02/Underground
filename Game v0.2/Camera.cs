@@ -29,13 +29,13 @@ namespace MiniCube
                 Convert.ToSingle(Math.Sqrt(.001f)),
             };
             double produit_scalaire;
-            if (input.KeysDown.Contains(Keys.W))
+            if (input.KeysDown.Contains(Keys.Space))
             {
                 position.Y -= VitesseTranslation[1];
                 Console.WriteLine("Vers le haut !");
             }
 
-            if (input.KeysDown.Contains(Keys.A))
+            if (input.KeysDown.Contains(Keys.ShiftKey))
             {
                 position.Y += VitesseTranslation[1];
                 Console.WriteLine("Vers le bas !");
@@ -45,7 +45,7 @@ namespace MiniCube
             {
                 produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2]);
                 position.Z -= Convert.ToSingle(produit_scalaire);
-                
+
 
                 produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2]);
                 position.X += Convert.ToSingle(produit_scalaire);

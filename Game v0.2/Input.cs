@@ -44,6 +44,7 @@ namespace MiniCube
                 //Matrix worldViewProj = Matrix.RotationY(time) * viewProj;
                 KeysDown.Add(key);
             }
+            Console.WriteLine(key);
         }
 
         void form_KeyUp(object sender, KeyEventArgs e)
@@ -52,7 +53,7 @@ namespace MiniCube
             ClearKeyCache();
             KeysReleased.Add(key);
             KeysDown.Remove(key);
-            Console.WriteLine(key);
+            //Console.WriteLine(key);
         }
 
         public void ClearKeyCache()
