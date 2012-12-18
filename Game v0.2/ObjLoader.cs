@@ -13,11 +13,12 @@ using Color = SharpDX.Color;
 
 namespace MiniCube
 {
-    static class ObjLoader
+    class ObjLoader
     {
-        private static void gotonextvalue(ref FileStream fichier)
+        private static void gotonextvalue(ref int i, byte[] obj)
         {
-            int carac_Lu = fichier.ReadByte();
+            int carac_Lu = obj[i];
+            i++;
             while (!(
                 (carac_Lu >= Convert.ToInt32('0') && carac_Lu <= Convert.ToInt32('9')) ||
                 (carac_Lu >= Convert.ToInt32('a') && carac_Lu <= Convert.ToInt32('z')) ||
@@ -26,24 +27,45 @@ namespace MiniCube
                 carac_Lu == Convert.ToInt32('.')
                 ))
             {
+                carac_Lu = obj[i];
+                i++;
+            }
+            i--;
+        }
+
+
+
+        private static string getstring(ref FileStream fichier)
+        {
+            List<char> liste = new List<char>();
+            int carac_Lu = fichier.ReadByte();
+            while (carac_Lu != Convert.ToInt32('\n') &&
+                carac_Lu != Convert.ToInt32(' ') &&
+                carac_Lu != -1
+            )
+            {
+                liste.Add(Convert.ToChar(carac_Lu));
                 carac_Lu = fichier.ReadByte();
             }
             fichier.Position--;
+            return new string(liste.ToArray());
         }
 
-        private static float getfloat(ref FileStream fichier)
+        private static float getfloat(ref int i, byte[] obj)
         {
             bool est_negatif = false;
             bool virgule = false;
             float resultat = 0;
             int decalage = 0;
-            int carac_Lu = fichier.ReadByte();
+            int carac_Lu = carac_Lu = obj[i];
+            i++;
             if (carac_Lu == Convert.ToInt32('-'))
             {
                 est_negatif = true;
-                carac_Lu = fichier.ReadByte();
+                carac_Lu = carac_Lu = obj[i];
+                i++;
             }
-            while ((carac_Lu >= Convert.ToInt32('0') && carac_Lu <= Convert.ToInt32('9')) || carac_Lu == Convert.ToInt32('.'))
+            while (((carac_Lu >= Convert.ToInt32('0') && carac_Lu <= Convert.ToInt32('9')) || carac_Lu == Convert.ToInt32('.')) && carac_Lu != -1)
             {
                 if (carac_Lu == Convert.ToInt32('.')) virgule = true;
                 else
@@ -52,34 +74,36 @@ namespace MiniCube
                     if (est_negatif) resultat = resultat * 10 - (carac_Lu - Convert.ToInt32('0'));
                     else resultat = resultat * 10 + (carac_Lu - Convert.ToInt32('0'));
                 }
-                carac_Lu = fichier.ReadByte();
+                carac_Lu = carac_Lu = obj[i];
+                i++;
             }
-            fichier.Position--;
-            return Convert.ToSingle(resultat/(Math.Pow(10,decalage)));
+            i--;
+            return Convert.ToSingle(resultat / (Math.Pow(10, decalage)));
         }
 
-        private static void gotonextline(ref FileStream fichier)
+        private static void gotonextline(ref int i, byte[] obj)
         {
-            int carac_Lu = fichier.ReadByte();
+            int carac_Lu = obj[i];
+            i++;
             while (carac_Lu != '\n')
             {
-                carac_Lu = fichier.ReadByte();
+                carac_Lu = obj[i];
+                i++;
             }
         }
 
-        public static Vertex[] read_obj(string path, Vector4 referentiel, ref int nbfaces, ref int nbsommets, ref int nbnormales, ref int nbtextures)
+        public static Vertex[] read_obj(byte[] obj, Vector4 referentiel, ref int nbfaces, ref int nbsommets, ref int nbnormales, ref int nbtextures)
         {
-            Console.WriteLine("# Ouverture du fichier {0}", path);
-            nbfaces = 0;
-            nbsommets = 0;
+            int i = 0;
+
+            int precedent_pourcentage = 0;
+            Console.WriteLine("# Ouverture du fichier {0}", obj);
             List<Vector2> ListeCoordTextures = new List<Vector2>();
             List<Vector4> ListeCoordSommets = new List<Vector4>();
             List<Vector4> ListeNormales = new List<Vector4>();
             List<Vertex> ListeVertex = new List<Vertex>();
-            float x=1, y=1, z=1;
+            float x = 1, y = 1, z = 1;
 
-            FileStream fichier = File.Open(path, FileMode.Open);
-            fichier.Seek(0, SeekOrigin.Begin);
 
             Color3[] couleur = new Color3[3] { 
                 Color.White.ToColor3(),
@@ -87,81 +111,85 @@ namespace MiniCube
                 Color.Green.ToColor3()
             };
 
-            int carac_Lu = fichier.ReadByte();
+            int carac_Lu = obj[i];
+            i++;
             int count;
             while (carac_Lu != -1)
             {
                 count = ListeVertex.Count;
                 if (carac_Lu == Convert.ToInt32('v'))
                 {
-                    carac_Lu = fichier.ReadByte();
+                    carac_Lu = obj[i];
+                    i++;
                     if (carac_Lu == Convert.ToInt32('t'))
                     {
-                        carac_Lu = fichier.ReadByte();
+                        carac_Lu = obj[i];
+                        i++;
                         if (carac_Lu == Convert.ToInt32(' '))
                         {
                             nbtextures++;
                             // Il s'agit d'une coordonnée de texture
-                            gotonextvalue(ref fichier);
-                            x = getfloat(ref fichier);
-                            gotonextvalue(ref fichier);
-                            y = getfloat(ref fichier);
+                            gotonextvalue(ref i, obj);
+                            x = getfloat(ref i, obj);
+                            gotonextvalue(ref i, obj);
+                            y = getfloat(ref i, obj);
                             ListeCoordTextures.Add(new Vector2(x, y));
                         }
-                        else gotonextvalue(ref fichier);
                     }
                     else if (carac_Lu == Convert.ToInt32('n'))
                     {
-                        carac_Lu = fichier.ReadByte();
+                        carac_Lu = obj[i];
+                        i++;
                         if (carac_Lu == Convert.ToInt32(' '))
                         {
                             nbnormales++;
                             // Il s'agit d'une normale
-                            gotonextvalue(ref fichier);
-                            x = getfloat(ref fichier);
-                            gotonextvalue(ref fichier);
-                            y = getfloat(ref fichier);
-                            gotonextvalue(ref fichier);
-                            z = getfloat(ref fichier);
+                            gotonextvalue(ref i, obj);
+                            x = getfloat(ref i, obj);
+                            gotonextvalue(ref i, obj);
+                            y = getfloat(ref i, obj);
+                            gotonextvalue(ref i, obj);
+                            z = getfloat(ref i, obj);
                             ListeNormales.Add(new Vector4(x, y, z, 1.0f));
                         }
-                        else gotonextvalue(ref fichier);
                     }
                     else if (carac_Lu == Convert.ToInt32(' '))
                     {
                         nbsommets++;
                         // Il s'agit d'une coordonnée de sommet
-                        gotonextvalue(ref fichier);
-                        x = getfloat(ref fichier);
-                        gotonextvalue(ref fichier);
-                        y = getfloat(ref fichier);
-                        gotonextvalue(ref fichier);
-                        z = getfloat(ref fichier);
+                        gotonextvalue(ref i, obj);
+                        x = getfloat(ref i, obj);
+                        gotonextvalue(ref i, obj);
+                        y = getfloat(ref i, obj);
+                        gotonextvalue(ref i, obj);
+                        z = getfloat(ref i, obj);
                         ListeCoordSommets.Add(new Vector4(x, y, z, 1.0f));
                     }
                 }
                 else if (carac_Lu == Convert.ToInt32('f'))
                 {
-                    carac_Lu = fichier.ReadByte();
+                    carac_Lu = obj[i];
+                    i++;
                     if (carac_Lu == ' ')
                     {
                         nbfaces++;
                         // Il s'agit d'une face
 
                         // Sommet 1 2 3
-                        for (int i = 0; i < 3; i++)
+                        for (int k = 0; k < 3; k++)
                         {
-                            gotonextvalue(ref fichier);
-                            x = getfloat(ref fichier);
-                            carac_Lu = fichier.ReadByte();
+                            gotonextvalue(ref i, obj);
+                            x = getfloat(ref i, obj);
+                            carac_Lu = obj[i];
+                            i++;
                             if (carac_Lu == Convert.ToInt32('/'))
                             {
-                                gotonextvalue(ref fichier);
-                                y = getfloat(ref fichier);
-                                gotonextvalue(ref fichier);
-                                z = getfloat(ref fichier);
+                                gotonextvalue(ref i, obj);
+                                y = getfloat(ref i, obj);
+                                gotonextvalue(ref i, obj);
+                                z = getfloat(ref i, obj);
                             }
-                            else fichier.Position--;
+                            else i--;
 
                             ListeVertex.Add(
                                 new Vertex()
@@ -177,19 +205,63 @@ namespace MiniCube
                                         ListeCoordTextures[Convert.ToInt32(y) - 1][0],
                                         ListeCoordTextures[Convert.ToInt32(y) - 1][1]
                                     ),
-                                    Color = new Vector4(couleur[i].Red, couleur[i].Green, couleur[i].Blue, 1.0f),
+                                    Color = new Vector4(couleur[k].Red, couleur[k].Green, couleur[k].Blue, 1.0f),
                                 }
                             );
                         }
                     }
                 }
-                Console.WriteLine("\t{0} % lu", Convert.ToSingle(fichier.Position) / Convert.ToSingle(fichier.Length) * 100);
-                Console.CursorTop--;
-                gotonextline(ref fichier);
-                carac_Lu = fichier.ReadByte();
+                else if (carac_Lu == Convert.ToInt32('m'))
+                {
+                    carac_Lu = obj[i];
+                    i++;
+                    if (carac_Lu == 't')
+                    {
+                        carac_Lu = obj[i];
+                        i++;
+                        if (carac_Lu == 'l')
+                        {
+                            carac_Lu = obj[i];
+                            i++;
+                            if (carac_Lu == 'l')
+                            {
+                                carac_Lu = obj[i];
+                                i++;
+                                if (carac_Lu == 'i')
+                                {
+                                    carac_Lu = obj[i];
+                                    i++;
+                                    if (carac_Lu == 'b')
+                                    {
+                                        carac_Lu = obj[i];
+                                        i++;
+                                        if (carac_Lu == ' ')
+                                        {
+                                            //Console.WriteLine("# Material: {0}", getstring(ref i, obj));
+
+                                            // Ouvrir MTLLIB
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (precedent_pourcentage != Convert.ToInt32(Convert.ToSingle(i) / Convert.ToSingle(obj.Length) * 100))
+                {
+                    precedent_pourcentage = Convert.ToInt32(Convert.ToSingle(i) / Convert.ToSingle(obj.Length) * 100);
+                    Console.WriteLine("\t{0} % lu", precedent_pourcentage);
+                    Console.CursorTop--;
+                }
+                gotonextline(ref i, obj);
+                if (i != obj.Length)
+                {
+                    carac_Lu = obj[i];
+                    i++;
+                }
+                else carac_Lu = -1;
             }
-            Console.WriteLine("# Le fichier {0} a été lu", path);
-            fichier.Close();
+
             return ListeVertex.ToArray();
         }
     }
