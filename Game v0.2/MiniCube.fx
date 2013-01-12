@@ -66,6 +66,9 @@ float4 PS( PS_IN input ) : COLOR
 
 technique Main {
 	pass P0 {
+        AlphaBlendEnable = TRUE;
+        DestBlend = INVSRCALPHA;
+        SrcBlend = SRCALPHA;
 		VertexShader = compile vs_2_0 VS();
         PixelShader  = compile ps_2_0 PS();
 	}

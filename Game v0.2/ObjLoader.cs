@@ -184,8 +184,17 @@ namespace MiniCube
                             i++;
                             if (carac_Lu == Convert.ToInt32('/'))
                             {
-                                gotonextvalue(ref i, obj);
-                                y = getfloat(ref i, obj);
+                                carac_Lu = obj[i];
+                                if (carac_Lu == '/')
+                                {
+                                    y = 1.0f;
+                                    ListeCoordTextures.Add(new Vector2(1, 1));
+                                }
+                                else
+                                {
+                                    gotonextvalue(ref i, obj);
+                                    y = getfloat(ref i, obj);
+                                }
                                 gotonextvalue(ref i, obj);
                                 z = getfloat(ref i, obj);
                             }
