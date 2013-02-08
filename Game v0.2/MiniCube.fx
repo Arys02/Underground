@@ -19,12 +19,17 @@
 // THE SOFTWARE.
 
 
+float4 AmbientColor = float4(1, 1, 1, 1);
+float AmbientIntensity = 1; // 0.1
+float3 DiffuseLightDirection = float3(1, 0, 0);
+float3 ViewVector = float3(1, 0, 0);
 
 struct VS_IN
 {
 	float4 pos : POSITION;
 	float2 tex : TEXCOORD0;
 	float4 col : COLOR0;
+	float4 normal : NORMAL;
 };
 
 struct PS_IN
@@ -59,7 +64,24 @@ PS_IN VS( VS_IN input )
 
 float4 PS( PS_IN input ) : COLOR
 {
-	return tex2D(s_2D, input.tex);
+	//float3 light = normalize(DiffuseLightDirection);
+	//float3 normal = normalize(input.Normal);
+    //float3 r = normalize(2 * dot(light, normal) * normal - light);
+    //float3 v = normalize(mul(normalize(ViewVector), World));
+	
+	/*float3 n = normalize(input.normal);
+	float3 h = normalize(input.halfVector);
+	float3 l = normalize(input.lightDir);
+	
+	float nDotL = saturate(dot(n, l));
+	float nDotH = saturate(dot(n, h));
+	float power = (nDotL == 0.0f) ? 0.0f : pow(nDotH, material.shininess);   
+
+	float4 color = (material.ambient * (globalAmbient + light.ambient)) +
+		(IN.diffuse * nDotL) + (IN.specular * power);*/
+
+	//return tex2D(s_2D, input.tex);
+	return AmbientColor * AmbientIntensity * tex2D(s_2D, input.tex);
 	//return input.col;
 }
 
