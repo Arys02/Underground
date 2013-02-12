@@ -33,13 +33,13 @@ namespace Underground
                                 Matrix.RotationAxis(new Vector3(0, 0, 1), angle.Z);
         }
 
-        public void orient_camera(Input input)
+        public void orient_camera(Input input, long timer)
         {
-            float[] VitesseRotation = new float[3] { 0.1f, 0.1f, 0.1f };
+            float[] VitesseRotation = new float[3] { 0.002f * timer, 0.002f * timer, 0.002f * timer };
             float[] VitesseTranslation = new float[3] { 
-                Convert.ToSingle((0.5f)),
-                Convert.ToSingle((0.5f)),
-                Convert.ToSingle((0.5f)),
+                0.002f * timer,
+                0.002f * timer,
+                0.002f * timer,
             };
             double produit_scalaire;
 
@@ -48,55 +48,9 @@ namespace Underground
             {
                 Console.WriteLine("Y: {0} \t X: {1} \t Z: {2}", angle.Y, angle.X, angle.Z);
             }
-            if (input.KeysDown.Contains(Keys.T)) // Reset
-            {
-                angle = new Vector3(Convert.ToSingle(Math.PI / 10), Convert.ToSingle(2 * Math.PI / 2), 0);
-                camera_altere = true;
-            }
             if (input.KeysDown.Contains(Keys.R)) // Reset
             {
                 angle = new Vector3(0, 0, 0);
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.E)) // Reset
-            {
-                angle = new Vector3(0, Convert.ToSingle(Math.PI/4), 0);
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.NumPad9))
-            {
-                angle.Z += VitesseRotation[0];
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.NumPad3))
-            {
-                angle.Z -= VitesseRotation[0];
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.NumPad8))
-            {
-                angle.Y += VitesseRotation[0];
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.NumPad2))
-            {
-                angle.Y -= VitesseRotation[0];
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.NumPad7))
-            {
-                angle.X += VitesseRotation[0];
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.NumPad1))
-            {
-                angle.X -= VitesseRotation[0];
-                camera_altere = true;
-            }
-            if (input.KeysDown.Contains(Keys.Enter))
-            {
-               // Console.WriteLine("Equal");
-                angle.X = angle.Z;
                 camera_altere = true;
             }
             /************ END ************/
@@ -136,7 +90,6 @@ namespace Underground
                 camera_altere = true;
             }
 
-            /************ EFFECTUER LES PROJECTIONS ************/
             if (input.KeysDown.Contains(Keys.Right))
             {
                 angle.Y -= VitesseRotation[1];
@@ -171,22 +124,13 @@ namespace Underground
             }
             if (input.KeysDown.Contains(Keys.PageUp))
             {
-                produit_scalaire = (Math.Cos(angle.Y)) * VitesseRotation[0];
-                angle.X += Convert.ToSingle(produit_scalaire);
-
-                produit_scalaire = (Math.Sin(angle.Y)) * VitesseRotation[0];
-                angle.Z += Convert.ToSingle(produit_scalaire);
+                angle.X += VitesseRotation[0];
                // Console.WriteLine("Montez !");
                 camera_altere = true;
             }
             if (input.KeysDown.Contains(Keys.PageDown))
             {
-                produit_scalaire = (Math.Cos(angle.Y)) * VitesseRotation[0];
-                angle.X -= Convert.ToSingle(produit_scalaire);
-
-
-                produit_scalaire = (Math.Sin(angle.Y)) * VitesseRotation[0];
-                angle.Z -= Convert.ToSingle(produit_scalaire);
+                angle.X -= VitesseRotation[0];
                // Console.WriteLine("Coulez !");
                 camera_altere = true;
             }
@@ -204,7 +148,7 @@ namespace Underground
                                 Matrix.RotationAxis(new Vector3(0, 1, 0), angle.Y) *
                                 Matrix.RotationAxis(new Vector3(1, 0, 0), angle.X) *
                                 Matrix.RotationAxis(new Vector3(0, 0, 1), angle.Z);
-               // camera_altere = false;
+               //camera_altere = false;
             }
         }
     }

@@ -108,8 +108,8 @@ namespace Underground
 
             Color3[] couleur = new Color3[3] { 
                 Color.White.ToColor3(),
-                Color.Green.ToColor3(),
-                Color.Green.ToColor3()
+                Color.White.ToColor3(),
+                Color.White.ToColor3()
             };
 
             int carac_Lu = obj[i];
@@ -177,12 +177,12 @@ namespace Underground
                         // Il s'agit d'une face
 
                         // Sommet 1 2 3
-                        float[] values = new float[8];
+                        float[] values = new float[4*3]; // 4*2 sans NORMAL
                         for (int k = 0; k < 3; k++)
                         {
                             gotonextvalue(ref i, obj);
                             x = getfloat(ref i, obj);
-                            values[k * 2] = x;
+                            values[k * 3] = x;
                             carac_Lu = obj[i];
                             i++;
                             if (carac_Lu == Convert.ToInt32('/'))
@@ -198,9 +198,10 @@ namespace Underground
                                     gotonextvalue(ref i, obj);
                                     y = getfloat(ref i, obj);
                                 }
-                                values[k * 2 + 1] = y;
+                                values[k * 3 + 1] = y;
                                 gotonextvalue(ref i, obj);
                                 z = getfloat(ref i, obj);
+                                values[k * 3 + 2] = z;
                             }
                             else i--;
                         }
@@ -210,7 +211,7 @@ namespace Underground
                             int k = 3;
                             gotonextvalue(ref i, obj);
                             x = getfloat(ref i, obj);
-                            values[k * 2] = x;
+                            values[k * 3] = x;
                             carac_Lu = obj[i];
                             i++;
                             if (carac_Lu == Convert.ToInt32('/'))
@@ -226,9 +227,10 @@ namespace Underground
                                     gotonextvalue(ref i, obj);
                                     y = getfloat(ref i, obj);
                                 }
-                                values[k * 2 + 1] = y;
+                                values[k * 3 + 1] = y;
                                 gotonextvalue(ref i, obj);
                                 z = getfloat(ref i, obj);
+                                values[k * 3 + 2] = z;
                             }
                             else i--;
                         }
@@ -237,17 +239,20 @@ namespace Underground
                                 new Vertex()
                                 {
                                     Position = new Vector4(
-                                        ListeCoordSommets[Convert.ToInt32(values[k*2]) - 1][0] + referentiel.X,
-                                        ListeCoordSommets[Convert.ToInt32(values[k * 2]) - 1][1] + referentiel.Y,
-                                        ListeCoordSommets[Convert.ToInt32(values[k * 2]) - 1][2] + referentiel.Z,
-                                        ListeCoordSommets[Convert.ToInt32(values[k * 2]) - 1][3] + referentiel.W
+                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][0] + referentiel.X,
+                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][1] + referentiel.Y,
+                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][2] + referentiel.Z,
+                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][3] + referentiel.W
                                     ),
                                     //Color = new Color(couleur[i].Red, couleur[i].Green, couleur[i].Blue, 1.0f),
                                     CoordTextures = new Vector2(
-                                        ListeCoordTextures[Convert.ToInt32(values[k * 2 + 1]) - 1][0],
-                                        ListeCoordTextures[Convert.ToInt32(values[k * 2 + 1]) - 1][1]
+                                        ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][0],
+                                        ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][1]
                                     ),
                                     Color = new Vector4(couleur[k].Red, couleur[k].Green, couleur[k].Blue, 1.0f),
+
+                                    // NORMAL
+                                    Normal = ListeNormales[Convert.ToInt32(values[k * 3 + 2]) - 1]
                                 }
                             );
                         }
@@ -261,17 +266,19 @@ namespace Underground
                                         new Vertex()
                                         {
                                             Position = new Vector4(
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 2]) - 1][0] + referentiel.X,
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 2]) - 1][1] + referentiel.Y,
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 2]) - 1][2] + referentiel.Z,
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 2]) - 1][3] + referentiel.W
+                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][0] + referentiel.X,
+                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][1] + referentiel.Y,
+                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][2] + referentiel.Z,
+                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][3] + referentiel.W
                                             ),
                                             //Color = new Color(couleur[i].Red, couleur[i].Green, couleur[i].Blue, 1.0f),
                                             CoordTextures = new Vector2(
-                                                ListeCoordTextures[Convert.ToInt32(values[k * 2 + 1]) - 1][0],
-                                                ListeCoordTextures[Convert.ToInt32(values[k * 2 + 1]) - 1][1]
+                                                ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][0],
+                                                ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][1]
                                             ),
                                             Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
+                                            // NORMAL
+                                            Normal = ListeNormales[Convert.ToInt32(values[k * 3 + 2]) - 1]
                                         }
                                     );
                                 }
