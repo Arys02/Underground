@@ -19,24 +19,16 @@
 // THE SOFTWARE.
 
 
-
-struct VS_IN
-{
-	float4 pos : POSITION;
-	float2 tex : TEXCOORD0;
-	float4 col : COLOR0;
-};
-
-struct PS_IN
-{
-	float4 pos : POSITION;
-	float2 tex : TEXCOORD0;
-	float4 col : COLOR0;
-};
-
+float4 AmbientColor = float4(1, 1, 1, 1);
+float4 DiffuseColor = float4(1, 1, 1, 1);
+float AmbientIntensity = 1; // 0.1
+float3 DiffuseLightDirection = float3(1, 0, 0);
+float3 ViewVector = float3(1, 0, 0);
+bool Lumiere = true;
 texture Textu;
 sampler2D s_2D;
 float4x4 worldViewProj;
+
 
 sampler S0 = sampler_state
 {
@@ -46,30 +38,61 @@ sampler S0 = sampler_state
     MipFilter = LINEAR;
 };
 
-PS_IN VS( VS_IN input )
+struct VertexShaderInput
 {
-	PS_IN output = (PS_IN)0;
+    float4 Position : POSITION0;  
+	float2 tex : TEXCOORD0;
+	float4 col : COLOR0;  
+    float4 Normal : NORMAL0;
+};
+struct VertexShaderOutput
+{
+    float4 Position : POSITION0;
+	float2 tex : TEXCOORD0;
+    float4 Color : COLOR0;
+};
+
+VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
+{
 	
-	output.pos = mul(input.pos, worldViewProj);
-	output.col = input.col;
+    VertexShaderOutput output;
+
+    output.Position = mul(input.Position, worldViewProj);
+
+    float4 normal = input.Normal;
+    float lightIntensity = dot(normal, DiffuseLightDirection);
 	output.tex = input.tex;
-	
-	return output;
+	if (Lumiere)
+	{
+		output.Color = saturate ( AmbientColor * input.col * DiffuseColor * lightIntensity);
+	}
+	else
+	{
+		output.Color = saturate (AmbientColor * input.col * DiffuseColor);
+	}
+	output.Color[3] = 1;
+
+    return output;
 }
 
-float4 PS( PS_IN input ) : COLOR
+
+float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-	return tex2D(s_2D, input.tex);
-	//return input.col;
+	float4 finalColor = input.Color * tex2D(s_2D, input.tex);
+	float4 outputColor = finalColor;
+    /* FILTRE SEPIA
+	outputColor.r = (finalColor.r * 0.393) + (finalColor.g * 0.769) + (finalColor.b * 0.189);
+    outputColor.g = (finalColor.r * 0.349) + (finalColor.g * 0.686) + (finalColor.b * 0.168);    
+    outputColor.b = (finalColor.r * 0.272) + (finalColor.g * 0.534) + (finalColor.b * 0.131);*/
+	return outputColor;
 }
-
 
 technique Main {
 	pass P0 {
         AlphaBlendEnable = TRUE;
         DestBlend = INVSRCALPHA;
         SrcBlend = SRCALPHA;
-		VertexShader = compile vs_2_0 VS();
-        PixelShader  = compile ps_2_0 PS();
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader  = compile ps_2_0 PixelShaderFunction();
 	}
 }

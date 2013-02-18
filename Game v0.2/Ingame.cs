@@ -21,6 +21,7 @@ namespace Underground
 {
     static class Ingame
     {
+        public static PrimitiveType PrimType = PrimitiveType.TriangleList;
         public static void recup_env(ref Device device, ref List<VertexBuffer> vertices, ref List<Vertex[]> ListeVerticesFinal, ref List<int> ModelSizes, ref List<Byte[]> ModelFiles, int nbmodels)
         {
             int nbmodelfaces = 0;
@@ -69,12 +70,13 @@ namespace Underground
             EffectHandle pass = effect.GetPass(technique, 0);
             Stopwatch clock = new Stopwatch();
             clock.Start();
-            long previous_time = clock.ElapsedMilliseconds;
 
-            string path = @"Ressources\Game\Firstlevel.obj";
+            //string path = @"Ressources\Game\Firstlevel.obj";
             //string path = @"E:\TEST SOUTENANCE\Couloir_Maya2.obj";
             //string path = @"C:\Users\b95093cf\Desktop\untitled.obj";
             //string path = @"Ressources\Game\Lighthouse.obj";
+            //string path = @"Ressources\Game\boxman.obj";
+            string path = @"Ressources\Game\ct0.obj";
             Byte[] fichier = File.ReadAllBytes(path);
             for (int i = 0; i < nbmodels; i++)
             {
@@ -119,45 +121,44 @@ namespace Underground
                 Vertices[i].Unlock();
                 //SizeModels[i] = 150;
             }
+
+            effect.SetValue("AmbientColor", new Vector4(1f, 1f, 1f, 1f));
+            effect.SetValue("DiffuseColor", new Vector4(1f, 1f, 1f, 1f));
+            effect.SetValue("DiffuseLightDirection", new Vector4(1f, 1f, 3f, 1f));
+            effect.SetValue("Lumiere", true);
+            /*
+            effect.SetValue("vecLightPos",position);
+            effect.SetValue("LightRange",30.0f);
+            effect.SetValue("LightColor",new Vector4(255,255,255,255));*/
+
+            effect.Technique = technique;
+            //Program.device.SetRenderState(RenderState.CullMode, true);
+
+            Int64 previous_time = clock.ElapsedTicks;
+
             RenderLoop.Run(Program.form, () =>
             {
+                Program.device.BeginScene();
                 //DrawingPoint Center; = form.ClientSize.Height
                 //device.SetCursorPosition(form.ClientSize.Width / 2, form.ClientSize.Height / 2);
 
-                //device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, new ColorBGRA(0, 0, 0, 1f), 1.0f, 0);
                 Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-                Program.device.BeginScene();
-                effect.Technique = technique;
                 effect.Begin();
                 effect.BeginPass(0);
-                //effect.SetValue("AmbientColor", new Vector4(0.5f, 0.5f, 0.5f, 1));
-                Program.device.SetCursorPosition(new DrawingPoint(1, 1), true);
 
+                macamera.orient_camera(input, clock.ElapsedTicks - previous_time);
+                previous_time = clock.ElapsedTicks;
 
-                macamera.orient_camera(input, clock.ElapsedMilliseconds);
-                clock.Reset();
-                clock.Start();
-
+                worldViewProj = macamera.view * proj;
+                effect.SetValue("worldViewProj", worldViewProj);
                 for (int i = 0; i < VerticesCount; i++)
                 {
                     Program.device.SetStreamSource(0, Vertices[i], 0, Utilities.SizeOf<Vertex>());
                     Program.device.SetTexture(0, Texture_ressource[i]);
-                    worldViewProj = macamera.view * proj;
-                    Program.device.SetRenderState(RenderState.CullMode, true);
-                    //Program.device.SetRenderState(RenderState.FillMode, FillMode.Wireframe);
-                    //device.SetRenderState(RenderState.FillMode, true);
-                    //device.DrawPrimitives(PrimitiveType.TriangleList, 300000, SizeModels[i]-300000);
-                    //device.DrawPrimitives(PrimitiveType.TriangleList, 0, 300000);
-                    effect.SetValue("worldViewProj", worldViewProj);
-                    effect.SetValue("AmbientColor", new Vector4(0.5f,0.5f,0.5f,1f));
-                    effect.SetValue("DiffuseColor", new Vector4(0.5f, 1f, 1f, 1f));
-                    effect.SetValue("DiffuseLightDirection", new Vector4(0.5f, 0.7f, 1f, 1f));
-                    Program.device.DrawPrimitives(PrimitiveType.TriangleList, 0, SizeModels[i]);
-                    //Vertices[i].Dispose();
+                    Program.device.DrawPrimitives(PrimType, 0, SizeModels[i]);
                 }
                 effect.EndPass();
                 effect.End();
-
                 Program.device.EndScene();
                 Program.device.Present();
             });

@@ -35,11 +35,11 @@ namespace Underground
 
         public void orient_camera(Input input, long timer)
         {
-            float[] VitesseRotation = new float[3] { 0.002f * timer, 0.002f * timer, 0.002f * timer };
+            float[] VitesseRotation = new float[3] { 0.000002f * timer, 0.000002f * timer, 0.000002f * timer };
             float[] VitesseTranslation = new float[3] { 
-                0.002f * timer,
-                0.002f * timer,
-                0.002f * timer,
+                0.000002f * timer,
+                0.000002f * timer,
+                0.000002f * timer,
             };
             double produit_scalaire;
 
@@ -53,6 +53,9 @@ namespace Underground
                 angle = new Vector3(0, 0, 0);
                 camera_altere = true;
             }
+            if (input.KeysDown.Contains(Keys.F1)) Ingame.PrimType = PrimitiveType.LineList;
+            if (input.KeysDown.Contains(Keys.F2)) Ingame.PrimType = PrimitiveType.PointList;
+            if (input.KeysDown.Contains(Keys.F3)) Ingame.PrimType = PrimitiveType.TriangleList;
             /************ END ************/
 
             if (input.KeysDown.Contains(Keys.Space))
@@ -68,7 +71,7 @@ namespace Underground
                // Console.WriteLine("Vers le bas !");
                 camera_altere = true;
             }
-
+            
             view = Matrix.LookAtLH(position,new Vector3(0, 0, 0), Vector3.UnitY);
 
             if (input.KeysDown.Contains(Keys.Up) || input.KeysDown.Contains(Keys.Z))
