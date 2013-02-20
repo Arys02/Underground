@@ -1,64 +1,36 @@
-// Copyright (c) 2010-2012 SharpDX - Alexandre Mutel
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
-
-
-/*
-
-float4 PS( PS_IN input ) : COLOR
-{
-	float3 light = normalize(DiffuseLightDirection);
-	//float3 normal = normalize(input.Normal);
-    //float3 r = normalize(2 * dot(light, normal) * normal - light);
-    //float3 v = normalize(mul(normalize(ViewVector), World));
-	
-	//float3 n = normalize(input.normal);
-	//float3 h = normalize(input.halfVector);
-	//float3 l = normalize(input.lightDir);
-	
-	//float nDotL = saturate(dot(n, l));
-	//float nDotH = saturate(dot(n, h));
-	//float power = (nDotL == 0.0f) ? 0.0f : pow(nDotH, material.shininess);   
-
-	//float4 color = (material.ambient * (globalAmbient + light.ambient)) +
-	//	(IN.diffuse * nDotL) + (IN.specular * power);
-
-	//return tex2D(s_2D, input.tex);
-	return AmbientColor * AmbientIntensity * tex2D(s_2D, input.tex);
-	//return input.col;
-}*/
-
-
-
-float4 AmbientColor = float4(1, 1, 1, 1);
+/*float4 AmbientColor = float4(1, 1, 1, 1);
 float4 DiffuseColor = float4(1, 1, 1, 1);
 float AmbientIntensity = 1; // 0.1
-float3 DiffuseLightDirection = float3(1, 0, 0);
+float4 DiffuseLightDirection = float4(1, 0, 0, 1);
 float3 ViewVector = float3(1, 0, 0);
+bool Lumiere = true;
 texture Textu;
 sampler2D s_2D;
-float4x4 worldViewProj;
+float4x4 worldViewProj; // viewprojection
+float4 PositionPLight;*/
+
+float4x4 World;
+float4x4 View;
+float4x4 Projection;
+
+texture DiffuseTexture;
+float4 CameraPos;
+float4 LightPosition;
+float4 LightDiffuseColor; // intensity multiplier
+float4 LightSpecularColor; // intensity multiplier
+float LightDistanceSquared;
+float4 DiffuseColor;
+float4 AmbientLightColor;
+float4 EmissiveColor;
+float4 SpecularColor;
+float SpecularPower;
+bool Sepia = true;
+
+sampler2D s_2D;
 
 sampler S0 = sampler_state
 {
-    Texture = (Textu);
+    Texture = (DiffuseTexture);
     MinFilter = ANISOTROPIC; //LINEAR;
     MagFilter = ANISOTROPIC; //LINEAR;
     MipFilter = LINEAR;
@@ -76,28 +48,48 @@ struct VertexShaderOutput
     float4 Position : POSITION0;
 	float2 tex : TEXCOORD0;
     float4 Color : COLOR0;
+	float4 Normal : TEXCOORD1;
+	float4 WorldPos : TEXCOORD2;
 };
+
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
-	
-    VertexShaderOutput output;
+	VertexShaderOutput output;
 
-    output.Position = mul(input.Position, worldViewProj);
-
-    float4 normal = input.Normal;
-    float lightIntensity = dot(normal, DiffuseLightDirection);
+	// "Multiplication will be done in the pre-shader - so no cost per vertex"
+	float4 posWorld = mul(input.Position, World);
+	float4x4 viewprojection = mul(View, Projection);
+	output.Position = mul(posWorld, viewprojection);
 	output.tex = input.tex;
-    output.Color = saturate ( AmbientColor * input.col * DiffuseColor * lightIntensity);
-	output.Color[3] = 1;
 
-    return output;
+	// Passing information on to do both specular AND diffuse calculation in pixel shader
+	output.Normal = mul(input.Normal, (float4x4)World);
+	output.WorldPos = posWorld;
+	output.Color = input.col;
+	return output;
 }
-
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    return input.Color * tex2D(s_2D, input.tex);
+	float4 lightDir = normalize(input.WorldPos - LightPosition); // per pixel diffuse lighting
+	float diffuseLighting = saturate(dot(input.Normal, -lightDir));
+	diffuseLighting *= (LightDistanceSquared / dot(LightPosition - input.WorldPos, LightPosition - input.WorldPos));
+	float4 h = normalize(normalize(CameraPos - input.WorldPos) - lightDir);
+	float specLighting = pow(saturate(dot(h, input.Normal)), SpecularPower);
+	float4 texel = tex2D(s_2D, input.tex);
+	
+	float4 abc = texel.xyzw * DiffuseColor * LightDiffuseColor * min(diffuseLighting,float4(10,10,10,1)) * 0.6;
+	float4 abcd = (SpecularColor * LightSpecularColor * specLighting * 0.5);
+	float4 outputColor = (saturate(AmbientLightColor + abc + abcd));
+	float4 finalColor = outputColor;
+	if (Sepia)
+	{
+		finalColor.r = (outputColor.r * 0.393) + (outputColor.g * 0.769) + (outputColor.b * 0.189);
+		finalColor.g = (outputColor.r * 0.349) + (outputColor.g * 0.686) + (outputColor.b * 0.168);    
+		finalColor.b = (outputColor.r * 0.272) + (outputColor.g * 0.534) + (outputColor.b * 0.131);
+	}
+	return finalColor;
 }
 
 technique Main {

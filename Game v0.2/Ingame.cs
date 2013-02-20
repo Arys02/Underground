@@ -22,6 +22,7 @@ namespace Underground
     static class Ingame
     {
         public static PrimitiveType PrimType = PrimitiveType.TriangleList;
+        public static bool Sepia = false;
         public static void recup_env(ref Device device, ref List<VertexBuffer> vertices, ref List<Vertex[]> ListeVerticesFinal, ref List<int> ModelSizes, ref List<Byte[]> ModelFiles, int nbmodels)
         {
             int nbmodelfaces = 0;
@@ -52,7 +53,7 @@ namespace Underground
         static public void ingame()
         {
             Input input = new Input(Program.form);
-            const int nbmodels = 1;
+            const int nbmodels = 3;
             int VerticesCount = 0;
             List<Byte[]> ModelFiles = new List<Byte[]>();
             List<Vertex[]> ListeVerticesFinal = new List<Vertex[]>();
@@ -60,7 +61,7 @@ namespace Underground
             List<int> SizeModels = new List<int>();
             Vertex[][] VerticesFinal = new Vertex[nbmodels][];
             Texture[] Texture_ressource = new Texture[nbmodels];
-            Vector3 position = new Vector3(0, -10, 20), angle = new Vector3(0f, 0f, 0f);
+            //Vector3 position = new Vector3(0, -10, 20), angle = new Vector3(0f, 0f, 0f);
             Matrix view = Matrix.LookAtLH(new Vector3(0, 0, -0.00002f), new Vector3(0, 0, 0), Vector3.UnitY);
             Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 9999.0f);
             Matrix viewProj = Matrix.Multiply(view, proj);
@@ -74,9 +75,10 @@ namespace Underground
             //string path = @"Ressources\Game\Firstlevel.obj";
             //string path = @"E:\TEST SOUTENANCE\Couloir_Maya2.obj";
             //string path = @"C:\Users\b95093cf\Desktop\untitled.obj";
-            //string path = @"Ressources\Game\Lighthouse.obj";
+            string path = @"Ressources\Game\Lighthouse.obj";
             //string path = @"Ressources\Game\boxman.obj";
-            string path = @"Ressources\Game\ct0.obj";
+            //string path = @"Ressources\Game\ct0.obj";
+            
             Byte[] fichier = File.ReadAllBytes(path);
             for (int i = 0; i < nbmodels; i++)
             {
@@ -122,27 +124,35 @@ namespace Underground
                 //SizeModels[i] = 150;
             }
 
-            effect.SetValue("AmbientColor", new Vector4(1f, 1f, 1f, 1f));
-            effect.SetValue("DiffuseColor", new Vector4(1f, 1f, 1f, 1f));
-            effect.SetValue("DiffuseLightDirection", new Vector4(1f, 1f, 3f, 1f));
-            effect.SetValue("Lumiere", true);
+            /*effect.SetValue("AmbientColor", new Vector4(0.4f, 0.4f, 0.4f, 1f));
+            effect.SetValue("DiffuseColor", new Vector4(0.5f, 0.7f, 0.8f, 1f));
+            effect.SetValue("DiffuseLightDirection", new Vector4(1f, 1f, 3f, 1f));*/
+            effect.SetValue("EmissiveColor", new Vector4(0f, 0f, 0f, 1f));
+            effect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 1f));
+            effect.SetValue("SpecularColor", new Vector4(0.5f, 0.5f, 0.5f, 1f));
+            effect.SetValue("DiffuseColor", new Vector4(0.5f, 0.5f, 0.5f, 1));
+            effect.SetValue("LightDistanceSquared", 5f);
+            effect.SetValue("LightDiffuseColor", new Vector4(0.1f, 0.1f, 0.1f, 1));
+            //effect.SetValue("Lumiere", true);
             /*
             effect.SetValue("vecLightPos",position);
             effect.SetValue("LightRange",30.0f);
             effect.SetValue("LightColor",new Vector4(255,255,255,255));*/
 
             effect.Technique = technique;
-            //Program.device.SetRenderState(RenderState.CullMode, true);
-
+            //Program.device.SetRenderState(RenderState.CullMode, false);
             Int64 previous_time = clock.ElapsedTicks;
-
+            effect.SetValue("World", Matrix.Identity);
+            effect.SetValue("Projection", proj);
             RenderLoop.Run(Program.form, () =>
             {
+
                 Program.device.BeginScene();
                 //DrawingPoint Center; = form.ClientSize.Height
                 //device.SetCursorPosition(form.ClientSize.Width / 2, form.ClientSize.Height / 2);
 
                 Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                //effect.SetValue("LightPosition", new Vector4(-macamera.position.X, macamera.position.Y, -macamera.position.Z, 1));
                 effect.Begin();
                 effect.BeginPass(0);
 
@@ -150,7 +160,13 @@ namespace Underground
                 previous_time = clock.ElapsedTicks;
 
                 worldViewProj = macamera.view * proj;
-                effect.SetValue("worldViewProj", worldViewProj);
+                //effect.SetValue("worldViewProj", worldViewProj);
+                
+                effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
+                effect.SetValue("LightPosition", new Vector4(-macamera.position, 1));
+                effect.SetValue("View", macamera.view);
+                effect.SetValue("Sepia", Sepia);
+
                 for (int i = 0; i < VerticesCount; i++)
                 {
                     Program.device.SetStreamSource(0, Vertices[i], 0, Utilities.SizeOf<Vertex>());
