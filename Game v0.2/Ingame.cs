@@ -23,6 +23,7 @@ namespace Underground
     {
         public static PrimitiveType PrimType = PrimitiveType.TriangleList;
         public static bool Sepia = false;
+        public static bool Following_light = true;
         public static void recup_env(ref Device device, ref List<VertexBuffer> vertices, ref List<Vertex[]> ListeVerticesFinal, ref List<int> ModelSizes, ref List<Byte[]> ModelFiles, int nbmodels)
         {
             int nbmodelfaces = 0;
@@ -53,7 +54,7 @@ namespace Underground
         static public void ingame()
         {
             Input input = new Input(Program.form);
-            const int nbmodels = 3;
+            const int nbmodels = 1;
             int VerticesCount = 0;
             List<Byte[]> ModelFiles = new List<Byte[]>();
             List<Vertex[]> ListeVerticesFinal = new List<Vertex[]>();
@@ -63,12 +64,14 @@ namespace Underground
             Texture[] Texture_ressource = new Texture[nbmodels];
             //Vector3 position = new Vector3(0, -10, 20), angle = new Vector3(0f, 0f, 0f);
             Matrix view = Matrix.LookAtLH(new Vector3(0, 0, -0.00002f), new Vector3(0, 0, 0), Vector3.UnitY);
-            Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 9999.0f);
+            Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 100.0f);
             Matrix viewProj = Matrix.Multiply(view, proj);
             Matrix worldViewProj = viewProj;
             Effect effect = Effect.FromFile(Program.device, "MiniCube.fx", ShaderFlags.None);
             EffectHandle technique = effect.GetTechnique(0);
             EffectHandle pass = effect.GetPass(technique, 0);
+            Camera macamera = new Camera();
+            Vector3 position_Light = -macamera.position;
             Stopwatch clock = new Stopwatch();
             clock.Start();
 
@@ -78,6 +81,7 @@ namespace Underground
             string path = @"Ressources\Game\Lighthouse.obj";
             //string path = @"Ressources\Game\boxman.obj";
             //string path = @"Ressources\Game\ct0.obj";
+            //string path = @"Ressources\Game\couloirtourant.obj";
             
             Byte[] fichier = File.ReadAllBytes(path);
             for (int i = 0; i < nbmodels; i++)
@@ -108,8 +112,6 @@ namespace Underground
                 //Texture_ressource[i] = Texture.FromFile(device, @"Ressources\Game\Images\porte-beton-texture-en-beton_19-136906.png");
             }
 
-            Camera macamera = new Camera();
-
             recup_env(ref Program.device, ref Vertices, ref ListeVerticesFinal, ref SizeModels, ref ModelFiles, nbmodels);
             VerticesCount = ListeVerticesFinal.Count;
             for (int i = 0; i < nbmodels; i++)
@@ -127,12 +129,50 @@ namespace Underground
             /*effect.SetValue("AmbientColor", new Vector4(0.4f, 0.4f, 0.4f, 1f));
             effect.SetValue("DiffuseColor", new Vector4(0.5f, 0.7f, 0.8f, 1f));
             effect.SetValue("DiffuseLightDirection", new Vector4(1f, 1f, 3f, 1f));*/
+
+            // Lumière ambiante
             effect.SetValue("EmissiveColor", new Vector4(0f, 0f, 0f, 1f));
             effect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 1f));
-            effect.SetValue("SpecularColor", new Vector4(0.5f, 0.5f, 0.5f, 1f));
-            effect.SetValue("DiffuseColor", new Vector4(0.5f, 0.5f, 0.5f, 1));
-            effect.SetValue("LightDistanceSquared", 5f);
-            effect.SetValue("LightDiffuseColor", new Vector4(0.1f, 0.1f, 0.1f, 1));
+
+            // Light1
+            effect.SetValue("LightPosition0", new Vector4(position_Light, 1));
+            effect.SetValue("LightDiffuseColor0", new Vector4(0.1f, 0f, 0f, 1));
+            effect.SetValue("LightSpecularColor0", new Vector4(0.1f, 0.1f, 0.1f, 1));
+            effect.SetValue("LightDistanceSquared0", 15f);
+            effect.SetValue("DiffuseColor0", new Vector4(0.5f, 0.5f, 0.5f, 1));
+            effect.SetValue("SpecularColor0", new Vector4(0.5f, 0.5f, 0.5f, 1f));
+            effect.SetValue("SpecularPower0", 1);
+
+            effect.SetValue("LightPosition1", new Vector4(0,2,2, 1));
+            effect.SetValue("LightDiffuseColor1", new Vector4(0.1f, 0.4f, 0.4f, 1));
+            effect.SetValue("LightSpecularColor1", new Vector4(0.1f, 0.1f, 0.1f, 1));
+            effect.SetValue("LightDistanceSquared1", 50f);
+            effect.SetValue("DiffuseColor1", new Vector4(0.5f, 0.5f, 0.5f, 1));
+            effect.SetValue("SpecularColor1", new Vector4(0.5f, 0.5f, 0.5f, 1f));
+            effect.SetValue("SpecularPower1", 1);
+
+            effect.SetValue("LightPosition2", new Vector4(2, 2, 2, 1));
+            effect.SetValue("LightDiffuseColor2", new Vector4(0.1f, 0.4f, 0.1f, 1));
+            effect.SetValue("LightSpecularColor2", new Vector4(0.1f, 0.1f, 0.1f, 1));
+            effect.SetValue("LightDistanceSquared2", 50f);
+            effect.SetValue("DiffuseColor2", new Vector4(0.5f, 0.5f, 0.5f, 1));
+            effect.SetValue("SpecularColor2", new Vector4(0.5f, 0.5f, 0.5f, 1f));
+            effect.SetValue("SpecularPower2", 1);
+
+            /* 
+                float4 LightPosition1;
+                float4 LightDiffuseColor1;
+                float4 LightSpecularColor1;
+                float LightDistanceSquared1;
+                float4 DiffuseColor1;
+                float4 AmbientLightColor1;
+                float4 SpecularColor1;
+                float SpecularPower1;
+             */
+
+
+            //effect.SetValue("g_spot_theta", 4.0f);
+            //effect.SetValue("g_spot_phi", 4.0f);
             //effect.SetValue("Lumiere", true);
             /*
             effect.SetValue("vecLightPos",position);
@@ -144,6 +184,7 @@ namespace Underground
             Int64 previous_time = clock.ElapsedTicks;
             effect.SetValue("World", Matrix.Identity);
             effect.SetValue("Projection", proj);
+            Int64 previous_clignement = clock.ElapsedTicks;
             RenderLoop.Run(Program.form, () =>
             {
 
@@ -155,15 +196,23 @@ namespace Underground
                 //effect.SetValue("LightPosition", new Vector4(-macamera.position.X, macamera.position.Y, -macamera.position.Z, 1));
                 effect.Begin();
                 effect.BeginPass(0);
-
+                /*if (clock.ElapsedTicks - previous_clignement > 100000000) // 1 tick != 100ns (cf diff entre Date et Stopwatch) utiliser Stopwatch.Frequency
+                {
+                    Console.WriteLine(Stopwatch.Frequency);
+                    previous_clignement = clock.ElapsedTicks;
+                }*/
                 macamera.orient_camera(input, clock.ElapsedTicks - previous_time);
+                if (Following_light)
+                {
+                    position_Light = -macamera.position;
+                }
                 previous_time = clock.ElapsedTicks;
 
-                worldViewProj = macamera.view * proj;
+                //worldViewProj = macamera.view * proj;
                 //effect.SetValue("worldViewProj", worldViewProj);
                 
                 effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
-                effect.SetValue("LightPosition", new Vector4(-macamera.position, 1));
+                effect.SetValue("LightPosition0", new Vector4(position_Light, 1));
                 effect.SetValue("View", macamera.view);
                 effect.SetValue("Sepia", Sepia);
 
