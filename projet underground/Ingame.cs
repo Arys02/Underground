@@ -60,13 +60,6 @@ namespace Underground
         //13: Magenta.
         //14: Yellow.
         //15: White.
-        public static void WriteNicely(string op, int c, string msg)
-        {
-            Console.ForegroundColor = (ConsoleColor)c;
-            Console.Write("[" + op + "] ");
-            Console.ResetColor();
-            Console.WriteLine(msg);
-        }
 
         static public void ingame()
         {
@@ -93,7 +86,7 @@ namespace Underground
 
 
             //string path = @"..\..\ct0_new.obj";
-            string path = @"..\..\Lighthouse.obj";
+            string path = @"Ressources\Game\Lighthouse.obj";
 
             //string path = @"Ressources\Game\ct0.obj";
 
@@ -104,7 +97,7 @@ namespace Underground
                 //ModelFiles.Add(fichier);
                 if (i == 0)
                     //Texture_ressource[i] = Texture.FromFile(device, @"Ressources\Game\Images\dev.png");
-                    Texture_ressource[i] = Texture.FromFile(Program.device, @"Beton20.jpg");
+                    Texture_ressource[i] = Texture.FromFile(Program.device, @"Ressources\Game\Images\Beton20.jpg");
                 else if (i == 1)
                 {
                     Texture_ressource[i] = Texture.FromFile(Program.device, @"porte-beton-texture-en-beton_19-136906.jpg");
@@ -136,16 +129,36 @@ namespace Underground
                 Vertices[i].Unlock();
             }
 
-            /*effect.SetValue("AmbientColor", new Vector4(0.4f, 0.4f, 0.4f, 1f));
-            effect.SetValue("DiffuseColor", new Vector4(0.5f, 0.7f, 0.8f, 1f));
-            effect.SetValue("DiffuseLightDirection", new Vector4(1f, 1f, 3f, 1f));*/
+            // Lumière ambiante
             effect.SetValue("EmissiveColor", new Vector4(0f, 0f, 0f, 1f));
             effect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 1f));
-            effect.SetValue("SpecularColor", new Vector4(0.5f, 0.5f, 0.5f, 1f));
-            effect.SetValue("DiffuseColor", new Vector4(0.5f, 0.5f, 0.5f, 1));
-            effect.SetValue("LightDistanceSquared", 250f);
-            effect.SetValue("LightDiffuseColor", new Vector4(0.1f, 0.1f, 0.1f, 1));
-            //effect.SetValue("Lumiere", true);
+
+            // Light1
+            effect.SetValue("LightPosition0", new Vector4(position_Light, 1));
+            effect.SetValue("LightDiffuseColor0", new Vector4(0.1f, 0.1f, 0f, 1));
+            effect.SetValue("LightSpecularColor0", new Vector4(0.1f, 0.1f, 0.1f, 1));
+            effect.SetValue("LightDistanceSquared0", 15f);
+            effect.SetValue("DiffuseColor0", new Vector4(0.5f, 0.5f, 0.5f, 1));
+            effect.SetValue("SpecularColor0", new Vector4(0.5f, 0.5f, 0.5f, 1f));
+            effect.SetValue("SpecularPower0", 1);
+
+            // Light2
+            effect.SetValue("LightPosition1", new Vector4(0, 2, 2, 1));
+            effect.SetValue("LightDiffuseColor1", new Vector4(0.1f, 0.1f, 0.4f, 1));
+            effect.SetValue("LightSpecularColor1", new Vector4(0.1f, 0.1f, 0.1f, 1));
+            effect.SetValue("LightDistanceSquared1", 50f);
+            effect.SetValue("DiffuseColor1", new Vector4(0.5f, 0.5f, 0.5f, 1));
+            effect.SetValue("SpecularColor1", new Vector4(0.5f, 0.5f, 0.5f, 1f));
+            effect.SetValue("SpecularPower1", 1);
+
+            // Light3
+            effect.SetValue("LightPosition2", new Vector4(2, 2, 2, 1));
+            effect.SetValue("LightDiffuseColor2", new Vector4(0.1f, 0.4f, 0.1f, 1));
+            effect.SetValue("LightSpecularColor2", new Vector4(0.1f, 0.1f, 0.1f, 1));
+            effect.SetValue("LightDistanceSquared2", 50f);
+            effect.SetValue("DiffuseColor2", new Vector4(0.5f, 0.5f, 0.5f, 1));
+            effect.SetValue("SpecularColor2", new Vector4(0.5f, 0.5f, 0.5f, 1f));
+            effect.SetValue("SpecularPower2", 1);
 
             effect.SetValue("World", Matrix.Identity);
             effect.SetValue("Projection", proj);
@@ -160,10 +173,11 @@ namespace Underground
             Int64 previous_time = clock.ElapsedTicks;
             Int64 previous_clignement = clock.ElapsedTicks;
 
-            var ListeBoundingBoxes = Collision.Initialize(VerticesFinal);
+            List<BoundingBox> ListeBoundingBoxes = Collision.Initialize(VerticesFinal);
 
-            var oldView = macamera.view;
-            var oldPos = macamera.position;
+            Matrix oldView = macamera.view;
+            Vector3 oldPos = macamera.position;
+            Vector3 oldAngle = macamera.angle;
 
             RenderLoop.Run(Program.form, () =>
             {
@@ -186,6 +200,7 @@ namespace Underground
                         Console.WriteLine(Stopwatch.Frequency);
                         previous_clignement = clock.ElapsedTicks;
                     }*/
+                    oldAngle = macamera.angle;
                     macamera.orient_camera(Program.input, clock.ElapsedTicks - previous_time);
 
 
@@ -205,16 +220,20 @@ namespace Underground
                         oldPos = macamera.position;
 
                     effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
-
-                    effect.SetValue("LightPosition", new Vector4(position_Light, 1));
+                    effect.SetValue("LightPosition0", new Vector4(position_Light, 1));
 
                     if (collide)
+                    {
+                        oldView *=
+                            Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y - oldAngle.Y) *
+                            Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X - oldAngle.X) *
+                            Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z - oldAngle.Z);
                         macamera.view = oldView;
+                    }
                     else
                         oldView = macamera.view;
 
                     effect.SetValue("View", macamera.view);
-
                     effect.SetValue("Sepia", false);
 
                     for (int i = 0; i < VerticesCount; i++)

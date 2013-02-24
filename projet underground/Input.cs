@@ -53,8 +53,8 @@ namespace Underground
         {
             MousePoint = e.Location;
 
-            Ingame.WriteNicely("i", 5, "x mousePos = " + MousePoint.X);
-            Ingame.WriteNicely("i", 5, "y mousePos = " + MousePoint.Y);
+            Program.WriteNicely("i", 5, "x mousePos = " + MousePoint.X);
+            Program.WriteNicely("i", 5, "y mousePos = " + MousePoint.Y);
         }
 
 
@@ -62,7 +62,7 @@ namespace Underground
         {
             MousePoint = e.Location;
 
-            Ingame.WriteNicely("i", 6, "Mouse clicked ! x:" + MousePoint.X + " & y:" + MousePoint.Y);
+            Program.WriteNicely("i", 6, "Mouse clicked ! x:" + MousePoint.X + " & y:" + MousePoint.Y);
 
             if (e.Button == MouseButtons.Left)
             {

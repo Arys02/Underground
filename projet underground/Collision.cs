@@ -17,7 +17,7 @@ namespace Underground
         {
             var ListeBoundingBoxes = new List<BoundingBox>();
 
-            Ingame.WriteNicely("#", 12, "Creation des BBoxes !");
+            Program.WriteNicely("#", 12, "Creation des BBoxes !");
             int t1 = VerticesFinal[0].GetUpperBound(0);
 
             int vecPerBox = 2;
@@ -47,7 +47,7 @@ namespace Underground
             {
                 if (BBox.Intersects(ref cameraSphere))
                 {
-                    Ingame.WriteNicely("!", 12, "Intersection");
+                    Program.WriteNicely("!", 12, "Intersection");
                     return true;
                 }
             }

@@ -34,7 +34,7 @@ namespace Underground
             vertices_img = new VertexBuffer(Program.device, Utilities.SizeOf<Vertex>() * nbvertex, Usage.WriteOnly, VertexFormat.None, Pool.Default);
             Console.WriteLine(Utilities.SizeOf<Vertex>());
             // ******* ICI ****** /
-            Texture_background_menu = SharpDX.Direct3D9.Texture.FromFile(Program.device, @"..\..\bg.jpg");
+            Texture_background_menu = SharpDX.Direct3D9.Texture.FromFile(Program.device, @"Ressources\Game\Images\bg.jpg");
 
             FontDescription fontDescription = new FontDescription()
             {
@@ -99,7 +99,7 @@ namespace Underground
                     1.0f - yRes * (Cursor.Position.Y - Program.form.Location.Y - 5),
                     0.0f, 0.0f);
 
-                Ingame.WriteNicely("i", 3, "Mouse clicked ! x:" + mouse.X + " & y:" + mouse.Y);
+                Program.WriteNicely("i", 3, "Mouse clicked ! x:" + mouse.X + " & y:" + mouse.Y);
 
                 if (mouse.X > -0.16 && mouse.X < 0.15 && mouse.Y > -0.08 && mouse.Y < 0.04)
                 {

@@ -35,7 +35,13 @@ namespace Underground
 
         public static Input input;
         [STAThread]
-
+        public static void WriteNicely(string op, int c, string msg)
+        {
+            Console.ForegroundColor = (ConsoleColor)c;
+            Console.Write("[" + op + "] ");
+            Console.ResetColor();
+            Console.WriteLine(msg);
+        }
         private static void Main()
         {
             #region Variables
@@ -87,9 +93,6 @@ namespace Underground
             device.VertexDeclaration = vertexDecl;
             #endregion
 
-            #region Menu, fonts
-
-            #endregion
 
             Thread test = new Thread(Sound.main);
             test.Start();
