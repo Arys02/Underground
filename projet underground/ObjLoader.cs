@@ -98,7 +98,7 @@ namespace Underground
             bool is_4 = true;
 
             int precedent_pourcentage = 0;
-            Console.WriteLine("# Ouverture du fichier {0}", obj);
+            Ingame.WriteNicely("#", 2, "Ouverture du fichier " + obj[0].ToString());
             List<Vector2> ListeCoordTextures = new List<Vector2>();
             List<Vector4> ListeCoordSommets = new List<Vector4>();
             List<Vector4> ListeNormales = new List<Vector4>();

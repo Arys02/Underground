@@ -33,6 +33,7 @@ namespace Underground
         public static Device device;
         public static RenderForm form;
 
+        public static Input input;
         [STAThread]
 
         private static void Main()
@@ -65,7 +66,7 @@ namespace Underground
                 PresentFlags.None,
                 0,
                 PresentInterval.Immediate);
-            Input input = new Input(form);
+            input = new Input(form);
             device = new Device(direct3D, 0, DeviceType.Hardware, form.Handle, CreateFlags.HardwareVertexProcessing, Parametres);
             VertexElement[] vertexElems = new[] {
         		new VertexElement(0, 0, DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Position, 0),
@@ -85,42 +86,21 @@ namespace Underground
             VertexDeclaration vertexDecl = new VertexDeclaration(device, vertexElems);
             device.VertexDeclaration = vertexDecl;
             #endregion
-            
+
             #region Menu, fonts
-            FontDescription fontDescription = new FontDescription()
-            {
-                Height = 45,
-                Italic = false,
-                CharacterSet = FontCharacterSet.Ansi,
-                FaceName = "Arial",
-                MipLevels = 0,
-                OutputPrecision = FontPrecision.TrueType,
-                PitchAndFamily = FontPitchAndFamily.Default,
-                Quality = FontQuality.ClearType,
-                Weight = FontWeight.Bold
-            };
-            SharpDX.Direct3D9.Font font = new SharpDX.Direct3D9.Font(device, fontDescription);
-            string displayText = "PLAY !";
-            SharpDX.Rectangle fontDimension = font.MeasureText(null, displayText, new SharpDX.Rectangle(0, 0, form.ClientSize.Width, form.ClientSize.Height), SharpDX.Direct3D9.FontDrawFlags.Center | SharpDX.Direct3D9.FontDrawFlags.VerticalCenter);
-            SharpDX.Rectangle fontPauseDimension = font.MeasureText(null, "PAUSE", new SharpDX.Rectangle(0, 0, form.ClientSize.Width, form.ClientSize.Height), SharpDX.Direct3D9.FontDrawFlags.Top | SharpDX.Direct3D9.FontDrawFlags.Right);
-
-            // Image
-
-            int nbvertex = 5;
-            VertexBuffer vertices_img = new VertexBuffer(device, Utilities.SizeOf<Vertex>() * nbvertex, Usage.WriteOnly, VertexFormat.None, Pool.Default);
-            Console.WriteLine(Utilities.SizeOf<Vertex>());
-            // ******* ICI ****** /
-            Texture Texture_background_menu = SharpDX.Direct3D9.Texture.FromFile(device, @"bg.jpg");
 
             #endregion
 
-            Thread test= new Thread(Sound.main);
-            test.Start(); 
+            Thread test = new Thread(Sound.main);
+            test.Start();
+
+            Menu.Initialize();
+
             Ingame.ingame();
-           
+
             device.Dispose();
             direct3D.Dispose();
-            
+
         }
     }
 }

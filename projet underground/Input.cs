@@ -21,13 +21,29 @@ namespace Underground
 
         Form form;
 
+        private bool mouseLeft;
+        public bool MouseLeft
+        {
+            get
+            {
+                //Only one left is set if the user holds..
+                if (mouseLeft)
+                {
+                    mouseLeft = false;
+                    return true;
+                }
+                return mouseLeft;
+            }
+        }
+
         public Input(Form form)
         {
-            
+
             this.form = form;
             form.KeyDown += form_KeyDown;
             form.KeyUp += form_KeyUp;
             form.MouseMove += form_MouseMove;
+            form.MouseDown += form_MouseDown;
             KeysDown = new List<Keys>();
             KeysPressed = new List<Keys>();
             KeysReleased = new List<Keys>();
@@ -41,6 +57,18 @@ namespace Underground
             Ingame.WriteNicely("i", 5, "y mousePos = " + MousePoint.Y);
         }
 
+
+        void form_MouseDown(object sender, MouseEventArgs e)
+        {
+            MousePoint = e.Location;
+
+            Ingame.WriteNicely("i", 6, "Mouse clicked ! x:" + MousePoint.X + " & y:" + MousePoint.Y);
+
+            if (e.Button == MouseButtons.Left)
+            {
+                mouseLeft = true;
+            }
+        }
 
         void form_KeyDown(object sender, KeyEventArgs e)
         {

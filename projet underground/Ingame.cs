@@ -70,7 +70,6 @@ namespace Underground
 
         static public void ingame()
         {
-            Input input = new Input(Program.form);
             const int nbmodels = 1;
             int VerticesCount = 0;
             List<Byte[]> ModelFiles = new List<Byte[]>();
@@ -93,8 +92,8 @@ namespace Underground
             clock.Start();
 
 
-            //string path = @"ct0_new.obj";
-            string path = @"Lighthouse.obj";
+            //string path = @"..\..\ct0_new.obj";
+            string path = @"..\..\Lighthouse.obj";
 
             //string path = @"Ressources\Game\ct0.obj";
 
@@ -135,7 +134,6 @@ namespace Underground
             {
                 Vertices[i].Lock(0, 0, LockFlags.DoNotWait).WriteRange(VerticesFinal[i]);
                 Vertices[i].Unlock();
-                //SizeModels[i] = 150;
             }
 
             /*effect.SetValue("AmbientColor", new Vector4(0.4f, 0.4f, 0.4f, 1f));
@@ -148,6 +146,10 @@ namespace Underground
             effect.SetValue("LightDistanceSquared", 250f);
             effect.SetValue("LightDiffuseColor", new Vector4(0.1f, 0.1f, 0.1f, 1));
             //effect.SetValue("Lumiere", true);
+
+            effect.SetValue("World", Matrix.Identity);
+            effect.SetValue("Projection", proj);
+
             /*
             effect.SetValue("vecLightPos",position);
             effect.SetValue("LightRange",30.0f);
@@ -156,8 +158,6 @@ namespace Underground
             effect.Technique = technique;
             //Program.device.SetRenderState(RenderState.CullMode, false);
             Int64 previous_time = clock.ElapsedTicks;
-            effect.SetValue("World", Matrix.Identity);
-            effect.SetValue("Projection", proj);
             Int64 previous_clignement = clock.ElapsedTicks;
 
             var ListeBoundingBoxes = Collision.Initialize(VerticesFinal);
@@ -168,56 +168,65 @@ namespace Underground
             RenderLoop.Run(Program.form, () =>
             {
 
-                Program.device.BeginScene();
-                //DrawingPoint Center; = form.ClientSize.Height
-                //device.SetCursorPosition(form.ClientSize.Width / 2, form.ClientSize.Height / 2);
-
                 Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-                //effect.SetValue("LightPosition", new Vector4(-macamera.position.X, macamera.position.Y, -macamera.position.Z, 1));
-                effect.Begin();
-                effect.BeginPass(0);
-                /*if (clock.ElapsedTicks - previous_clignement > 100000000) // 1 tick != 100ns (cf diff entre Date et Stopwatch) utiliser Stopwatch.Frequency
-                {
-                    Console.WriteLine(Stopwatch.Frequency);
-                    previous_clignement = clock.ElapsedTicks;
-                }*/
-                macamera.orient_camera(input, clock.ElapsedTicks - previous_time);
-                if (Following_light)
-                {
-                    position_Light = -macamera.position;
-                }
-                previous_time = clock.ElapsedTicks;
 
-                //worldViewProj = macamera.view * proj;
-                //effect.SetValue("worldViewProj", worldViewProj);
+                Program.device.BeginScene();
 
-                bool collide = Collision.CheckCollisions(macamera.position);
-
-                if (collide)
-                    macamera.position = oldPos;
+                if (Menu.IsInMenu)
+                    Menu.InMenu();
                 else
-                    oldPos = macamera.position;
-
-                effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
-
-                effect.SetValue("LightPosition", new Vector4(position_Light, 1));
-
-                if (collide)
-                    macamera.view = oldView;
-                else
-                    oldView = macamera.view;
-
-                effect.SetValue("View", macamera.view);
-                effect.SetValue("Sepia", Sepia);
-
-                for (int i = 0; i < VerticesCount; i++)
                 {
-                    Program.device.SetStreamSource(0, Vertices[i], 0, Utilities.SizeOf<Vertex>());
-                    Program.device.SetTexture(0, Texture_ressource[i]);
-                    Program.device.DrawPrimitives(PrimType, 0, SizeModels[i]);
+                    //DrawingPoint Center; = form.ClientSize.Height
+                    //device.SetCursorPosition(form.ClientSize.Width / 2, form.ClientSize.Height / 2);
+                    //effect.SetValue("LightPosition", new Vector4(-macamera.position.X, macamera.position.Y, -macamera.position.Z, 1));
+                    effect.Begin();
+                    effect.BeginPass(0);
+                    /*if (clock.ElapsedTicks - previous_clignement > 100000000) // 1 tick != 100ns (cf diff entre Date et Stopwatch) utiliser Stopwatch.Frequency
+                    {
+                        Console.WriteLine(Stopwatch.Frequency);
+                        previous_clignement = clock.ElapsedTicks;
+                    }*/
+                    macamera.orient_camera(Program.input, clock.ElapsedTicks - previous_time);
+
+
+                    if (Following_light)
+                        position_Light = -macamera.position;
+
+                    previous_time = clock.ElapsedTicks;
+
+                    //worldViewProj = macamera.view * proj;
+                    //effect.SetValue("worldViewProj", worldViewProj);
+
+                    bool collide = Collision.CheckCollisions(macamera.position);
+
+                    if (collide)
+                        macamera.position = oldPos;
+                    else
+                        oldPos = macamera.position;
+
+                    effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
+
+                    effect.SetValue("LightPosition", new Vector4(position_Light, 1));
+
+                    if (collide)
+                        macamera.view = oldView;
+                    else
+                        oldView = macamera.view;
+
+                    effect.SetValue("View", macamera.view);
+
+                    effect.SetValue("Sepia", false);
+
+                    for (int i = 0; i < VerticesCount; i++)
+                    {
+                        Program.device.SetStreamSource(0, Vertices[i], 0, Utilities.SizeOf<Vertex>());
+                        Program.device.SetTexture(0, Texture_ressource[i]);
+                        Program.device.DrawPrimitives(PrimType, 0, SizeModels[i]);
+                    }
+
+                    effect.EndPass();
+                    effect.End();
                 }
-                effect.EndPass();
-                effect.End();
                 Program.device.EndScene();
                 Program.device.Present();
             });
