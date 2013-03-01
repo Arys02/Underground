@@ -15,17 +15,18 @@ namespace Underground
 {
     class ObjLoader
     {
-        private static void gotonextvalue(ref int i, byte[] obj)
+        private static void gotonextvalue(ref int i, ref byte[] obj)
         {
             int carac_Lu = obj[i];
             i++;
-            while (!(
+            while ((!(
                 (carac_Lu >= Convert.ToInt32('0') && carac_Lu <= Convert.ToInt32('9')) ||
                 (carac_Lu >= Convert.ToInt32('a') && carac_Lu <= Convert.ToInt32('z')) ||
                 (carac_Lu >= Convert.ToInt32('A') && carac_Lu <= Convert.ToInt32('Z')) ||
                 carac_Lu == Convert.ToInt32('-') ||
-                carac_Lu == Convert.ToInt32('.')
-                ))
+                carac_Lu == Convert.ToInt32('.') ||
+                carac_Lu == Convert.ToInt32('_')
+                )) && i < obj.Length)
             {
                 carac_Lu = obj[i];
                 i++;
@@ -33,25 +34,25 @@ namespace Underground
             i--;
         }
 
-
-
-        private static string getstring(ref FileStream fichier)
+        private static string getstring(ref int i, ref byte[] obj)
         {
             List<char> liste = new List<char>();
-            int carac_Lu = fichier.ReadByte();
+            int carac_Lu = obj[i];
+            i++;
             while (carac_Lu != Convert.ToInt32('\n') &&
                 carac_Lu != Convert.ToInt32(' ') &&
-                carac_Lu != -1
+                i < obj.Length
             )
             {
                 liste.Add(Convert.ToChar(carac_Lu));
-                carac_Lu = fichier.ReadByte();
+                carac_Lu = obj[i];
+                i++;
             }
-            fichier.Position--;
+            i--;
             return new string(liste.ToArray());
         }
 
-        private static float getfloat(ref int i, byte[] obj)
+        private static float getfloat(ref int i, ref byte[] obj)
         {
             bool est_negatif = false;
             bool virgule = false;
@@ -65,7 +66,7 @@ namespace Underground
                 carac_Lu = carac_Lu = obj[i];
                 i++;
             }
-            while (((carac_Lu >= Convert.ToInt32('0') && carac_Lu <= Convert.ToInt32('9')) || carac_Lu == Convert.ToInt32('.')) && carac_Lu != -1)
+            while (((carac_Lu >= Convert.ToInt32('0') && carac_Lu <= Convert.ToInt32('9')) || carac_Lu == Convert.ToInt32('.')) && i < obj.Length)
             {
                 if (carac_Lu == Convert.ToInt32('.')) virgule = true;
                 else
@@ -81,30 +82,27 @@ namespace Underground
             return Convert.ToSingle(resultat / (Math.Pow(10, decalage)));
         }
 
-        private static void gotonextline(ref int i, byte[] obj)
+        private static void gotonextline(ref int i, ref byte[] obj)
         {
-            int carac_Lu = obj[i];
-            i++;
-            while (carac_Lu != '\n')
+            int carac_Lu;
+            do
             {
                 carac_Lu = obj[i];
                 i++;
-            }
+            } while (carac_Lu != '\n' && i < obj.Length);
         }
 
         public static Vertex[] read_obj(byte[] obj, Vector4 referentiel, ref int nbfaces, ref int nbsommets, ref int nbnormales, ref int nbtextures)
         {
             int i = 0;
-            bool is_4 = true;
-
             int precedent_pourcentage = 0;
-            Ingame.WriteNicely("#", 2, "Ouverture du fichier " + obj[0].ToString());
+            Program.WriteNicely("#", 2, "Ouverture du fichier " + obj[0].ToString());
             List<Vector2> ListeCoordTextures = new List<Vector2>();
             List<Vector4> ListeCoordSommets = new List<Vector4>();
             List<Vector4> ListeNormales = new List<Vector4>();
             List<Vertex> ListeVertex = new List<Vertex>();
             float x = 1, y = 1, z = 1;
-
+            string type;
 
             Color3[] couleur = new Color3[3] { 
                 Color.White.ToColor3(),
@@ -112,232 +110,197 @@ namespace Underground
                 Color.White.ToColor3()
             };
 
-            int carac_Lu = obj[i];
-            i++;
-            int count;
-            while (carac_Lu != -1)
+            while (i < obj.Length)
             {
-                count = ListeVertex.Count;
-                if (carac_Lu == Convert.ToInt32('v'))
+                type = getstring(ref i, ref obj);
+                #region sommet
+                if (type == "v")
                 {
-                    carac_Lu = obj[i];
-                    i++;
-                    if (carac_Lu == Convert.ToInt32('t'))
-                    {
-                        carac_Lu = obj[i];
-                        i++;
-                        if (carac_Lu == Convert.ToInt32(' '))
-                        {
-                            nbtextures++;
-                            // Il s'agit d'une coordonnée de texture
-                            gotonextvalue(ref i, obj);
-                            x = getfloat(ref i, obj);
-                            gotonextvalue(ref i, obj);
-                            y = getfloat(ref i, obj);
-                            ListeCoordTextures.Add(new Vector2(x, y));
-                        }
-                    }
-                    else if (carac_Lu == Convert.ToInt32('n'))
-                    {
-                        carac_Lu = obj[i];
-                        i++;
-                        if (carac_Lu == Convert.ToInt32(' '))
-                        {
-                            nbnormales++;
-                            // Il s'agit d'une normale
-                            gotonextvalue(ref i, obj);
-                            x = getfloat(ref i, obj);
-                            gotonextvalue(ref i, obj);
-                            y = getfloat(ref i, obj);
-                            gotonextvalue(ref i, obj);
-                            z = getfloat(ref i, obj);
-                            ListeNormales.Add(new Vector4(x, y, z, 1.0f));
-                        }
-                    }
-                    else if (carac_Lu == Convert.ToInt32(' '))
-                    {
-                        nbsommets++;
-                        // Il s'agit d'une coordonnée de sommet
-                        gotonextvalue(ref i, obj);
-                        x = getfloat(ref i, obj);
-                        gotonextvalue(ref i, obj);
-                        y = getfloat(ref i, obj);
-                        gotonextvalue(ref i, obj);
-                        z = getfloat(ref i, obj);
-                        ListeCoordSommets.Add(new Vector4(x, y, z, 1.0f));
-                    }
+                    nbsommets++;
+                    // On recupère les coordonnées du sommet
+                    i++; // espace
+                    x = getfloat(ref i, ref obj); // Coord x
+                    i++; // espace
+                    y = getfloat(ref i, ref obj); // Coord y
+                    i++; // espace
+                    z = getfloat(ref i, ref obj); // Coord z
+
+                    // Ajout dans la liste le nouveau sommet
+                    ListeCoordSommets.Add(new Vector4(x, y, z, 1));
+
+                    // DEBUG
+                    //string abc = "Nouveau sommet " + x + " " + y + " " + z;
+                    //Program.WriteNicely("#", 3, abc);
                 }
-                else if (carac_Lu == Convert.ToInt32('f'))
+                #endregion
+                #region textures
+                else if (type == "vt")
                 {
-                    carac_Lu = obj[i];
-                    i++;
-                    if (carac_Lu == ' ')
-                    {
-                        nbfaces++;
-                        // Il s'agit d'une face
+                    nbtextures++;
+                    // On recupère les coordonnées de texture
+                    i++; // espace
+                    x = getfloat(ref i, ref obj); // Coord x
+                    i++; // espace
+                    y = getfloat(ref i, ref obj); // Coord y
 
-                        // Sommet 1 2 3
-                        float[] values = new float[4*3]; // 4*2 sans NORMAL
-                        for (int k = 0; k < 3; k++)
-                        {
-                            gotonextvalue(ref i, obj);
-                            x = getfloat(ref i, obj);
-                            values[k * 3] = x;
-                            carac_Lu = obj[i];
-                            i++;
-                            if (carac_Lu == Convert.ToInt32('/'))
-                            {
-                                carac_Lu = obj[i];
-                                if (carac_Lu == '/')
-                                {
-                                    y = 1.0f;
-                                    ListeCoordTextures.Add(new Vector2(1, 1));
-                                }
-                                else
-                                {
-                                    gotonextvalue(ref i, obj);
-                                    y = getfloat(ref i, obj);
-                                }
-                                values[k * 3 + 1] = y;
-                                gotonextvalue(ref i, obj);
-                                z = getfloat(ref i, obj);
-                                values[k * 3 + 2] = z;
-                            }
-                            else i--;
-                        }
-                        if ((obj[i] < '0' || obj[i] > '9') && obj[i]!=' ') is_4 = false;
-                        else
-                        {
-                            int k = 3;
-                            gotonextvalue(ref i, obj);
-                            x = getfloat(ref i, obj);
-                            values[k * 3] = x;
-                            carac_Lu = obj[i];
-                            i++;
-                            if (carac_Lu == Convert.ToInt32('/'))
-                            {
-                                carac_Lu = obj[i];
-                                if (carac_Lu == '/')
-                                {
-                                    y = 1.0f;
-                                    ListeCoordTextures.Add(new Vector2(1, 1));
-                                }
-                                else
-                                {
-                                    gotonextvalue(ref i, obj);
-                                    y = getfloat(ref i, obj);
-                                }
-                                values[k * 3 + 1] = y;
-                                gotonextvalue(ref i, obj);
-                                z = getfloat(ref i, obj);
-                                values[k * 3 + 2] = z;
-                            }
-                            else i--;
-                        }
-                        for (int k=0;k<3;k++) {
-                            ListeVertex.Add(
-                                new Vertex()
-                                {
-                                    Position = new Vector4(
-                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][0] + referentiel.X,
-                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][1] + referentiel.Y,
-                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][2] + referentiel.Z,
-                                        ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][3] + referentiel.W
-                                    ),
-                                    //Color = new Color(couleur[i].Red, couleur[i].Green, couleur[i].Blue, 1.0f),
-                                    CoordTextures = new Vector2(
-                                        ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][0],
-                                        ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][1]
-                                    ),
-                                    Color = new Vector4(couleur[k].Red, couleur[k].Green, couleur[k].Blue, 1.0f),
+                    // Ajout dans la liste la nouvelle texture
+                    ListeCoordTextures.Add(new Vector2(x, y));
 
-                                    // NORMAL
-                                    Normal = ListeNormales[Convert.ToInt32(values[k * 3 + 2]) - 1]
-                                }
-                            );
-                        }
-                        if (is_4)
-                        {
-                            for (int k = 0; k < 4; k++)
-                            {
-                                if (k != 1)
-                                {
-                                    ListeVertex.Add(
-                                        new Vertex()
-                                        {
-                                            Position = new Vector4(
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][0] + referentiel.X,
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][1] + referentiel.Y,
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][2] + referentiel.Z,
-                                                ListeCoordSommets[Convert.ToInt32(values[k * 3]) - 1][3] + referentiel.W
-                                            ),
-                                            //Color = new Color(couleur[i].Red, couleur[i].Green, couleur[i].Blue, 1.0f),
-                                            CoordTextures = new Vector2(
-                                                ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][0],
-                                                ListeCoordTextures[Convert.ToInt32(values[k * 3 + 1]) - 1][1]
-                                            ),
-                                            Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
-                                            // NORMAL
-                                            Normal = ListeNormales[Convert.ToInt32(values[k * 3 + 2]) - 1]
-                                        }
-                                    );
-                                }
-                            }
-                        }
-                    }
+                    // DEBUG
+                    //string abc = "Nouvelle texture " + x + " " + y;
+                    //Program.WriteNicely("#", 3, abc);
                 }
-                else if (carac_Lu == Convert.ToInt32('m'))
+                #endregion
+                #region normales
+                else if (type == "vn")
                 {
-                    carac_Lu = obj[i];
-                    i++;
-                    if (carac_Lu == 't')
-                    {
-                        carac_Lu = obj[i];
-                        i++;
-                        if (carac_Lu == 'l')
-                        {
-                            carac_Lu = obj[i];
-                            i++;
-                            if (carac_Lu == 'l')
-                            {
-                                carac_Lu = obj[i];
-                                i++;
-                                if (carac_Lu == 'i')
-                                {
-                                    carac_Lu = obj[i];
-                                    i++;
-                                    if (carac_Lu == 'b')
-                                    {
-                                        carac_Lu = obj[i];
-                                        i++;
-                                        if (carac_Lu == ' ')
-                                        {
-                                            // Console.WriteLine("# Material: {0}", getstring(ref i, obj));
+                    nbnormales++;
+                    // On recupère les normales
+                    i++; // espace
+                    x = getfloat(ref i, ref obj); // Coord x
+                    i++; // espace
+                    y = getfloat(ref i, ref obj); // Coord y
+                    i++; // espace
+                    z = getfloat(ref i, ref obj); // Coord z
 
-                                            // Ouvrir MTLLIB
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    // Ajout dans la liste des normales
+                    ListeNormales.Add(new Vector4(x, y, z, 1));
+
+                    // DEBUG
+                    //string abc = "Nouvelle normale " + x + " " + y;
+                    //Program.WriteNicely("#", 3, abc);
                 }
+                #endregion
+                #region faces
+                else if (type == "f")
+                {
+                    nbfaces++;
+                    //string abc;
+                    // CONSTRUCTION SOMMET 1
+                    // On recupère les info du sommet
+                    i++; // espace
+                    x = getfloat(ref i, ref obj); // Coord x
+                    i++; // slash
+                    y = getfloat(ref i, ref obj); // Coord y
+                    i++; // slash
+                    z = getfloat(ref i, ref obj); // Coord z
+                    ListeVertex.Add(new Vertex()
+                    {
+                        Position = new Vector4(
+                            ListeCoordSommets[Convert.ToInt32(x-1)].X + referentiel.X,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].Y + referentiel.Y,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].Z + referentiel.Z,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].W + referentiel.W
+                        ),
+                        CoordTextures = new Vector2(
+                            ListeCoordTextures[Convert.ToInt32(y-1)].X,
+                            ListeCoordTextures[Convert.ToInt32(y-1)].Y
+                        ),
+                        Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
+                        Normal = ListeNormales[Convert.ToInt32(z - 1)]
+                    });
+                    //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
+                    //Program.WriteNicely("#", 3, abc);
+
+                    // CONSTRUCTION SOMMET 2
+                    // On recupère les info du sommet
+                    i++; // espace
+                    x = getfloat(ref i, ref obj); // Coord x
+                    i++; // slash
+                    y = getfloat(ref i, ref obj); // Coord y
+                    i++; // slash
+                    z = getfloat(ref i, ref obj); // Coord z
+                    ListeVertex.Add(new Vertex()
+                    {
+                        Position = new Vector4(
+                            ListeCoordSommets[Convert.ToInt32(x-1)].X + referentiel.X,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].Y + referentiel.Y,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].Z + referentiel.Z,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].W + referentiel.W
+                        ),
+                        CoordTextures = new Vector2(
+                            ListeCoordTextures[Convert.ToInt32(y-1)].X,
+                            ListeCoordTextures[Convert.ToInt32(y-1)].Y
+                        ),
+                        Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
+                        Normal = ListeNormales[Convert.ToInt32(z - 1)]
+                    });
+                    //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
+                    //Program.WriteNicely("#", 3, abc);
+
+                    // CONSTRUCTION SOMMET 3
+                    // On recupère les info du sommet
+                    i++; // espace
+                    x = getfloat(ref i, ref obj); // Coord x
+                    i++; // slash
+                    y = getfloat(ref i, ref obj); // Coord y
+                    i++; // slash
+                    z = getfloat(ref i, ref obj); // Coord z
+                    ListeVertex.Add(new Vertex()
+                    {
+                        Position = new Vector4(
+                            ListeCoordSommets[Convert.ToInt32(x-1)].X + referentiel.X,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].Y + referentiel.Y,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].Z + referentiel.Z,
+                            ListeCoordSommets[Convert.ToInt32(x-1)].W + referentiel.W
+                        ),
+                        CoordTextures = new Vector2(
+                            ListeCoordTextures[Convert.ToInt32(y-1)].X,
+                            ListeCoordTextures[Convert.ToInt32(y-1)].Y
+                        ),
+                        Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
+                        Normal = ListeNormales[Convert.ToInt32(z - 1)]
+                    });
+                    //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
+                    //Program.WriteNicely("#", 3, abc);
+                }
+                #endregion
+                #region objet
+                else if (type == "o")
+                {
+                    i++;
+                    Program.WriteNicely("#", 3, "Nouvel objet : " + getstring(ref i, ref obj));
+                }
+                #endregion
+                #region groupe
+                else if (type == "g")
+                {
+                    i++;
+                    Program.WriteNicely("#", 3, "Nouveau groupe : " + getstring(ref i, ref obj));
+                }
+                #endregion
+                #region material
+                else if (type == "mtllib")
+                {
+                    i++;
+                    Program.WriteNicely("#", 11, "Nouveau fichier .MTL : " + getstring(ref i, ref obj));
+                }
+                #endregion
+                else if (type == "")
+                {
+                    //Program.WriteNicely("#", 5, "Ligne vide");
+                }
+                #region commentaire
+                else if (type[0] == '#')
+                {
+                    Program.WriteNicely("#", 4, "Nouveau commentaire");
+                }
+                #endregion
+                else
+                {
+                    Program.WriteNicely("!", 2, "Type inconnu");
+                }
+
+                // FIN DU TRAITEMENT
                 if (precedent_pourcentage != Convert.ToInt32(Convert.ToSingle(i) / Convert.ToSingle(obj.Length) * 100))
                 {
                     precedent_pourcentage = Convert.ToInt32(Convert.ToSingle(i) / Convert.ToSingle(obj.Length) * 100);
                     Console.WriteLine("\t{0} % lu", precedent_pourcentage);
                     Console.CursorTop--;
                 }
-                gotonextline(ref i, obj);
-                if (i != obj.Length)
-                {
-                    carac_Lu = obj[i];
-                    i++;
-                }
-                else carac_Lu = -1;
+                gotonextline(ref i, ref obj);
+                //i++;
             }
-
-            if (is_4) nbfaces *= 2;
 
             return ListeVertex.ToArray();
         }
