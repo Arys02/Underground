@@ -16,30 +16,15 @@ namespace Underground
         public static PrimitiveType PrimType = PrimitiveType.TriangleList;
         public static bool Sepia = false;
         public static bool Following_light = true;
-        public static void recup_env(ref Device device, ref List<VertexBuffer> vertices, ref List<Vertex[]> ListeVerticesFinal, ref List<int> ModelSizes, ref List<Byte[]> ModelFiles, int nbmodels)
+        public static bool maximum_disallowed = false;
+        
+        public static void recup_env(ref List<Model> Liste_Models, ref List<Byte[]> ModelFiles, int nbmodels)
         {
-            int nbmodelfaces = 0;
-            int nbsommets = 0;
-            int nbnormales = 0;
-            int nbtextures = 0;
-            ListeVerticesFinal.Clear();
-            ModelSizes.Clear();
+            Liste_Models.Clear();
+
             for (int i = 0; i < nbmodels; i++)
             {
-                nbmodelfaces = 0;
-                nbsommets = 0;
-                nbnormales = 0;
-                nbtextures = 0;
-                ListeVerticesFinal.Add(ObjLoader.read_obj(ModelFiles[i], new Vector4(i * 0, ((float)i) / 10, i * 10, 0), ref nbmodelfaces, ref nbsommets, ref nbnormales, ref nbtextures));
-                ModelSizes.Add(nbmodelfaces);
-                vertices.Add(new VertexBuffer(device,
-                            (
-                                Utilities.SizeOf<Vector4>()
-                                + Utilities.SizeOf<Vector2>()
-                                + Utilities.SizeOf<Vector4>()
-                                + Utilities.SizeOf<Vector4>() // NORMAL
-                            ) * 3 * nbmodelfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed)
-                );
+                ObjLoader.read_obj(ModelFiles[i], new Vector4(i * 0, ((float)i) / 10, i * 10, 0), ref Liste_Models);
             }
         }
 
@@ -60,23 +45,19 @@ namespace Underground
         //13: Magenta.
         //14: Yellow.
         //15: White.
-
         static public void ingame()
         {
-            const int nbmodels = 1;
-            int VerticesCount = 0;
+            const int nbmodels = 1, nblights = 3;
             List<Byte[]> ModelFiles = new List<Byte[]>();
-            List<Vertex[]> ListeVerticesFinal = new List<Vertex[]>();
-            List<VertexBuffer> Vertices = new List<VertexBuffer>();
-            List<int> SizeModels = new List<int>();
-            Vertex[][] VerticesFinal = new Vertex[nbmodels][];
-            Texture[] Texture_ressource = new Texture[nbmodels];
-            //Vector3 position = new Vector3(0, -10, 20), angle = new Vector3(0f, 0f, 0f);
+            List<Model> Liste_Models = new List<Model>();
+            Texture[] Texture_ressource = new Texture[5];
             Matrix view = Matrix.LookAtLH(new Vector3(0, 0, -0.00002f), new Vector3(0, 0, 0), Vector3.UnitY);
             Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 100.0f);
             Matrix viewProj = Matrix.Multiply(view, proj);
             Matrix worldViewProj = viewProj;
-            Effect effect = Effect.FromFile(Program.device, "MiniCube.fx", ShaderFlags.None);
+            Macro macro = new Macro("nblights", nblights.ToString());
+            Effect effect = Effect.FromFile(Program.device, "MiniCube.fx", new Macro[] { macro }, null, "", ShaderFlags.None);
+            //effect.SetValue("nblights", nblights);
             EffectHandle technique = effect.GetTechnique(0);
             EffectHandle pass = effect.GetPass(technique, 0);
             Camera macamera = new Camera();
@@ -86,64 +67,63 @@ namespace Underground
 
 
             //string path = @"..\..\ct0_new.obj";
-            string path = @"Ressources\Game\Lighthouse.obj";
-
-            //string path = @"Ressources\Game\ct0.obj";
+            //string path = @"Ressources\Game\Lighthouse.obj";
+            //string path = @"Ressources\Game\cube.obj";
+            //string path = @"C:\Users\b95093cf\Desktop\model.obj";
+            string path = @"Ressources\Game\ct0.obj";
 
             Byte[] fichier = File.ReadAllBytes(path);
-            for (int i = 0; i < nbmodels; i++)
+            ModelFiles.Add(fichier);
+            Texture_ressource[0] = Texture.FromMemory(Program.device, File.ReadAllBytes("null.bmp"));
+            for (int i = 1; i < 5; i++)
             {
-                ModelFiles.Add(fichier);
-                //ModelFiles.Add(fichier);
-                if (i == 0)
+                if (i == 1)
                     //Texture_ressource[i] = Texture.FromFile(device, @"Ressources\Game\Images\dev.png");
-                    Texture_ressource[i] = Texture.FromFile(Program.device, @"Ressources\Game\Images\Beton20.jpg");
-                else if (i == 1)
-                {
-                    Texture_ressource[i] = Texture.FromFile(Program.device, @"porte-beton-texture-en-beton_19-136906.jpg");
-                }
+                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\Beton20.jpg"));
                 else if (i == 2)
-                {
-                    Texture_ressource[i] = Texture.FromFile(Program.device, @"dev2.png");
-                }
+                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\porte-beton-texture-en-beton_19-136906.jpg"));
                 else if (i == 3)
-                {
-                    Texture_ressource[i] = Texture.FromFile(Program.device, @"woodfloor.bmp");
-                }
+                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\dev2.png"));
+                else if (i == 4)
+                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\woodfloor.bmp"));
                 else
-                {
-                    Texture_ressource[i] = Texture.FromFile(Program.device, @"Beton20.jpg");
-                }
+                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\Beton20.jpg"));
             }
 
-            recup_env(ref Program.device, ref Vertices, ref ListeVerticesFinal, ref SizeModels, ref ModelFiles, nbmodels);
-            VerticesCount = ListeVerticesFinal.Count;
-            for (int i = 0; i < nbmodels; i++)
-            {
-                VerticesFinal[i] = ListeVerticesFinal[i];
-            }
+            recup_env(ref Liste_Models, ref ModelFiles, nbmodels);
 
-            for (int i = 0; i < VerticesCount; i++)
+            for (int i = 0; i < Liste_Models.Count; i++)
             {
-                Vertices[i].Lock(0, 0, LockFlags.DoNotWait).WriteRange(VerticesFinal[i]);
-                Vertices[i].Unlock();
+                Liste_Models[i].VertexBuffer.Lock(0, 0, LockFlags.DoNotWait).WriteRange(Liste_Models[i].Sommets);
+                Liste_Models[i].VertexBuffer.Unlock();
             }
 
             // Lumière ambiante
-            effect.SetValue("EmissiveColor", new Vector4(0f, 0f, 0f, 1f));
             effect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 1f));
 
             // Light1
-            effect.SetValue("LightPosition0", new Vector4(position_Light, 1));
-            effect.SetValue("LightDiffuseColor0", new Vector4(0.1f, 0.1f, 0f, 1));
-            effect.SetValue("LightSpecularColor0", new Vector4(0.1f, 0.1f, 0.1f, 1));
-            effect.SetValue("LightDistanceSquared0", 15f);
-            effect.SetValue("DiffuseColor0", new Vector4(0.5f, 0.5f, 0.5f, 1));
-            effect.SetValue("SpecularColor0", new Vector4(0.5f, 0.5f, 0.5f, 1f));
-            effect.SetValue("SpecularPower0", 1);
+            effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
+            effect.SetValue("LightDiffuseColor[0]", new Vector4(0.9f, 0.9f, 0.9f, 1));
+            effect.SetValue("LightDistanceSquared[0]", 30f);
 
             // Light2
-            effect.SetValue("LightPosition1", new Vector4(0, 2, 2, 1));
+            if (nblights > 1)
+            {
+                effect.SetValue("LightPosition[1]", new Vector4(0, 2, 2, 1));
+                effect.SetValue("LightDiffuseColor[1]", new Vector4(0.1f, 0.1f, 0.4f, 1));
+                effect.SetValue("LightDistanceSquared[1]", 10f);
+
+                // Light3
+                if (nblights > 2)
+                {
+                    effect.SetValue("LightPosition[2]", new Vector4(2, 2, 2, 1));
+                    effect.SetValue("LightDiffuseColor[2]", new Vector4(0.1f, 0.4f, 0.1f, 1));
+                    effect.SetValue("LightDistanceSquared[2]", 10f);
+                }
+            }
+
+            // Light2
+            /*effect.SetValue("LightPosition1", new Vector4(0, 2, 2, 1));
             effect.SetValue("LightDiffuseColor1", new Vector4(0.1f, 0.1f, 0.4f, 1));
             effect.SetValue("LightSpecularColor1", new Vector4(0.1f, 0.1f, 0.1f, 1));
             effect.SetValue("LightDistanceSquared1", 50f);
@@ -158,7 +138,7 @@ namespace Underground
             effect.SetValue("LightDistanceSquared2", 50f);
             effect.SetValue("DiffuseColor2", new Vector4(0.5f, 0.5f, 0.5f, 1));
             effect.SetValue("SpecularColor2", new Vector4(0.5f, 0.5f, 0.5f, 1f));
-            effect.SetValue("SpecularPower2", 1);
+            effect.SetValue("SpecularPower2", 1);*/
 
             effect.SetValue("World", Matrix.Identity);
             effect.SetValue("Projection", proj);
@@ -173,17 +153,17 @@ namespace Underground
             Int64 previous_time = clock.ElapsedTicks;
             Int64 previous_clignement = clock.ElapsedTicks;
 
-            List<BoundingBox> ListeBoundingBoxes = Collision.Initialize(VerticesFinal);
+            //List<BoundingBox> ListeBoundingBoxes = Collision.Initialize(new Vertex[1][] { Liste_structure_models[0].Sommets });
 
             Matrix oldView = macamera.view;
             Vector3 oldPos = macamera.position;
             Vector3 oldAngle = macamera.angle;
 
+
             RenderLoop.Run(Program.form, () =>
             {
 
                 Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-
                 Program.device.BeginScene();
 
                 if (Menu.IsInMenu)
@@ -201,58 +181,76 @@ namespace Underground
                         previous_clignement = clock.ElapsedTicks;
                     }*/
                     oldAngle = macamera.angle;
-                    macamera.orient_camera(Program.input, clock.ElapsedTicks - previous_time);
+                    macamera.orient_camera(clock.ElapsedTicks - previous_time);
 
 
-                    if (Following_light)
-                        position_Light = -macamera.position;
 
                     previous_time = clock.ElapsedTicks;
 
                     //worldViewProj = macamera.view * proj;
                     //effect.SetValue("worldViewProj", worldViewProj);
 
-                    bool collide = Collision.CheckCollisions(macamera.position);
-
-                    if (collide)
-                        macamera.position = oldPos;
-                    else
-                        oldPos = macamera.position;
-
-                    effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
-                    effect.SetValue("LightPosition0", new Vector4(position_Light, 1));
+                    bool collide = false; //Collision.CheckCollisions(macamera.position);
 
                     if (collide)
                     {
-                        oldView *=
-                            Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y - oldAngle.Y) *
-                            Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X - oldAngle.X) *
-                            Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z - oldAngle.Z);
+                        macamera.position = oldPos;
+                        oldView =
+                            Matrix.Translation(oldPos) *
+                            Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y) *
+                            Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X) *
+                            Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z);
                         macamera.view = oldView;
                     }
                     else
+                    {
+                        oldPos = macamera.position;
                         oldView = macamera.view;
+                    }
+
+                    effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
+                    if (Following_light)
+                        position_Light = -macamera.position;
+                    effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
 
                     effect.SetValue("View", macamera.view);
-                    effect.SetValue("Sepia", false);
-
-                    for (int i = 0; i < VerticesCount; i++)
+                    effect.SetValue("Sepia", Sepia);
+                    /*if (maximum_disallowed)
                     {
-                        Program.device.SetStreamSource(0, Vertices[i], 0, Utilities.SizeOf<Vertex>());
-                        Program.device.SetTexture(0, Texture_ressource[i]);
-                        Program.device.DrawPrimitives(PrimType, 0, SizeModels[i]);
+                        effect.SetValue("nblights", 1);
+                        effect.SetValue("test", 100000f);
+                    }
+                    else
+                    {
+                        effect.SetValue("nblights", 3);
+                        effect.SetValue("test", 1f);
+                    }*/
+
+                    for (int i = 0; i < Liste_Models.Count; i++)
+                    {
+                        Program.device.SetStreamSource(0, Liste_Models[i].VertexBuffer, 0, Utilities.SizeOf<Vertex>());
+                        int j = 0;
+                        while (Liste_Models[i].map_Kd != Program.Liste_textures[j].path)
+                        {
+                            if (j > 0)
+                            {
+                            }
+                            j++;
+                        }
+                        Program.device.SetTexture(0, Program.Liste_textures[j].texture);
+                        Program.device.DrawPrimitives(PrimType, 0, Liste_Models[i].nbfaces);
                     }
 
                     effect.EndPass();
                     effect.End();
                 }
-                Program.device.EndScene();
+                Program.device.EndScene(); // Okay
                 Program.device.Present();
             });
 
-            for (int i = 0; i < nbmodels; i++)
+            for (int i = 0; i < Liste_Models.Count; i++)
             {
-                Texture_ressource[i].Dispose();
+                Liste_Models[i].VertexBuffer.Dispose();
             }
             clock.Stop();
             effect.Dispose();

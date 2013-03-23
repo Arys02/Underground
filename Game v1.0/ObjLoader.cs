@@ -15,7 +15,7 @@ namespace Underground
 {
     class ObjLoader
     {
-        private static void gotonextvalue(ref int i, ref byte[] obj)
+        public static void gotonextvalue(ref int i, ref byte[] obj)
         {
             int carac_Lu = obj[i];
             i++;
@@ -34,7 +34,7 @@ namespace Underground
             i--;
         }
 
-        private static string getstring(ref int i, ref byte[] obj)
+        public static string getstring(ref int i, ref byte[] obj)
         {
             List<char> liste = new List<char>();
             int carac_Lu = obj[i];
@@ -52,7 +52,7 @@ namespace Underground
             return new string(liste.ToArray());
         }
 
-        private static float getfloat(ref int i, ref byte[] obj)
+        public static float getfloat(ref int i, ref byte[] obj)
         {
             bool est_negatif = false;
             bool virgule = false;
@@ -82,7 +82,7 @@ namespace Underground
             return Convert.ToSingle(resultat / (Math.Pow(10, decalage)));
         }
 
-        private static void gotonextline(ref int i, ref byte[] obj)
+        public static void gotonextline(ref int i, ref byte[] obj)
         {
             int carac_Lu;
             do
@@ -92,15 +92,24 @@ namespace Underground
             } while (carac_Lu != '\n' && i < obj.Length);
         }
 
-        public static Vertex[] read_obj(byte[] obj, Vector4 referentiel, ref int nbfaces, ref int nbsommets, ref int nbnormales, ref int nbtextures)
+        public static void read_obj(byte[] obj, Vector4 referentiel, ref List<Model> Liste_Models)
         {
-            int i = 0;
+            int i = 0, nbsommets = 0, nbtextures = 0, nbnormales = 0;
+            int material_used = 0;
             int precedent_pourcentage = 0;
+            MtlLoader mtlloader = new MtlLoader();
             Program.WriteNicely("#", 2, "Ouverture du fichier " + obj[0].ToString());
+            Model model_actuel = new Model(new VertexBuffer(IntPtr.Zero), new Vertex[0], 0, "null.bmp");
+
+            ///////////// Pour la construction des sommets /////////////
             List<Vector2> ListeCoordTextures = new List<Vector2>();
             List<Vector4> ListeCoordSommets = new List<Vector4>();
             List<Vector4> ListeNormales = new List<Vector4>();
+
+            ///////////// Sommets /////////////
             List<Vertex> ListeVertex = new List<Vertex>();
+            //List<Vertex[]> ListeVerticesComplete_avec_differentes_textures_separee = new List<Vertex[]>();
+
             float x = 1, y = 1, z = 1;
             string type;
 
@@ -174,7 +183,7 @@ namespace Underground
                 #region faces
                 else if (type == "f")
                 {
-                    nbfaces++;
+                    model_actuel.nbfaces++;
                     //string abc;
                     // CONSTRUCTION SOMMET 1
                     // On recupère les info du sommet
@@ -187,16 +196,16 @@ namespace Underground
                     ListeVertex.Add(new Vertex()
                     {
                         Position = new Vector4(
-                            ListeCoordSommets[Convert.ToInt32(x-1)].X + referentiel.X,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].Y + referentiel.Y,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].Z + referentiel.Z,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].W + referentiel.W
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].X + referentiel.X,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].Y + referentiel.Y,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].Z + referentiel.Z,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].W + referentiel.W
                         ),
                         CoordTextures = new Vector2(
-                            ListeCoordTextures[Convert.ToInt32(y-1)].X,
-                            ListeCoordTextures[Convert.ToInt32(y-1)].Y
+                            ListeCoordTextures[Convert.ToInt32(y - 1)].X,
+                            ListeCoordTextures[Convert.ToInt32(y - 1)].Y
                         ),
-                        Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
+                        Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
                         Normal = ListeNormales[Convert.ToInt32(z - 1)]
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
@@ -222,7 +231,7 @@ namespace Underground
                             ListeCoordTextures[Convert.ToInt32(y-1)].X,
                             ListeCoordTextures[Convert.ToInt32(y-1)].Y
                         ),
-                        Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
+                        Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
                         Normal = ListeNormales[Convert.ToInt32(z - 1)]
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
@@ -248,7 +257,7 @@ namespace Underground
                             ListeCoordTextures[Convert.ToInt32(y-1)].X,
                             ListeCoordTextures[Convert.ToInt32(y-1)].Y
                         ),
-                        Color = new Vector4(couleur[0].Red, couleur[0].Green, couleur[0].Blue, 1.0f),
+                        Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
                         Normal = ListeNormales[Convert.ToInt32(z - 1)]
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
@@ -256,29 +265,66 @@ namespace Underground
                 }
                 #endregion
                 #region objet
-                else if (type == "o")
+                else if (type == "o") // S'il s'agit d'un nouvel objet on ne fait rien
                 {
                     i++;
                     Program.WriteNicely("#", 3, "Nouvel objet : " + getstring(ref i, ref obj));
                 }
                 #endregion
                 #region groupe
-                else if (type == "g")
+                else if (type == "g") // S'il s'agit d'un nouveau groupe on ne fait rien
                 {
                     i++;
                     Program.WriteNicely("#", 3, "Nouveau groupe : " + getstring(ref i, ref obj));
                 }
                 #endregion
                 #region material
-                else if (type == "mtllib")
+                else if (type == "mtllib") // S'il s'agit d'un nouveau fichier mtl on le lit et on le stocke
                 {
                     i++;
-                    Program.WriteNicely("#", 11, "Nouveau fichier .MTL : " + getstring(ref i, ref obj));
+                    string abc = getstring(ref i, ref obj);
+                    Console.Write("\t");
+                    Program.WriteNicely("#", 11, "Nouveau fichier .MTL : " + abc);
+                    mtlloader.read_mtl(abc, @"Ressources/Game/");
+                }
+                else if (type == "usemtl")
+                {
+                    i++;
+                    string abc = getstring(ref i, ref obj);
+                    Program.WriteNicely("#", 11, "utilisation de : " + abc);
+                    if (model_actuel.nbfaces != 0)
+                    {
+                        model_actuel.Sommets = ListeVertex.ToArray();
+                        model_actuel.map_Kd = mtlloader.MTLData[material_used].map_Kd;
+                        model_actuel.VertexBuffer = new VertexBuffer(Program.device,
+                            (
+                                Utilities.SizeOf<Vector4>()
+                                + Utilities.SizeOf<Vector2>()
+                                + Utilities.SizeOf<Vector4>()
+                                + Utilities.SizeOf<Vector4>() // NORMAL
+                            ) * 3 * model_actuel.nbfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
+
+                        ListeVertex.Clear();
+                        Liste_Models.Add(model_actuel);
+                        model_actuel = new Model(new VertexBuffer(IntPtr.Zero),new Vertex[0], 0, "null.bmp");
+                    }
+                    for (int j = 0; j < mtlloader.MTLData.Count; j++)
+                    {
+                        if (mtlloader.MTLData[j].name == abc)
+                        {
+                            material_used = j;
+                            j = mtlloader.MTLData.Count;
+                        }
+                    }
+                }
+                else if (type == "s")
+                {
+                    //Program.WriteNicely("#", 11, "Lissage OFF");
                 }
                 #endregion
                 else if (type == "")
                 {
-                    //Program.WriteNicely("#", 5, "Ligne vide");
+                    Program.WriteNicely("#", 5, "Ligne vide");
                 }
                 #region commentaire
                 else if (type[0] == '#')
@@ -301,8 +347,24 @@ namespace Underground
                 gotonextline(ref i, ref obj);
                 //i++;
             }
+            if (model_actuel.nbfaces != 0)
+            {
+                model_actuel.Sommets = ListeVertex.ToArray();
+                model_actuel.map_Kd = mtlloader.MTLData[material_used].map_Kd;
+                model_actuel.VertexBuffer = new VertexBuffer(Program.device,
+                    (
+                        Utilities.SizeOf<Vector4>()
+                        + Utilities.SizeOf<Vector2>()
+                        + Utilities.SizeOf<Vector4>()
+                        + Utilities.SizeOf<Vector4>() // NORMAL
+                    ) * 3 * model_actuel.nbfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
 
-            return ListeVertex.ToArray();
+                ListeVertex.Clear();
+                Liste_Models.Add(model_actuel);
+                model_actuel = new Model(new VertexBuffer(IntPtr.Zero), new Vertex[0], 0, "null.bmp");
+            }
+
+            //return ListeVertex.ToArray();
         }
     }
 }

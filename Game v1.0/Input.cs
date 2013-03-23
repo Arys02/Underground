@@ -51,19 +51,21 @@ namespace Underground
 
         void form_MouseMove(object sender, MouseEventArgs e)
         {
+            //Program.device.ShowCursor = false;
+            //Cursor.Hide();
+            //Cursor.Current = new Cursor("Curseur.cur");
+            //Cursor.Position = new Point(form.DesktopBounds.X., form.DesktopBounds.Y);
             MousePoint = e.Location;
 
-            Program.WriteNicely("i", 5, "x mousePos = " + MousePoint.X);
-            Program.WriteNicely("i", 5, "y mousePos = " + MousePoint.Y);
+            //Program.WriteNicely("i", 5, "x mousePos = " + MousePoint.X);
+            //Program.WriteNicely("i", 5, "y mousePos = " + MousePoint.Y);
         }
 
 
         void form_MouseDown(object sender, MouseEventArgs e)
         {
             MousePoint = e.Location;
-
             Program.WriteNicely("i", 6, "Mouse clicked ! x:" + MousePoint.X + " & y:" + MousePoint.Y);
-
             if (e.Button == MouseButtons.Left)
             {
                 mouseLeft = true;

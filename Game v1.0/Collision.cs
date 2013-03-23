@@ -16,24 +16,25 @@ namespace Underground
         public static List<BoundingBox> Initialize(Vertex[][] VerticesFinal)
         {
             var ListeBoundingBoxes = new List<BoundingBox>();
-
-            Program.WriteNicely("#", 12, "Creation des BBoxes !");
-            int t1 = VerticesFinal[0].GetUpperBound(0);
-
-            int vecPerBox = 2;
-
-            for (int i = 0; i <= t1 - vecPerBox; i = i + vecPerBox)
+            for (int k = 0; k <= VerticesFinal.GetUpperBound(0); k++)
             {
-                var tmp_vec = new List<Vector3>();
+                Program.WriteNicely("#", 12, "Creation des BBoxes !");
+                int t1 = VerticesFinal[k].GetUpperBound(0);
 
-                for (int j = 0; j < vecPerBox; j++)
+                int vecPerBox = 2;
+
+                for (int i = 0; i <= t1 - vecPerBox; i = i + vecPerBox)
                 {
-                    tmp_vec.Add((Vector3)VerticesFinal[0][i + j].Position);
-                }
-                var tmp2 = SharpDX.BoundingBox.FromPoints(tmp_vec.ToArray());
-                ListeBoundingBoxes.Add(tmp2);
-            }
+                    var tmp_vec = new List<Vector3>();
 
+                    for (int j = 0; j < vecPerBox; j++)
+                    {
+                        tmp_vec.Add((Vector3)VerticesFinal[k][i + j].Position);
+                    }
+                    var tmp2 = SharpDX.BoundingBox.FromPoints(tmp_vec.ToArray());
+                    ListeBoundingBoxes.Add(tmp2);
+                }
+            }
             bboxList = ListeBoundingBoxes;
 
             return ListeBoundingBoxes;

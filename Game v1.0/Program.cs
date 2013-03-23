@@ -20,7 +20,7 @@ using Effect = SharpDX.Direct3D9.Effect;
 
 namespace Underground
 {
-    struct Vertex
+    public struct Vertex
     {
         public Vector4 Position;
         //public Color Color;
@@ -28,10 +28,51 @@ namespace Underground
         public Vector4 Color;
         public Vector4 Normal;
     }
+    public struct Texturestruct
+    {
+        public string path;
+        public Texture texture;
+        public Texturestruct(string path, Texture texture)
+        {
+            this.path = path;
+            this.texture = texture;
+        }
+    }
+    public struct mtlstruct
+    {
+        public string name;
+        public Color Ka;
+        public Color Kd;
+        public Color Ks;
+        public string map_Kd;
+        public mtlstruct(string name, Color Ka, Color Kd, Color Ks, string map_Kd)
+        {
+            this.Ka = Ka;
+            this.Kd = Kd;
+            this.name = name;
+            this.Ks = Ks;
+            this.map_Kd = map_Kd;
+        }
+    }
+    public struct Model
+    {
+        public VertexBuffer VertexBuffer;
+        public Vertex[] Sommets;
+        public int nbfaces;
+        public string map_Kd;
+        public Model(VertexBuffer VertexBuffer, Vertex[] Sommets, int nbfaces, string map_Kd)
+        {
+            this.VertexBuffer = VertexBuffer;
+            this.Sommets = Sommets;
+            this.nbfaces = nbfaces;
+            this.map_Kd = map_Kd;
+        }
+    }
     internal static class Program
     {
         public static Device device;
         public static RenderForm form;
+        public static List<Texturestruct> Liste_textures;
 
         public static Input input;
         [STAThread]
@@ -53,7 +94,7 @@ namespace Underground
             #endregion
 
             #region Fenêtre
-            form = new RenderForm("Game - Soutenance 1");
+            form = new RenderForm("Game - Soutenance 3");
             form.Width = resolution[0];
             form.Height = resolution[1];
             Direct3D direct3D = new Direct3D();
@@ -93,11 +134,14 @@ namespace Underground
             device.VertexDeclaration = vertexDecl;
             #endregion
 
+            Liste_textures = new List<Texturestruct>();
+            Liste_textures.Add(new Texturestruct("null.bmp", Texture.FromFile(device, "null.bmp")));
 
             Thread test = new Thread(Sound.main);
             test.Start();
 
             Menu.Initialize();
+
 
             Ingame.ingame();
 

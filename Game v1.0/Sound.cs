@@ -36,14 +36,14 @@ namespace Underground
         }
         public static void bruitpas()
         {
-            Playsound(audio, @"Sound\pas.wav");
+            Playsound(audio, @"Ressources\Sound\pas.wav");
             pas.Abort();
             pas = new Thread(bruitpas);
         }
 
         public static void PlayEvenement()
         {
-            string even = @"Sound\bruitage\";
+            string even = @"Ressources\Sound\bruitage\";
             string[] soundbruitage = new[]
                 {
                     even+"cri.wav", even+"gore.wav",
@@ -52,7 +52,7 @@ namespace Underground
                     even+"bouillon.wav", even+"Breath.wav",
                     even+"Breath1.wav", even+"Breath3.wav",
                     even+"Chains.wav",even+"fire.wav",
-                    even+"Growl.wav", even+"Snarl1.wav",
+                    //even+"Growl.wav", even+"Snarl1.wav",
                     even+"Wind1.wav", even+"Wind2.wav",
                     even+"Wind3.wav", even+"Wind4.wav"
                 };
@@ -88,7 +88,7 @@ namespace Underground
         {
 
             Voice.SetVolume(10);
-            string ambiance = @"Sound\ambiance\";
+            string ambiance = @"Ressources\Sound\ambiance\";
             string[] soundAmbiance = new[]
                 {
                     @ambiance+@"a1.wav",
