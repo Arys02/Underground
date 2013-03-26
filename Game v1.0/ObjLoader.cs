@@ -206,7 +206,11 @@ namespace Underground
                             ListeCoordTextures[Convert.ToInt32(y - 1)].Y
                         ),
                         Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
-                        Normal = Vector4.Transform(ListeNormales[Convert.ToInt32(z - 1)],referentiel),
+                        Normal = new Vector4(Vector3.TransformNormal(new Vector3(
+                            ListeNormales[Convert.ToInt32(z - 1)].X,
+                            ListeNormales[Convert.ToInt32(z - 1)].Y,
+                            ListeNormales[Convert.ToInt32(z - 1)].Z),
+                            referentiel),1),
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
@@ -231,11 +235,15 @@ namespace Underground
                             ListeCoordSommets[Convert.ToInt32(x-1)].W
                         ),referentiel),
                         CoordTextures = new Vector2(
-                            ListeCoordTextures[Convert.ToInt32(y-1)].X,
-                            ListeCoordTextures[Convert.ToInt32(y-1)].Y
+                            ListeCoordTextures[Convert.ToInt32(y - 1)].X,
+                            ListeCoordTextures[Convert.ToInt32(y - 1)].Y
                         ),
                         Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
-                        Normal = Vector4.Transform(ListeNormales[Convert.ToInt32(z - 1)], referentiel),
+                        Normal = new Vector4(Vector3.TransformNormal(new Vector3(
+                            ListeNormales[Convert.ToInt32(z - 1)].X,
+                            ListeNormales[Convert.ToInt32(z - 1)].Y,
+                            ListeNormales[Convert.ToInt32(z - 1)].Z),
+                            referentiel), 1),
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
@@ -257,11 +265,15 @@ namespace Underground
                             ListeCoordSommets[Convert.ToInt32(x-1)].W
                         ),referentiel),
                         CoordTextures = new Vector2(
-                            ListeCoordTextures[Convert.ToInt32(y-1)].X,
-                            ListeCoordTextures[Convert.ToInt32(y-1)].Y
+                            ListeCoordTextures[Convert.ToInt32(y - 1)].X,
+                            ListeCoordTextures[Convert.ToInt32(y - 1)].Y
                         ),
                         Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
-                        Normal = Vector4.Transform(ListeNormales[Convert.ToInt32(z - 1)],referentiel),
+                        Normal = new Vector4(Vector3.TransformNormal(new Vector3(
+                            ListeNormales[Convert.ToInt32(z - 1)].X,
+                            ListeNormales[Convert.ToInt32(z - 1)].Y,
+                            ListeNormales[Convert.ToInt32(z - 1)].Z),
+                            referentiel), 1),
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
