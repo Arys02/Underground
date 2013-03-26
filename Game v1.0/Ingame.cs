@@ -24,7 +24,7 @@ namespace Underground
 
             for (int i = 0; i < nbmodels; i++)
             {
-                ObjLoader.read_obj(ModelFiles[i], new Vector4(i * 0, ((float)i) / 10, i * 10, 0), ref Liste_Models);
+                ObjLoader.read_obj(ModelFiles[i], Matrix.Multiply(Matrix.RotationY(Convert.ToSingle(Math.PI/2)),Matrix.Translation(i * 0, ((float)i) / 10, i * 10)), ref Liste_Models);
             }
         }
 
@@ -71,6 +71,7 @@ namespace Underground
             //string path = @"Ressources\Game\cube.obj";
             //string path = @"C:\Users\b95093cf\Desktop\model.obj";
             string path = @"Ressources\Game\ct0.obj";
+            //string path = @"Ressources\Game\cabine.obj";
 
             Byte[] fichier = File.ReadAllBytes(path);
             ModelFiles.Add(fichier);
@@ -225,16 +226,12 @@ namespace Underground
                         effect.SetValue("nblights", 3);
                         effect.SetValue("test", 1f);
                     }*/
-
                     for (int i = 0; i < Liste_Models.Count; i++)
                     {
                         Program.device.SetStreamSource(0, Liste_Models[i].VertexBuffer, 0, Utilities.SizeOf<Vertex>());
                         int j = 0;
                         while (Liste_Models[i].map_Kd != Program.Liste_textures[j].path)
                         {
-                            if (j > 0)
-                            {
-                            }
                             j++;
                         }
                         Program.device.SetTexture(0, Program.Liste_textures[j].texture);
