@@ -18,14 +18,19 @@ namespace Underground
         public static bool Following_light = true;
         public static bool maximum_disallowed = false;
         
-        public static void recup_env(ref List<Model> Liste_Models, ref List<Byte[]> ModelFiles, int nbmodels)
+        public static void recup_env(ref List<Model> Liste_Models, ref List<Byte[]> ModelFiles)
         {
             Liste_Models.Clear();
 
-            for (int i = 0; i < nbmodels; i++)
+            /*for (int i = 0; i < ModelFiles.Count; i++)
             {
-                ObjLoader.read_obj(ModelFiles[i], Matrix.Multiply(Matrix.RotationY(Convert.ToSingle(Math.PI/2)),Matrix.Translation(i * 0, ((float)i) / 10, i * 10)), ref Liste_Models);
-            }
+                ObjLoader.read_obj(ModelFiles[i], Matrix.Translation(i * 0, 0, i * 10) * Matrix.RotationY((float) Math.PI/2), ref Liste_Models);
+            }*/
+            ObjLoader.read_obj(ModelFiles[0], Matrix.RotationY(0 * (float)Math.PI / 2) * Matrix.Translation(0, 0, 0), ref Liste_Models);
+            ObjLoader.read_obj(ModelFiles[1], Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(-2, 0, 34), ref Liste_Models);
+            ObjLoader.read_obj(ModelFiles[2], Matrix.RotationY(1 * (float)Math.PI / 2) * Matrix.Translation(-34, 0, -2), ref Liste_Models);
+            ObjLoader.read_obj(ModelFiles[3], Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-36, 0, 32), ref Liste_Models);
+            ObjLoader.read_obj(ModelFiles[4], Matrix.Scaling(0.5f) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-3f, -1.8f, 6), ref Liste_Models);
         }
 
         //> Color codes for WriteNicely : 
@@ -47,7 +52,7 @@ namespace Underground
         //15: White.
         static public void ingame()
         {
-            const int nbmodels = 1, nblights = 3;
+            int nblights = 3;
             List<Byte[]> ModelFiles = new List<Byte[]>();
             List<Model> Liste_Models = new List<Model>();
             Texture[] Texture_ressource = new Texture[5];
@@ -71,10 +76,17 @@ namespace Underground
             //string path = @"Ressources\Game\cube.obj";
             //string path = @"C:\Users\b95093cf\Desktop\model.obj";
             string path = @"Ressources\Game\ct0.obj";
-            //string path = @"Ressources\Game\cabine.obj";
+            string path2 = @"Ressources\Game\cabine.obj";
 
             Byte[] fichier = File.ReadAllBytes(path);
+            Byte[] fichier2 = File.ReadAllBytes(path2);
             ModelFiles.Add(fichier);
+            ModelFiles.Add(fichier);
+            ModelFiles.Add(fichier);
+            ModelFiles.Add(fichier);
+            ModelFiles.Add(fichier2);
+            //ModelFiles.Add(fichier);
+            //ModelFiles.Add(fichier);
             Texture_ressource[0] = Texture.FromMemory(Program.device, File.ReadAllBytes("null.bmp"));
             for (int i = 1; i < 5; i++)
             {
@@ -91,7 +103,7 @@ namespace Underground
                     Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\Beton20.jpg"));
             }
 
-            recup_env(ref Liste_Models, ref ModelFiles, nbmodels);
+            recup_env(ref Liste_Models, ref ModelFiles);
 
             for (int i = 0; i < Liste_Models.Count; i++)
             {
@@ -105,7 +117,7 @@ namespace Underground
             // Light1
             effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
             effect.SetValue("LightDiffuseColor[0]", new Vector4(0.9f, 0.9f, 0.9f, 1));
-            effect.SetValue("LightDistanceSquared[0]", 30f);
+            effect.SetValue("LightDistanceSquared[0]", 50f);
 
             // Light2
             if (nblights > 1)
