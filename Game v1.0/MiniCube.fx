@@ -10,6 +10,7 @@ float4 AmbientLightColor;
 float4 LightPosition[nblights];
 float4 LightDiffuseColor[nblights]; // intensity multiplier
 float LightDistanceSquared[nblights];
+float luminosity;
 
 bool Sepia = false;
 float test;
@@ -76,9 +77,9 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		finalLights[0] += finalLights[i];
 	}
 	//finalLights[0] = min(finalLights[0],float4(0.6,0.6,0.6,1));
-	float4 finalPixel = saturate(texel.xyzw * (AmbientLightColor + finalLights[0]) * input.Color);
+	float4 finalPixel = saturate(texel.xyzw * (AmbientLightColor + finalLights[0]) * input.Color) * luminosity;
 	finalPixel.w = texel.w;
-	return finalPixel;
+	return min(finalPixel,texel);
 
 }
 
@@ -88,6 +89,6 @@ technique Main {
         DestBlend = INVSRCALPHA;
         SrcBlend = SRCALPHA;
 		VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader  = compile ps_3_0 PixelShaderFunction();
+        PixelShader  = compile ps_2_0 PixelShaderFunction();
 	}
 }

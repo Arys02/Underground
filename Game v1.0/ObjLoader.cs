@@ -44,7 +44,10 @@ namespace Underground
                 i < obj.Length
             )
             {
-                liste.Add(Convert.ToChar(carac_Lu));
+                if (carac_Lu != '\r')
+                {
+                    liste.Add(Convert.ToChar(carac_Lu));
+                }
                 carac_Lu = obj[i];
                 i++;
             }
@@ -183,6 +186,12 @@ namespace Underground
                 #region faces
                 else if (type == "f")
                 {
+                    bool testing = false;
+                    if (mtlloader.MTLData.Count == 0)
+                    {
+                        testing = true;
+                        mtlloader.MTLData.Add(new mtlstruct("", Color.White, Color.White, Color.White, "null.bmp"));
+                    }
                     model_actuel.nbfaces++;
                     //string abc;
                     // CONSTRUCTION SOMMET 1
@@ -277,6 +286,8 @@ namespace Underground
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
+                    if (testing)
+                        mtlloader.MTLData.Clear();
                 }
                 #endregion
                 #region objet
@@ -364,6 +375,7 @@ namespace Underground
             }
             if (model_actuel.nbfaces != 0)
             {
+                mtlloader.MTLData.Add(new mtlstruct("", Color.White, Color.White, Color.White, "null.bmp"));
                 model_actuel.Sommets = ListeVertex.ToArray();
                 model_actuel.map_Kd = mtlloader.MTLData[material_used].map_Kd;
                 model_actuel.VertexBuffer = new VertexBuffer(Program.device,
@@ -373,7 +385,7 @@ namespace Underground
                         + Utilities.SizeOf<Vector4>()
                         + Utilities.SizeOf<Vector4>() // NORMAL
                     ) * 3 * model_actuel.nbfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
-
+                mtlloader.MTLData.Clear();
                 ListeVertex.Clear();
                 Liste_Models.Add(model_actuel);
                 model_actuel = new Model(new VertexBuffer(IntPtr.Zero), new Vertex[0], 0, "null.bmp");

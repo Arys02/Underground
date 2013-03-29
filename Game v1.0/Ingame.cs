@@ -17,7 +17,48 @@ namespace Underground
         public static bool Sepia = false;
         public static bool Following_light = true;
         public static bool maximum_disallowed = false;
-        
+        public static float luminosity = 1f;
+
+        public static void fevents()
+        {
+            Stopwatch clock = new Stopwatch();
+            clock.Start();
+            Int64 previous_flash = clock.ElapsedTicks;
+            Int64 previous_time = clock.ElapsedTicks;
+            int stateinflash = 0; // 0 = non débuté // -1 = en décroissance // 1 = en croissance
+            while (true)
+            {
+                if (stateinflash == -1)
+                {
+                    luminosity -= Convert.ToSingle((clock.ElapsedTicks - previous_time) / 500000f);
+                    if (luminosity < 0)
+                    {
+                        luminosity = 0;
+                        stateinflash = 1;
+                    }
+                }
+                else if (stateinflash == 1)
+                {
+                    luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / 500000f);
+                    if (luminosity > 1)
+                    {
+                        luminosity = 1;
+                        stateinflash = 0;
+                        previous_flash = clock.ElapsedTicks;
+                    }
+                }
+                else
+                {
+                    if (clock.ElapsedTicks > previous_flash + 10000000)
+                    {
+                        Console.WriteLine("Flash !");
+                        stateinflash = -1;
+                    }
+                }
+                previous_time = clock.ElapsedTicks;
+            }
+        }
+
         public static void recup_env(ref List<Model> Liste_Models, ref List<Byte[]> ModelFiles)
         {
             Liste_Models.Clear();
@@ -30,7 +71,7 @@ namespace Underground
             ObjLoader.read_obj(ModelFiles[1], Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(-2, 0, 34), ref Liste_Models);
             ObjLoader.read_obj(ModelFiles[2], Matrix.RotationY(1 * (float)Math.PI / 2) * Matrix.Translation(-34, 0, -2), ref Liste_Models);
             ObjLoader.read_obj(ModelFiles[3], Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-36, 0, 32), ref Liste_Models);
-            ObjLoader.read_obj(ModelFiles[4], Matrix.Scaling(0.5f) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-3f, -1.8f, 6), ref Liste_Models);
+            ObjLoader.read_obj(ModelFiles[4], Matrix.Scaling(0.5f) * Matrix.RotationY((float)Math.PI) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-3f, -1.8f, 28), ref Liste_Models);
         }
 
         //> Color codes for WriteNicely : 
@@ -69,7 +110,6 @@ namespace Underground
             Vector3 position_Light = -macamera.position;
             Stopwatch clock = new Stopwatch();
             clock.Start();
-
 
             //string path = @"..\..\ct0_new.obj";
             //string path = @"Ressources\Game\Lighthouse.obj";
@@ -117,7 +157,7 @@ namespace Underground
             // Light1
             effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
             effect.SetValue("LightDiffuseColor[0]", new Vector4(0.9f, 0.9f, 0.9f, 1));
-            effect.SetValue("LightDistanceSquared[0]", 50f);
+            effect.SetValue("LightDistanceSquared[0]", 80f);
 
             // Light2
             if (nblights > 1)
@@ -228,6 +268,7 @@ namespace Underground
 
                     effect.SetValue("View", macamera.view);
                     effect.SetValue("Sepia", Sepia);
+                    effect.SetValue("luminosity", luminosity);
                     /*if (maximum_disallowed)
                     {
                         effect.SetValue("nblights", 1);

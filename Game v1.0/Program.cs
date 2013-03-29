@@ -137,14 +137,18 @@ namespace Underground
             Liste_textures = new List<Texturestruct>();
             Liste_textures.Add(new Texturestruct("null.bmp", Texture.FromFile(device, "null.bmp")));
 
-            Thread test = new Thread(Sound.main);
-            test.Start();
+            Thread ThSound = new Thread(Sound.main);
+            Thread ThEvents = new Thread(Ingame.fevents);
+            ThSound.Start();
+            ThEvents.Start();
 
             Menu.Initialize();
 
 
             Ingame.ingame();
 
+            ThSound.Abort();
+            ThEvents.Abort();
             device.Dispose();
             direct3D.Dispose();
 
