@@ -52,7 +52,7 @@ namespace Underground
             /************ Utile pour faire des tests ************/
             if (Program.input.KeysDown.Contains(Keys.A))
             {
-                Console.WriteLine("Y: {0} \t X: {1} \t Z: {2}", angle.Y, angle.X, angle.Z);
+                if (Ingame.stateinflash == 0) Ingame.stateinflash = -1;
             }
             if (Program.input.KeysDown.Contains(Keys.R)) // Reset
             {

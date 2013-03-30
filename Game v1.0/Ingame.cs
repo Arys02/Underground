@@ -18,6 +18,7 @@ namespace Underground
         public static bool Following_light = true;
         public static bool maximum_disallowed = false;
         public static float luminosity = 1f;
+        public static int stateinflash = 0; // 0 = non débuté // -1 = en décroissance // 1 = en croissance
 
         public static void fevents()
         {
@@ -25,7 +26,6 @@ namespace Underground
             clock.Start();
             Int64 previous_flash = clock.ElapsedTicks;
             Int64 previous_time = clock.ElapsedTicks;
-            int stateinflash = 0; // 0 = non débuté // -1 = en décroissance // 1 = en croissance
             while (true)
             {
                 if (stateinflash == -1)
@@ -49,7 +49,7 @@ namespace Underground
                 }
                 else
                 {
-                    if (clock.ElapsedTicks > previous_flash + 10000000)
+                    if (clock.ElapsedTicks > previous_flash + 10*3500000)
                     {
                         Console.WriteLine("Flash !");
                         stateinflash = -1;
