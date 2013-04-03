@@ -50,6 +50,10 @@ namespace Underground
 
             #region clavier
             /************ Utile pour faire des tests ************/
+            if (Program.input.KeysDown.Contains(Keys.Escape))
+            {
+                Menu.IsInMenu = true;
+            }
             if (Program.input.KeysDown.Contains(Keys.A))
             {
                 if (Ingame.stateinflash == 0) Ingame.stateinflash = -1;

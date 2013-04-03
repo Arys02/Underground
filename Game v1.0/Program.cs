@@ -73,6 +73,8 @@ namespace Underground
         public static Device device;
         public static RenderForm form;
         public static List<Texturestruct> Liste_textures;
+        public static int[] resolution = new int[2] { 1280, 1024 };
+        public static VertexElement[] vertexElems3D;
 
         public static Input input;
         [STAThread]
@@ -86,7 +88,6 @@ namespace Underground
         private static void Main()
         {
             #region Variables
-            int[] resolution = new int[2] { 1280, 1024 };
             int menu_running = 1;
             // 0 -> jeu en cours
             // 1 -> menu de demarrage
@@ -115,7 +116,7 @@ namespace Underground
                 PresentInterval.Immediate);
             input = new Input(form);
             device = new Device(direct3D, 0, DeviceType.Hardware, form.Handle, CreateFlags.HardwareVertexProcessing, Parametres);
-            VertexElement[] vertexElems = new[] {
+            vertexElems3D = new[] {
         		new VertexElement(0, 0, DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Position, 0),
 				new VertexElement(0,
                     Convert.ToInt16(Utilities.SizeOf<Vector4>()),
@@ -130,8 +131,11 @@ namespace Underground
                     DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Normal, 0),
                 VertexElement.VertexDeclarationEnd
         	};
-            VertexDeclaration vertexDecl = new VertexDeclaration(device, vertexElems);
-            device.VertexDeclaration = vertexDecl;
+            device.VertexDeclaration = new VertexDeclaration(device, vertexElems3D);
+
+            Program.device.SetRenderState(RenderState.AlphaBlendEnable, true);
+            Program.device.SetRenderState(RenderState.DestinationBlend, Blend.InverseSourceAlpha);
+            Program.device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha);
             #endregion
 
             Liste_textures = new List<Texturestruct>();
@@ -147,6 +151,7 @@ namespace Underground
 
             Ingame.ingame();
 
+            Menu.Dispose();
             ThSound.Abort();
             ThEvents.Abort();
             device.Dispose();

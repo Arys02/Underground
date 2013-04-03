@@ -60,6 +60,12 @@ namespace Underground
             {
                 for (int x = 0; x < 1; x++)
                 {
+                    VertexElement[] vertexElems2D = new[] {
+                                                new VertexElement(0,0,DeclarationType.Float4,DeclarationMethod.Default,DeclarationUsage.PositionTransformed,0),
+                                                new VertexElement(0,16,DeclarationType.Float2,DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
+                                                VertexElement.VertexDeclarationEnd
+                                            };
+                    Program.device.VertexDeclaration = new VertexDeclaration(Program.device, vertexElems2D);
                     vertices_img.Lock(0, 0, LockFlags.None).WriteRange(new Vertex[] {
                                                 new Vertex() { Position = new Vector4(x * w, y * h, 0f, 1.0f), CoordTextures = new Vector2(0f, 0f) },
                                                 new Vertex() { Position = new Vector4(x * w + w, y * h, 0f, 1.0f), CoordTextures = new Vector2(1f, 0f) },
@@ -67,15 +73,7 @@ namespace Underground
                                                 new Vertex() { Position = new Vector4(x * w + w, y * h + h, 0f, 1.0f), CoordTextures = new Vector2(1f, 1f) },
                                                 new Vertex() { Position = new Vector4(x * w + w, y * h, 0f, 1.0f), CoordTextures = new Vector2(1f, 0f) }});
                     vertices_img.Unlock();
-                    VertexElement[] VertexElemsImg = new[] {
-                                                new VertexElement(0,0,DeclarationType.Float4,DeclarationMethod.Default,DeclarationUsage.PositionTransformed,0),
-                                                new VertexElement(0,16,DeclarationType.Float2,DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
-                                                VertexElement.VertexDeclarationEnd
-                                            };
 
-                    VertexDeclaration VertexDec3 = new VertexDeclaration(Program.device, VertexElemsImg);
-                    Program.device.SetStreamSource(0, vertices_img, 0, Utilities.SizeOf<Vertex>() * 5);
-                    Program.device.VertexDeclaration = VertexDec3;
                     Program.device.SetTexture(0, Texture_background_menu);
                     Program.device.SetStreamSource(0, vertices_img, 0, Utilities.SizeOf<Vertex>());
                     Program.device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
@@ -103,33 +101,16 @@ namespace Underground
 
                 if (mouse.X > -0.16 && mouse.X < 0.15 && mouse.Y > -0.08 && mouse.Y < 0.04)
                 {
-                    Texture_background_menu.Dispose();
-                    vertices_img.Dispose();
-                    font.Dispose();
-
-                    VertexElement[] vertexElems = new[] {
-        		        new VertexElement(0, 0, DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Position, 0),
-				        new VertexElement(0,
-                            Convert.ToInt16(Utilities.SizeOf<Vector4>()),
-                            DeclarationType.Float2, DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
-                        new VertexElement(0,
-                            Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()),
-                            DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Color, 0),
-
-                        // NORMAL
-                        new VertexElement(0,
-                            Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()),
-                            DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Normal, 0),
-                        VertexElement.VertexDeclarationEnd
-        	        };
-                    VertexDeclaration vertexDecl = new VertexDeclaration(Program.device, vertexElems);
-                    Program.device.VertexDeclaration = vertexDecl;
+                    Program.device.VertexDeclaration = new VertexDeclaration(Program.device, Program.vertexElems3D);
                     IsInMenu = false;
                 }
             }
-
-
-
+        }
+        static public void Dispose()
+        {
+            Texture_background_menu.Dispose();
+            vertices_img.Dispose();
+            font.Dispose();
         }
     }
 }

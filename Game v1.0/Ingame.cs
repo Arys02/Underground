@@ -19,6 +19,7 @@ namespace Underground
         public static bool maximum_disallowed = false;
         public static float luminosity = 1f;
         public static int stateinflash = 0; // 0 = non débuté // -1 = en décroissance // 1 = en croissance
+        public static float percent = 1;
 
         public static void fevents()
         {
@@ -26,11 +27,13 @@ namespace Underground
             clock.Start();
             Int64 previous_flash = clock.ElapsedTicks;
             Int64 previous_time = clock.ElapsedTicks;
+            double Ticks_Clignement = 500000;
+            int Seconde_A_Attendre = 10;
             while (true)
             {
                 if (stateinflash == -1)
                 {
-                    luminosity -= Convert.ToSingle((clock.ElapsedTicks - previous_time) / 500000f);
+                    luminosity -= Convert.ToSingle((clock.ElapsedTicks - previous_time) / Ticks_Clignement);
                     if (luminosity < 0)
                     {
                         luminosity = 0;
@@ -39,7 +42,7 @@ namespace Underground
                 }
                 else if (stateinflash == 1)
                 {
-                    luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / 500000f);
+                    luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / Ticks_Clignement);
                     if (luminosity > 1)
                     {
                         luminosity = 1;
@@ -49,7 +52,9 @@ namespace Underground
                 }
                 else
                 {
-                    if (clock.ElapsedTicks > previous_flash + 10*3500000)
+                    percent = 1f - ((float)(clock.ElapsedTicks - previous_flash) / (float)(Seconde_A_Attendre * 3500000));
+                    if (percent < 0) percent = 0;
+                    if (clock.ElapsedTicks > previous_flash + Seconde_A_Attendre * 3500000)
                     {
                         Console.WriteLine("Flash !");
                         stateinflash = -1;
@@ -96,7 +101,6 @@ namespace Underground
             int nblights = 3;
             List<Byte[]> ModelFiles = new List<Byte[]>();
             List<Model> Liste_Models = new List<Model>();
-            Texture[] Texture_ressource = new Texture[5];
             Matrix view = Matrix.LookAtLH(new Vector3(0, 0, -0.00002f), new Vector3(0, 0, 0), Vector3.UnitY);
             Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 100.0f);
             Matrix viewProj = Matrix.Multiply(view, proj);
@@ -107,6 +111,7 @@ namespace Underground
             EffectHandle technique = effect.GetTechnique(0);
             EffectHandle pass = effect.GetPass(technique, 0);
             Camera macamera = new Camera();
+            HUD hud = new HUD();
             Vector3 position_Light = -macamera.position;
             Stopwatch clock = new Stopwatch();
             clock.Start();
@@ -127,21 +132,6 @@ namespace Underground
             ModelFiles.Add(fichier2);
             //ModelFiles.Add(fichier);
             //ModelFiles.Add(fichier);
-            Texture_ressource[0] = Texture.FromMemory(Program.device, File.ReadAllBytes("null.bmp"));
-            for (int i = 1; i < 5; i++)
-            {
-                if (i == 1)
-                    //Texture_ressource[i] = Texture.FromFile(device, @"Ressources\Game\Images\dev.png");
-                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\Beton20.jpg"));
-                else if (i == 2)
-                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\porte-beton-texture-en-beton_19-136906.jpg"));
-                else if (i == 3)
-                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\dev2.png"));
-                else if (i == 4)
-                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\woodfloor.bmp"));
-                else
-                    Texture_ressource[i] = Texture.FromMemory(Program.device, File.ReadAllBytes(@"Ressources\Game\Images\Beton20.jpg"));
-            }
 
             recup_env(ref Liste_Models, ref ModelFiles);
 
@@ -157,7 +147,7 @@ namespace Underground
             // Light1
             effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
             effect.SetValue("LightDiffuseColor[0]", new Vector4(0.9f, 0.9f, 0.9f, 1));
-            effect.SetValue("LightDistanceSquared[0]", 80f);
+            effect.SetValue("LightDistanceSquared[0]", 280f);
 
             // Light2
             if (nblights > 1)
@@ -212,7 +202,6 @@ namespace Underground
             Vector3 oldPos = macamera.position;
             Vector3 oldAngle = macamera.angle;
 
-
             RenderLoop.Run(Program.form, () =>
             {
 
@@ -262,6 +251,7 @@ namespace Underground
                     }
 
                     effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
+                    //effect.SetValue("CameraFaceTo", Vector3.Transform(new Vector3(1, 0, 0), Matrix.RotationYawPitchRoll((float)(-macamera.angle.Y + Math.PI/2), macamera.angle.X, macamera.angle.Z)));
                     if (Following_light)
                         position_Light = -macamera.position;
                     effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
@@ -293,11 +283,13 @@ namespace Underground
 
                     effect.EndPass();
                     effect.End();
+                    hud.Display_HUD();
                 }
                 Program.device.EndScene(); // Okay
                 Program.device.Present();
             });
-
+            Menu.Dispose();
+            hud.Dispose();
             for (int i = 0; i < Liste_Models.Count; i++)
             {
                 Liste_Models[i].VertexBuffer.Dispose();
