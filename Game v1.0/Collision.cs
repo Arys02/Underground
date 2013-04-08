@@ -13,7 +13,7 @@ namespace Underground
 
         private static List<BoundingBox> bboxList;
 
-        public static List<BoundingBox> Initialize(Vertex[][] VerticesFinal)
+        public static List<BoundingBox> Initialize(structVertex[][] VerticesFinal)
         {
             var ListeBoundingBoxes = new List<BoundingBox>();
             for (int k = 0; k <= VerticesFinal.GetUpperBound(0); k++)

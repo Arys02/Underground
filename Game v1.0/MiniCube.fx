@@ -13,8 +13,6 @@ float LightDistanceSquared[nblights];
 float luminosity;
 
 bool Sepia = false;
-float test;
-float4x4 essai;
 sampler2D s_2D;
 
 sampler S0 = sampler_state
@@ -79,7 +77,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	//finalLights[0] = min(finalLights[0],float4(0.6,0.6,0.6,1));
 	float4 finalPixel = saturate(texel.xyzw * (AmbientLightColor + finalLights[0]) * input.Color) * luminosity;
 	finalPixel.w = texel.w;
-	return min(finalPixel,texel);
+	return min(finalPixel,saturate(texel+input.Color));
 
 }
 
@@ -88,6 +86,8 @@ technique Main {
         AlphaBlendEnable = TRUE;
         DestBlend = INVSRCALPHA;
         SrcBlend = SRCALPHA;
+		AlphaTestEnable = True;
+		AlphaFunc = Greater;
 		VertexShader = compile vs_2_0 VertexShaderFunction();
         PixelShader  = compile ps_2_0 PixelShaderFunction();
 	}

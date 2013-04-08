@@ -15,6 +15,11 @@ namespace Underground
 {
     class ObjLoader
     {
+        private static MtlLoader mtlloader;
+        static public void Initialize()
+        {
+            mtlloader = new MtlLoader();
+        }
         public static void gotonextvalue(ref int i, ref byte[] obj)
         {
             int carac_Lu = obj[i];
@@ -95,14 +100,14 @@ namespace Underground
             } while (carac_Lu != '\n' && i < obj.Length);
         }
 
-        public static void read_obj(byte[] obj, Matrix referentiel, ref List<Model> Liste_Models)
+        public static List<structModel> read_obj(byte[] obj, Matrix referentiel)
         {
+            List<structModel> Liste_Models = new List<structModel>();
             int i = 0, nbsommets = 0, nbtextures = 0, nbnormales = 0;
             int material_used = 0;
             int precedent_pourcentage = 0;
-            MtlLoader mtlloader = new MtlLoader();
             Program.WriteNicely("#", 2, "Ouverture du fichier " + obj[0].ToString());
-            Model model_actuel = new Model(new VertexBuffer(IntPtr.Zero), new Vertex[0], 0, "null.bmp");
+            structModel model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp");
 
             ///////////// Pour la construction des sommets /////////////
             List<Vector2> ListeCoordTextures = new List<Vector2>();
@@ -110,7 +115,7 @@ namespace Underground
             List<Vector4> ListeNormales = new List<Vector4>();
 
             ///////////// Sommets /////////////
-            List<Vertex> ListeVertex = new List<Vertex>();
+            List<structVertex> ListeVertex = new List<structVertex>();
             //List<Vertex[]> ListeVerticesComplete_avec_differentes_textures_separee = new List<Vertex[]>();
 
             float x = 1, y = 1, z = 1;
@@ -190,7 +195,7 @@ namespace Underground
                     if (mtlloader.MTLData.Count == 0)
                     {
                         testing = true;
-                        mtlloader.MTLData.Add(new mtlstruct("", Color.White, Color.White, Color.White, "null.bmp"));
+                        mtlloader.MTLData.Add(new structMTL("", Color.White, Color.White, Color.White, "null.bmp"));
                     }
                     model_actuel.nbfaces++;
                     //string abc;
@@ -202,7 +207,7 @@ namespace Underground
                     y = getfloat(ref i, ref obj); // Coord y
                     i++; // slash
                     z = getfloat(ref i, ref obj); // Coord z
-                    ListeVertex.Add(new Vertex()
+                    ListeVertex.Add(new structVertex()
                     {
                         Position = Vector4.Transform(new Vector4(
                             ListeCoordSommets[Convert.ToInt32(x - 1)].X,
@@ -235,7 +240,7 @@ namespace Underground
 
                     //var abcd = Vector4.Transform(new Vector4(0, 0, 1, 1), Matrix.Multiply(Matrix.RotationY(Convert.ToSingle(-Math.PI / 2)), Matrix.Translation(1, 0, 0)));
 
-                    ListeVertex.Add(new Vertex()
+                    ListeVertex.Add(new structVertex()
                     {
                         Position = Vector4.Transform(new Vector4(
                             ListeCoordSommets[Convert.ToInt32(x-1)].X,
@@ -265,7 +270,7 @@ namespace Underground
                     y = getfloat(ref i, ref obj); // Coord y
                     i++; // slash
                     z = getfloat(ref i, ref obj); // Coord z
-                    ListeVertex.Add(new Vertex()
+                    ListeVertex.Add(new structVertex()
                     {
                         Position = Vector4.Transform(new Vector4(
                             ListeCoordSommets[Convert.ToInt32(x-1)].X,
@@ -324,15 +329,12 @@ namespace Underground
                         model_actuel.map_Kd = mtlloader.MTLData[material_used].map_Kd;
                         model_actuel.VertexBuffer = new VertexBuffer(Program.device,
                             (
-                                Utilities.SizeOf<Vector4>()
-                                + Utilities.SizeOf<Vector2>()
-                                + Utilities.SizeOf<Vector4>()
-                                + Utilities.SizeOf<Vector4>() // NORMAL
+                                Utilities.SizeOf<structVertex>() // NORMAL
                             ) * 3 * model_actuel.nbfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
 
                         ListeVertex.Clear();
                         Liste_Models.Add(model_actuel);
-                        model_actuel = new Model(new VertexBuffer(IntPtr.Zero),new Vertex[0], 0, "null.bmp");
+                        model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp");
                     }
                     for (int j = 0; j < mtlloader.MTLData.Count; j++)
                     {
@@ -375,22 +377,20 @@ namespace Underground
             }
             if (model_actuel.nbfaces != 0)
             {
-                mtlloader.MTLData.Add(new mtlstruct("", Color.White, Color.White, Color.White, "null.bmp"));
+                mtlloader.MTLData.Add(new structMTL("", Color.White, Color.White, Color.White, "null.bmp"));
                 model_actuel.Sommets = ListeVertex.ToArray();
                 model_actuel.map_Kd = mtlloader.MTLData[material_used].map_Kd;
                 model_actuel.VertexBuffer = new VertexBuffer(Program.device,
                     (
-                        Utilities.SizeOf<Vector4>()
-                        + Utilities.SizeOf<Vector2>()
-                        + Utilities.SizeOf<Vector4>()
-                        + Utilities.SizeOf<Vector4>() // NORMAL
+                        Utilities.SizeOf<structVertex>() // NORMAL
                     ) * 3 * model_actuel.nbfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
                 mtlloader.MTLData.Clear();
                 ListeVertex.Clear();
                 Liste_Models.Add(model_actuel);
-                model_actuel = new Model(new VertexBuffer(IntPtr.Zero), new Vertex[0], 0, "null.bmp");
+                //model_actuel = new Model(Program.VertexBufferZero, new Vertex[0], 0, "null.bmp");
             }
 
+            return Liste_Models;
             //return ListeVertex.ToArray();
         }
     }

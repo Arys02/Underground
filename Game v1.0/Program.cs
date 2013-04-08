@@ -20,7 +20,18 @@ using Effect = SharpDX.Direct3D9.Effect;
 
 namespace Underground
 {
-    public struct Vertex
+    #region structures
+    public struct structModelFiles
+    {
+        public byte[] data;
+        public Matrix Transformation;
+        public structModelFiles(byte[] data, Matrix Transformation)
+        {
+            this.data = data;
+            this.Transformation = Transformation;
+        }
+    }
+    public struct structVertex
     {
         public Vector4 Position;
         //public Color Color;
@@ -28,24 +39,34 @@ namespace Underground
         public Vector4 Color;
         public Vector4 Normal;
     }
-    public struct Texturestruct
+    public struct structTexture
     {
         public string path;
         public Texture texture;
-        public Texturestruct(string path, Texture texture)
+        public structTexture(string path, Texture texture)
         {
             this.path = path;
             this.texture = texture;
         }
     }
-    public struct mtlstruct
+    public struct structBinary
+    {
+        public string path;
+        public Byte[] data;
+        public structBinary(string path, Byte[] data)
+        {
+            this.path = path;
+            this.data = data;
+        }
+    }
+    public struct structMTL
     {
         public string name;
         public Color Ka;
         public Color Kd;
         public Color Ks;
         public string map_Kd;
-        public mtlstruct(string name, Color Ka, Color Kd, Color Ks, string map_Kd)
+        public structMTL(string name, Color Ka, Color Kd, Color Ks, string map_Kd)
         {
             this.Ka = Ka;
             this.Kd = Kd;
@@ -54,13 +75,13 @@ namespace Underground
             this.map_Kd = map_Kd;
         }
     }
-    public struct Model
+    public struct structModel
     {
         public VertexBuffer VertexBuffer;
-        public Vertex[] Sommets;
+        public structVertex[] Sommets;
         public int nbfaces;
         public string map_Kd;
-        public Model(VertexBuffer VertexBuffer, Vertex[] Sommets, int nbfaces, string map_Kd)
+        public structModel(VertexBuffer VertexBuffer, structVertex[] Sommets, int nbfaces, string map_Kd)
         {
             this.VertexBuffer = VertexBuffer;
             this.Sommets = Sommets;
@@ -68,13 +89,36 @@ namespace Underground
             this.map_Kd = map_Kd;
         }
     }
+    public struct structOBJ
+    {
+        public string path;
+        public Matrix Transformation;
+        public List<structModel> data;
+        public int IDTile;
+        public structOBJ(string path, Matrix Transformation, List<structModel> data, int IDTile)
+        {
+            this.IDTile = IDTile;
+            this.data = data;
+            this.path = path;
+            this.Transformation = Transformation;
+        }
+    }
+    #endregion
+
+
     internal static class Program
     {
         public static Device device;
         public static RenderForm form;
-        public static List<Texturestruct> Liste_textures;
+        public static List<structTexture> Liste_textures;
+        public static List<structBinary> Liste_binaires;
+        public static List<structOBJ> Liste_OBJ;
         public static int[] resolution = new int[2] { 1280, 1024 };
         public static VertexElement[] vertexElems3D;
+        public static VertexElement[] vertexElems2D;
+        public static VertexDeclaration VertexDeclaration3D;
+        public static VertexDeclaration VertexDeclaration2D;
+        public static VertexBuffer VertexBufferZero;
 
         public static Input input;
         [STAThread]
@@ -85,6 +129,72 @@ namespace Underground
             Console.ResetColor();
             Console.WriteLine(msg);
         }
+
+        ///////////////////////////////////////////
+        // Ajoute une texture dans Liste_textures en gardant en mémoire bah, la texture et le chemin de la texture.
+        // Si la texture est déjà présente dans la liste, inutile de la réajouter.
+        // Retourne la position de la texture
+        public static int getTexture(string filename)
+        {
+            for (int i = 0; i < Liste_textures.Count; i++)
+            {
+                if (Liste_textures[i].path == filename)
+                {
+                    return i;
+                }
+            }
+            Liste_textures.Add(new structTexture(filename, Texture.FromFile(device, filename)));
+            return Liste_textures.Count - 1;
+        }
+
+        public static int getBinary(string filename)
+        {
+            for (int i = 0; i < Liste_binaires.Count; i++)
+            {
+                if (Liste_binaires[i].path == filename)
+                {
+                    return i;
+                }
+            }
+            Liste_binaires.Add(new structBinary(filename, File.ReadAllBytes(filename)));
+            return Liste_binaires.Count - 1;
+        }
+
+        public static int getModel(string filename, Matrix Transformation, int IDTile)
+        {
+            for (int i = 0; i < Liste_OBJ.Count; i++)
+            {
+                if (Liste_OBJ[i].path == filename && Liste_OBJ[i].Transformation == Transformation)
+                {
+                    return i;
+                }
+            }
+            Liste_OBJ.Add(new structOBJ(filename, Transformation, ObjLoader.read_obj(Liste_binaires[getBinary(filename)].data, Transformation), IDTile));
+            for (int i = 0; i < Liste_OBJ[Liste_OBJ.Count - 1].data.Count; i++)
+            {
+                Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Lock(0, 0, LockFlags.DoNotWait).WriteRange(Liste_OBJ[Liste_OBJ.Count - 1].data[i].Sommets);
+                Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Unlock();
+            }
+            return Liste_OBJ.Count - 1;
+        }
+
+        public static void freeModel(int IDTile, bool supprimer_toutes_les_occurences)
+        {
+            for (int i = 0; i < Liste_OBJ.Count; i++)
+            {
+                if (Liste_OBJ[i].IDTile == IDTile)
+                {
+                    for (int j = 0; j < Liste_OBJ.Count; j++)
+                    {
+                        Liste_OBJ[i].data[j].VertexBuffer.Dispose();
+                    }
+                    Liste_OBJ.RemoveAt(i);
+                    i--;
+                    if (!supprimer_toutes_les_occurences) return;
+                }
+            }
+        }
+
         private static void Main()
         {
             #region Variables
@@ -131,15 +241,30 @@ namespace Underground
                     DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Normal, 0),
                 VertexElement.VertexDeclarationEnd
         	};
-            device.VertexDeclaration = new VertexDeclaration(device, vertexElems3D);
+            vertexElems2D = new[] {
+                new VertexElement(0,0,DeclarationType.Float4,DeclarationMethod.Default,DeclarationUsage.PositionTransformed,0),
+                new VertexElement(0,16,DeclarationType.Float2,DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
+                VertexElement.VertexDeclarationEnd
+            };
 
-            Program.device.SetRenderState(RenderState.AlphaBlendEnable, true);
-            Program.device.SetRenderState(RenderState.DestinationBlend, Blend.InverseSourceAlpha);
-            Program.device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha);
+            VertexDeclaration3D = new VertexDeclaration(Program.device, Program.vertexElems3D);
+            VertexDeclaration2D = new VertexDeclaration(Program.device, Program.vertexElems2D);
+            VertexBufferZero = new VertexBuffer(IntPtr.Zero);
+            
+            device.VertexDeclaration = VertexDeclaration3D;
+
+            Program.device.SetRenderState(RenderState.AlphaBlendEnable, true); // graphics.GraphicsDevice.RenderState.AlphaBlendEnable = true;
+            Program.device.SetRenderState(RenderState.DestinationBlend, Blend.InverseSourceAlpha); // graphics.GraphicsDevice.RenderState.DestinationBlend = Blend.One;
+            Program.device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha); // graphics.GraphicsDevice.RenderState.SourceBlend = Blend.One;
+            Program.device.SetRenderState(RenderState.AlphaFunc, BlendOperation.Maximum); // graphics.GraphicsDevice.RenderState.BlendFunction = BlendFunction.Add;
+            Program.device.SetRenderState(RenderState.AlphaTestEnable, true);
+
             #endregion
 
-            Liste_textures = new List<Texturestruct>();
-            Liste_textures.Add(new Texturestruct("null.bmp", Texture.FromFile(device, "null.bmp")));
+            Liste_textures = new List<structTexture>();
+            Liste_binaires = new List<structBinary>();
+            Liste_OBJ = new List<structOBJ>();
+            Liste_textures.Add(new structTexture("null.bmp", Texture.FromFile(device, "null.bmp")));
 
             Thread ThSound = new Thread(Sound.main);
             Thread ThEvents = new Thread(Ingame.fevents);
@@ -147,6 +272,7 @@ namespace Underground
             ThEvents.Start();
 
             Menu.Initialize();
+            ObjLoader.Initialize();
 
 
             Ingame.ingame();
@@ -154,6 +280,9 @@ namespace Underground
             Menu.Dispose();
             ThSound.Abort();
             ThEvents.Abort();
+            VertexBufferZero.Dispose();
+            VertexDeclaration3D.Dispose();
+            VertexDeclaration2D.Dispose();
             device.Dispose();
             direct3D.Dispose();
 

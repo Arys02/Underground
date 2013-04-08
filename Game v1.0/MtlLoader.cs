@@ -20,18 +20,19 @@ namespace Underground
         public bool Ks = false;
         public bool map_Kd = false;
         #endregion
-        
-        public List<mtlstruct> MTLData = new List<mtlstruct>();
+
+        public List<structMTL> MTLData = new List<structMTL>();
 
         public void read_mtl(string filename, string path)
         {
+            MTLData.Clear();
             byte[] mtl = File.ReadAllBytes(path + filename);
             int i = 0;
             bool on_en_a_deja_trouve_un = false;
             string type;
             string abc;
             float x, y, z;
-            mtlstruct material = new mtlstruct("", Color.Zero, Color.Zero, Color.Zero, "null.bmp");
+            structMTL material = new structMTL("", Color.Zero, Color.Zero, Color.Zero, "null.bmp");
             while (i < mtl.Length)
             {
                 type = ObjLoader.getstring(ref i, ref mtl);
@@ -41,7 +42,7 @@ namespace Underground
                     if (on_en_a_deja_trouve_un)
                     {
                         MTLData.Add(material);
-                        material = new mtlstruct("", Color.Zero, Color.Zero, Color.Zero, "null.bmp");
+                        material = new structMTL("", Color.Zero, Color.Zero, Color.Zero, "null.bmp");
                     }
                     else on_en_a_deja_trouve_un = true;
                     material.name = ObjLoader.getstring(ref i, ref mtl); // On recupère le nom
@@ -103,7 +104,8 @@ namespace Underground
                     Console.Write("\t");
                     Program.WriteNicely("#", 4, "Nouveau map_Kd " + path + abc);
                     material.map_Kd = path + abc;
-                    Program.Liste_textures.Add(new Texturestruct(material.map_Kd, Texture.FromFile(Program.device, material.map_Kd)));
+                    Program.getTexture(material.map_Kd);
+                    //Program.Liste_textures.Add(new Texturestruct(material.map_Kd, Texture.FromFile(Program.device, material.map_Kd)));
                 }
                 else if (type == "") { }
                 else if (type[0] == '#')

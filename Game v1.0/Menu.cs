@@ -21,20 +21,13 @@ namespace Underground
 {
     static class Menu
     {
-        private static Texture Texture_background_menu;
-        private static VertexBuffer vertices_img;
         private static SharpDX.Direct3D9.Font font;
 
         public static bool IsInMenu { get; set; }
 
         static public void Initialize()
         {
-            // Image
-            int nbvertex = 5;
-            vertices_img = new VertexBuffer(Program.device, Utilities.SizeOf<Vertex>() * nbvertex, Usage.WriteOnly, VertexFormat.None, Pool.Default);
-            Console.WriteLine(Utilities.SizeOf<Vertex>());
-            // ******* ICI ****** /
-            Texture_background_menu = SharpDX.Direct3D9.Texture.FromFile(Program.device, @"Ressources\Game\Images\bg.jpg");
+            Program.getTexture(@"Ressources\Game\Images\bg.jpg");
 
             FontDescription fontDescription = new FontDescription()
             {
@@ -55,39 +48,37 @@ namespace Underground
 
         static public void InMenu()
         {
-            int w = 1280, h = 1024;
-            for (int y = 0; y < 1; y++)
-            {
-                for (int x = 0; x < 1; x++)
-                {
-                    VertexElement[] vertexElems2D = new[] {
-                                                new VertexElement(0,0,DeclarationType.Float4,DeclarationMethod.Default,DeclarationUsage.PositionTransformed,0),
-                                                new VertexElement(0,16,DeclarationType.Float2,DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
-                                                VertexElement.VertexDeclarationEnd
-                                            };
-                    Program.device.VertexDeclaration = new VertexDeclaration(Program.device, vertexElems2D);
-                    vertices_img.Lock(0, 0, LockFlags.None).WriteRange(new Vertex[] {
-                                                new Vertex() { Position = new Vector4(x * w, y * h, 0f, 1.0f), CoordTextures = new Vector2(0f, 0f) },
-                                                new Vertex() { Position = new Vector4(x * w + w, y * h, 0f, 1.0f), CoordTextures = new Vector2(1f, 0f) },
-                                                new Vertex() { Position = new Vector4(x * w, y * h + h, 0f, 1.0f), CoordTextures = new Vector2(0f, 1f) },
-                                                new Vertex() { Position = new Vector4(x * w + w, y * h + h, 0f, 1.0f), CoordTextures = new Vector2(1f, 1f) },
-                                                new Vertex() { Position = new Vector4(x * w + w, y * h, 0f, 1.0f), CoordTextures = new Vector2(1f, 0f) }});
-                    vertices_img.Unlock();
+            int nbvertex = 5;
+            VertexBuffer VertexBufferHUD = new VertexBuffer(Program.device, Utilities.SizeOf<structVertex>() * nbvertex, Usage.WriteOnly, VertexFormat.None, Pool.Default);
+            /************ LEAK MEMOIRE DANS LE MENU **************/
+            VertexElement[] vertexElems2D = new[] {
+                new VertexElement(0,0,DeclarationType.Float4,DeclarationMethod.Default,DeclarationUsage.PositionTransformed,0),
+                new VertexElement(0,16,DeclarationType.Float2,DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
+                VertexElement.VertexDeclarationEnd
+            };
+            VertexDeclaration VertexDeclaration = new VertexDeclaration(Program.device, vertexElems2D);
+            Program.device.VertexDeclaration = VertexDeclaration;
+            VertexDeclaration.Dispose();
+            VertexBufferHUD.Lock(0, 0, LockFlags.None).WriteRange(new structVertex[] {
+                new structVertex() { Position = new Vector4(0                    , 0                    , 0f, 1.0f), CoordTextures = new Vector2(0f, 0f) },
+                new structVertex() { Position = new Vector4(Program.resolution[0], 0                    , 0f, 1.0f), CoordTextures = new Vector2(1f, 0f) },
+                new structVertex() { Position = new Vector4(0                    , Program.resolution[1], 0f, 1.0f), CoordTextures = new Vector2(0f, 1f) },
+                new structVertex() { Position = new Vector4(Program.resolution[0], Program.resolution[1], 0f, 1.0f), CoordTextures = new Vector2(1f, 1f) },
+                new structVertex() { Position = new Vector4(Program.resolution[0], 0                    , 0f, 1.0f), CoordTextures = new Vector2(1f, 0f) }});
+            VertexBufferHUD.Unlock();
 
-                    Program.device.SetTexture(0, Texture_background_menu);
-                    Program.device.SetStreamSource(0, vertices_img, 0, Utilities.SizeOf<Vertex>());
-                    Program.device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
-                }
-            }
+            Program.device.SetTexture(0, Program.Liste_textures[Program.getTexture(@"Ressources\Game\Images\bg.jpg")].texture);
+            Program.device.SetStreamSource(0, VertexBufferHUD, 0, Utilities.SizeOf<structVertex>());
+            Program.device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
 
             string displayText = "PLAY !";
-            SharpDX.Rectangle fontDimension = font.MeasureText(null, displayText, new SharpDX.Rectangle(0, 0, w, h), SharpDX.Direct3D9.FontDrawFlags.Center | SharpDX.Direct3D9.FontDrawFlags.VerticalCenter);
+            SharpDX.Rectangle fontDimension = font.MeasureText(null, displayText, new SharpDX.Rectangle(0, 0, Program.resolution[0], Program.resolution[1]), SharpDX.Direct3D9.FontDrawFlags.Center | SharpDX.Direct3D9.FontDrawFlags.VerticalCenter);
 
             // Texte
             font.DrawText(null, displayText, fontDimension, FontDrawFlags.Center | FontDrawFlags.VerticalCenter, Color.Gray);
 
-            float xRes = 2.0f / (w - 5);
-            float yRes = 2.0f / (h - 5);
+            float xRes = 2.0f / (Program.resolution[0] - 5);
+            float yRes = 2.0f / (Program.resolution[1] - 5);
 
             if (Program.input.MouseLeft)
             {
@@ -105,11 +96,11 @@ namespace Underground
                     IsInMenu = false;
                 }
             }
+            VertexBufferHUD.Dispose();
         }
         static public void Dispose()
         {
-            Texture_background_menu.Dispose();
-            vertices_img.Dispose();
+            Program.Liste_textures[Program.getTexture(@"Ressources\Game\Images\bg.jpg")].texture.Dispose();
             font.Dispose();
         }
     }

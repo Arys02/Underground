@@ -22,7 +22,6 @@ namespace Underground
             byte[] bytes = new byte[1];
             new RNGCryptoServiceProvider().GetBytes(bytes);
             return bytes[0] % (max - min) + min;
-
         }
 
         public static void main()
@@ -59,14 +58,14 @@ namespace Underground
 
             while (true)
             {
-                int y = Random.Next(0, 17);
+                int y = Random.Next(0, soundbruitage.Length);
                 int time = Random.Next(50000, 120000);
                 Console.WriteLine(soundbruitage[y] + " : " + y + " time : " + time);
                 Thread.Sleep(time);
                 switch (y)
                 {
                     case 2:
-                        for (int i = 0; i < 10; i++)
+                        for (int i = 0; i < soundbruitage.Length; i++)
                             Playsound(audio, soundbruitage[y]);
                         break;
                     case 11:
@@ -77,11 +76,6 @@ namespace Underground
                         Playsound(audio, soundbruitage[y]);
                         break;
                 }
-
-
-
-
-
             }
         }
         public static void Playbackground()
