@@ -24,7 +24,7 @@ namespace Underground
       //  public Vector3 position = new Vector3(2.0f, 0, -2.0f);
       //  private static Vector3 old_pos = new Vector3(2.0f, 0, -2.0f);
 
-        public Vector3 position = new Vector3(0f, -3f, 0);
+        public Vector3 position = new Vector3(0f, 0f, 0);
         public Vector3 angle = new Vector3(0, 0, 0);
         private bool camera_altere = true;
         private Point previous_mousepoint = Program.input.MousePoint;
@@ -40,6 +40,7 @@ namespace Underground
 
         public void orient_camera(long timer)
         {
+            Ingame.a_progresse = false;
             float[] VitesseRotation = new float[3] { 0.0000006f * timer, 0.0000006f * timer, 0.0000006f * timer };
             float[] VitesseTranslation = new float[3] { 
                 0.0000006f * timer,
@@ -92,6 +93,7 @@ namespace Underground
 
             if (Program.input.KeysDown.Contains(Keys.Up) || Program.input.KeysDown.Contains(Keys.Z))
             {
+                Ingame.a_progresse = true;
                 produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2]);
                 position.Z -= Convert.ToSingle(produit_scalaire);
                 produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2]);
@@ -109,6 +111,7 @@ namespace Underground
             }
             if (Program.input.KeysDown.Contains(Keys.Down) || Program.input.KeysDown.Contains(Keys.S))
             {
+                Ingame.a_progresse = true;
                 produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2]);
                 position.Z += Convert.ToSingle(produit_scalaire);
                 produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2]);
@@ -141,6 +144,7 @@ namespace Underground
 
             if (Program.input.KeysDown.Contains(Keys.Q))
             {
+                Ingame.a_progresse = true;
                 produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0]);
                 position.Z += Convert.ToSingle(produit_scalaire);
                 produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0]);
@@ -158,6 +162,7 @@ namespace Underground
             }
             if (Program.input.KeysDown.Contains(Keys.D))
             {
+                Ingame.a_progresse = true;
                 produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0]);
                 position.Z -= Convert.ToSingle(produit_scalaire);
                 produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0]);
@@ -215,7 +220,7 @@ namespace Underground
             {
                 view = Matrix.Translation(position.X, position.Y, position.Z) *
                                 Matrix.RotationAxis(new Vector3(0, 1, 0), angle.Y) *
-                                Matrix.RotationAxis(new Vector3(1, 0, 0), angle.X) *
+                                Matrix.RotationAxis(new Vector3(1, 0, 0), angle.X+(float)Math.Sin(Ingame.sinusoide)/55f) *
                                 Matrix.RotationAxis(new Vector3(0, 0, 1), angle.Z);
                 //camera_altere = false;
             }

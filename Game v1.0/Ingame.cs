@@ -30,10 +30,13 @@ namespace Underground
         public static bool Sepia = false;
         public static bool Following_light = true;
         public static bool maximum_disallowed = false;
+        public static float angle_walking = 0f;
         public static float luminosity = 1f;
         public static int stateinflash = 0; // 0 = non débuté // -1 = en décroissance // 1 = en croissance
         public static float percent = 1;
         public static Camera macamera;
+        public static float sinusoide = 0f;
+        public static bool a_progresse = false;
 
 
         /*public static void getTilesToLoad(Vector3 position)
@@ -52,6 +55,7 @@ namespace Underground
             int Seconde_A_Attendre = 10;
             while (true)
             {
+                #region flash
                 if (stateinflash == -1)
                 {
                     luminosity -= Convert.ToSingle((clock.ElapsedTicks - previous_time) / Ticks_Clignement);
@@ -81,6 +85,14 @@ namespace Underground
                         stateinflash = -1;
                     }
                 }
+                #endregion
+                #region walking
+                if (a_progresse)
+                {
+                    sinusoide += (0.0000025f * (clock.ElapsedTicks - previous_time));
+                    sinusoide %= (float)(Math.PI * 2);
+                }
+                #endregion
                 previous_time = clock.ElapsedTicks;
             }
         }
@@ -94,7 +106,6 @@ namespace Underground
             //string path = @"C:\Users\b95093cf\Desktop\model.obj";
             string path = @"Ressources\Game\ct0bis.obj";
             string path2 = @"Ressources\Game\cabine.obj";
-
             if ((-macamera.position.X <= rayon_salles && -macamera.position.X >= -rayon_salles) && (-macamera.position.Z >= -rayon_salles && -macamera.position.Z <= rayon_salles))
             {
                 //Console.WriteLine("Zone 1");
@@ -104,7 +115,7 @@ namespace Underground
                 Program.getModel(path, Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(0, 0, 32), 3);
                 Program.freeModel(4, true);
             }
-            if ((-macamera.position.X <= -rayon_salles && -macamera.position.X >= -rayon_salles * 3) && (-macamera.position.Z >= -rayon_salles && -macamera.position.Z <= rayon_salles))
+            else if ((-macamera.position.X <= -rayon_salles && -macamera.position.X >= -rayon_salles * 3) && (-macamera.position.Z >= -rayon_salles && -macamera.position.Z <= rayon_salles))
             {
                 //Console.WriteLine("Zone 2");
                 Program.freeModel(0, true);
@@ -113,7 +124,7 @@ namespace Underground
                 Program.freeModel(3, true);
                 Program.getModel(path, Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-32, 0, 32), 4);
             }
-            if ((-macamera.position.X <= rayon_salles && -macamera.position.X >= -rayon_salles) && (-macamera.position.Z >= rayon_salles && -macamera.position.Z <= rayon_salles * 3))
+            else if ((-macamera.position.X <= rayon_salles && -macamera.position.X >= -rayon_salles) && (-macamera.position.Z >= rayon_salles && -macamera.position.Z <= rayon_salles * 3))
             {
                 //Console.WriteLine("Zone 3");
                 Program.getModel(path2, Matrix.Scaling(0.5f) * Matrix.RotationY((float)Math.PI) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-1f, -1.8f, 28), 0);
@@ -122,7 +133,7 @@ namespace Underground
                 Program.getModel(path, Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(0, 0, 32), 3);
                 Program.getModel(path, Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-32, 0, 32), 4);
             }
-            if ((-macamera.position.X <= -rayon_salles && -macamera.position.X >= -rayon_salles * 3) && (-macamera.position.Z >= rayon_salles && -macamera.position.Z <= rayon_salles * 3))
+            else if ((-macamera.position.X <= -rayon_salles && -macamera.position.X >= -rayon_salles * 3) && (-macamera.position.Z >= rayon_salles && -macamera.position.Z <= rayon_salles * 3))
             {
                 //Console.WriteLine("Zone 4");
                 Program.getModel(path2, Matrix.Scaling(0.5f) * Matrix.RotationY((float)Math.PI) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-1f, -1.8f, 28), 0);
@@ -131,6 +142,7 @@ namespace Underground
                 Program.getModel(path, Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(0, 0, 32), 3);
                 Program.getModel(path, Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-32, 0, 32), 4);
             }
+            else Console.WriteLine("Out of bounds");
         }
 
         //> Color codes for WriteNicely : 
@@ -174,7 +186,7 @@ namespace Underground
             // Light1
             effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
             effect.SetValue("LightDiffuseColor[0]", new Vector4(0.9f, 0.9f, 0.9f, 1));
-            effect.SetValue("LightDistanceSquared[0]", 80f);
+            effect.SetValue("LightDistanceSquared[0]", 280f);
 
             // Light2
             if (nblights > 1)
@@ -228,7 +240,6 @@ namespace Underground
             Matrix oldView = macamera.view;
             Vector3 oldPos = macamera.position;
             Vector3 oldAngle = macamera.angle;
-
             RenderLoop.Run(Program.form, () =>
             {
                 Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
@@ -251,9 +262,6 @@ namespace Underground
                     }*/
                     oldAngle = macamera.angle;
                     macamera.orient_camera(clock.ElapsedTicks - previous_time);
-
-
-
                     previous_time = clock.ElapsedTicks;
 
                     bool collide = false; //Collision.CheckCollisions(macamera.position);
