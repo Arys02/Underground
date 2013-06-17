@@ -9,3 +9,14 @@ C:\Users\Arys\Documents\informatique\Projet\test\underground\Underground\Undergr
 C:\Users\Arys\Documents\informatique\Projet\test\underground\Underground\Underground\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Arys\Documents\informatique\Projet\test\underground\Underground\Underground\obj\x86\Debug\Underground.exe
 C:\Users\Arys\Documents\informatique\Projet\test\underground\Underground\Underground\obj\x86\Debug\Underground.pdb
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\obj\x86\Debug\Underground.exe
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\obj\x86\Debug\Underground.pdb
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\Underground.exe
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\Underground.pdb
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\SharpDX.DirectInput.dll
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\SharpDX.dll
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\SharpDX.xml
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\SharpDX.Direct3D9.xml
+C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\bin\Debug\SharpDX.DirectInput.xml

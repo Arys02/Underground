@@ -30,7 +30,8 @@ namespace MiniCube
             Vector3 angle = new Vector3(0, 0, 0);
 
             //string path = "untitled.obj";
-            string path = @"C:\Users\Arys\Documents\informatique\Projet\test\underground\Underground\Underground\FilmNoirTriangl.obj";
+            //string path = @"C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\FilmNoirTriangl.obj";
+            string path = @"C:\Users\Bastien\Documents\GitHub\Underground\Game v0.1\cranetest2.obj";  
             //string path = "Tuture.obj";
             //string path = "ressource.obj";
             //string path = "FilmNoirTriangl.obj";

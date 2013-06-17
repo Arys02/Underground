@@ -34,34 +34,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SharpDX, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\sharpdx\Bin\Signed-net40\SharpDX.dll</HintPath>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler">
-      <HintPath>..\GitHub\Underground\Debug\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\GitHub\Underground\Debug\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11.Effects">
-      <HintPath>..\GitHub\Underground\Debug\SharpDX.Direct3D11.Effects.dll</HintPath>
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.Direct3D11.Effects.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.Direct3D9, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\sharpdx\Bin\Signed-net40\SharpDX.Direct3D9.dll</HintPath>
+    <Reference Include="SharpDX.Direct3D9">
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DirectInput">
-      <HintPath>..\GitHub\Underground\Debug\SharpDX.DirectInput.dll</HintPath>
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.DirectInput.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DirectSound">
-      <HintPath>..\sharpdx\Bin\Signed-net20\SharpDX.DirectSound.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI">
-      <HintPath>..\GitHub\Underground\Debug\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.DirectSound.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
-      <HintPath>..\sharpdx\Bin\Signed-net20\SharpDX.XAudio2.dll</HintPath>
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.XAudio2.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput">
+      <HintPath>..\..\Bin\Standard-net40\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -76,9 +74,12 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Collision.cs" />
+    <Compile Include="HUD.cs" />
     <Compile Include="Ingame.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="Maze.cs" />
     <Compile Include="Menu.cs" />
+    <Compile Include="MtlLoader.cs" />
     <Compile Include="ObjLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
