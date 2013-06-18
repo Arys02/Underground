@@ -18,7 +18,7 @@ namespace Underground
         public MouseButtons MouseDown { get; private set; }
         public Point MousePoint { get; private set; }
         public int MouseWheelDelta { get; private set; }
-
+        
         Form form;
 
         private bool mouseLeft;

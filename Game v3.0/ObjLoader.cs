@@ -107,7 +107,7 @@ namespace Underground
             int material_used = 0;
             int precedent_pourcentage = 0;
             Program.WriteNicely("#", 2, "Ouverture du fichier " + obj[0].ToString());
-            structModel model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp");
+            structModel model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp", "null.bmp");
 
             ///////////// Pour la construction des sommets /////////////
             List<Vector2> ListeCoordTextures = new List<Vector2>();
@@ -195,7 +195,7 @@ namespace Underground
                     if (mtlloader.MTLData.Count == 0)
                     {
                         testing = true;
-                        mtlloader.MTLData.Add(new structMTL("", Color.White, Color.White, Color.White, "null.bmp"));
+                        mtlloader.MTLData.Add(new structMTL("", Color.White, Color.White, Color.White, "null.bmp", "null.bmp"));
                     }
                     model_actuel.nbfaces++;
                     //string abc;
@@ -314,8 +314,7 @@ namespace Underground
                 {
                     i++;
                     string abc = getstring(ref i, ref obj);
-                    Console.Write("\t");
-                    Program.WriteNicely("#", 11, "Nouveau fichier .MTL : " + abc);
+                    Program.WriteNicely("\t#", 11, "Nouveau fichier .MTL : " + abc);
                     mtlloader.read_mtl(abc, @"Ressources/Game/");
                 }
                 else if (type == "usemtl")
@@ -327,14 +326,14 @@ namespace Underground
                     {
                         model_actuel.Sommets = ListeVertex.ToArray();
                         model_actuel.map_Kd = mtlloader.MTLData[material_used].map_Kd;
+                        model_actuel.map_Ns = mtlloader.MTLData[material_used].map_Ns;
                         model_actuel.VertexBuffer = new VertexBuffer(Program.device,
                             (
                                 Utilities.SizeOf<structVertex>() // NORMAL
                             ) * 3 * model_actuel.nbfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
-
                         ListeVertex.Clear();
                         Liste_Models.Add(model_actuel);
-                        model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp");
+                        model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp", "null.bmp");
                     }
                     for (int j = 0; j < mtlloader.MTLData.Count; j++)
                     {
@@ -377,9 +376,10 @@ namespace Underground
             }
             if (model_actuel.nbfaces != 0)
             {
-                mtlloader.MTLData.Add(new structMTL("", Color.White, Color.White, Color.White, "null.bmp"));
+                mtlloader.MTLData.Add(new structMTL("", Color.White, Color.White, Color.White, "null.bmp", "null.bmp"));
                 model_actuel.Sommets = ListeVertex.ToArray();
                 model_actuel.map_Kd = mtlloader.MTLData[material_used].map_Kd;
+                model_actuel.map_Ns = mtlloader.MTLData[material_used].map_Ns;
                 model_actuel.VertexBuffer = new VertexBuffer(Program.device,
                     (
                         Utilities.SizeOf<structVertex>() // NORMAL

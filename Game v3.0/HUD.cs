@@ -23,6 +23,7 @@ namespace Underground
     {
         Default = 0,
         EyeBar = 1,
+        RunBar = 2,
     }
     struct EltInfo
     {
@@ -48,12 +49,40 @@ namespace Underground
             Liste_Elt.Add(new EltInfo(Vector2.Zero, new Vector2(Program.resolution[0],Program.resolution[1]), @"Ressources\HUD\Torch.png", EltType.Default));
             Liste_Elt.Add(new EltInfo(new Vector2(0, Program.resolution[1] - 200), new Vector2(400, 200), @"Ressources\HUD\Texture.png", EltType.Default));
             Liste_Elt.Add(new EltInfo(new Vector2(42, Program.resolution[1] - 102), new Vector2(300, 30), @"Ressources\HUD\ProgressBar1.png", EltType.EyeBar));
+            Liste_Elt.Add(new EltInfo(new Vector2(42, Program.resolution[1] - 102), new Vector2(400, 200), @"Ressources\HUD\Texture.png", EltType.Default ));
         }
+
+        /*public void Display_3DHUD()
+        {
+            VertexBuffer VertexBufferHUD;
+            structVertex[] Sommets;
+            // Affichage du brouillar
+            VertexBufferHUD = new VertexBuffer(Program.device,
+                    (
+                        Utilities.SizeOf<structVertex>()
+                    ) * 3 * 2, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
+            Sommets = new structVertex[] {
+                    new structVertex() { Position = new Vector4( - 5 , - 1, + 5, 1.0f), CoordTextures = new Vector2(0f, 0f), Normal = new Vector4(0,1,0,1), Color = Color.White.ToVector4() },
+                    new structVertex() { Position = new Vector4( + 5 , - 1, + 5, 1.0f), CoordTextures = new Vector2(1f, 0f), Normal = new Vector4(0,1,0,1), Color = Color.White.ToVector4() },
+                    new structVertex() { Position = new Vector4( + 5 , - 1, - 5, 1.0f), CoordTextures = new Vector2(1f, 1f), Normal = new Vector4(0,1,0,1), Color = Color.White.ToVector4() },
+                    
+                    new structVertex() { Position = new Vector4( - 5 , - 1, + 5, 1.0f), CoordTextures = new Vector2(0f, 0f), Normal = new Vector4(0,1,0,1), Color = Color.White.ToVector4() },
+                    new structVertex() { Position = new Vector4( + 5 , - 1, - 5, 1.0f), CoordTextures = new Vector2(1f, 1f), Normal = new Vector4(0,1,0,1), Color = Color.White.ToVector4() },
+                    new structVertex() { Position = new Vector4( - 5 , - 1, - 5, 1.0f), CoordTextures = new Vector2(0f, 1f), Normal = new Vector4(0,1,0,1), Color = Color.White.ToVector4() },
+            };
+            VertexBufferHUD.Lock(0, 0, LockFlags.DoNotWait).WriteRange(Sommets);
+            VertexBufferHUD.Unlock();
+            Program.device.SetStreamSource(0, VertexBufferHUD, 0, Utilities.SizeOf<structVertex>());
+            Program.device.SetTexture(0, Program.Liste_textures[Program.getTexture(@"Ressources\HUD\Brouillar.png")].texture);
+            Program.device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+            VertexBufferHUD.Dispose();
+        }*/
 
         public void Display_HUD()
         {
             VertexBuffer VertexBufferHUD;
             Program.device.VertexDeclaration = Program.VertexDeclaration2D;
+            structVertex[] Sommets;
 
             foreach (EltInfo Elt in Liste_Elt)
             {
@@ -61,7 +90,6 @@ namespace Underground
                     (
                         Utilities.SizeOf<structVertex>()
                     ) * 3 * 2, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
-                structVertex[] Sommets;
                 if (Elt.EltType == EltType.EyeBar) // Barre de progression des yeux
                 {
                     Sommets = new structVertex[] {
@@ -80,7 +108,7 @@ namespace Underground
                     new structVertex() { Position = new Vector4(Elt.Position.X + Elt.Taille.X, Elt.Position.Y+Elt.Taille.Y, 0f, 1.0f), CoordTextures = new Vector2(1f, 1f) },
                     new structVertex() { Position = new Vector4(Elt.Position.X + Elt.Taille.X, Elt.Position.Y             , 0f, 1.0f), CoordTextures = new Vector2(1f, 0f) }};
                 }
-                VertexBufferHUD.Lock(0, 0, LockFlags.DoNotWait).WriteRange(Sommets);
+                VertexBufferHUD.Lock(0, 0, LockFlags.None).WriteRange(Sommets);
                 VertexBufferHUD.Unlock();
                 Program.device.SetStreamSource(0, VertexBufferHUD, 0, Utilities.SizeOf<structVertex>());
                 Program.device.SetTexture(0, Program.Liste_textures[Program.getTexture(Elt.PathTexture)].texture);

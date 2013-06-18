@@ -66,13 +66,15 @@ namespace Underground
         public Color Kd;
         public Color Ks;
         public string map_Kd;
-        public structMTL(string name, Color Ka, Color Kd, Color Ks, string map_Kd)
+        public string map_Ns;
+        public structMTL(string name, Color Ka, Color Kd, Color Ks, string map_Kd, string map_Ns)
         {
             this.Ka = Ka;
             this.Kd = Kd;
             this.name = name;
             this.Ks = Ks;
             this.map_Kd = map_Kd;
+            this.map_Ns = map_Ns;
         }
     }
     public struct structModel
@@ -81,12 +83,17 @@ namespace Underground
         public structVertex[] Sommets;
         public int nbfaces;
         public string map_Kd;
-        public structModel(VertexBuffer VertexBuffer, structVertex[] Sommets, int nbfaces, string map_Kd)
+        public string map_Ns;
+        public bool isready;
+
+        public structModel(VertexBuffer VertexBuffer, structVertex[] Sommets, int nbfaces, string map_Kd, string map_Ns)
         {
             this.VertexBuffer = VertexBuffer;
             this.Sommets = Sommets;
             this.nbfaces = nbfaces;
             this.map_Kd = map_Kd;
+            this.map_Ns = map_Ns;
+            this.isready = true;
         }
     }
     public struct structOBJ
@@ -94,8 +101,8 @@ namespace Underground
         public string path;
         public Matrix Transformation;
         public List<structModel> data;
-        public int IDTile;
-        public structOBJ(string path, Matrix Transformation, List<structModel> data, int IDTile)
+        public Point IDTile;
+        public structOBJ(string path, Matrix Transformation, List<structModel> data, Point IDTile)
         {
             this.IDTile = IDTile;
             this.data = data;
@@ -113,21 +120,26 @@ namespace Underground
         public static List<structTexture> Liste_textures;
         public static List<structBinary> Liste_binaires;
         public static List<structOBJ> Liste_OBJ;
-        public static int[] resolution = new int[2] { 1280, 1024 };
+        public static int[] resolution = new int[2] { 1280, 700 };
         public static VertexElement[] vertexElems3D;
         public static VertexElement[] vertexElems2D;
         public static VertexDeclaration VertexDeclaration3D;
         public static VertexDeclaration VertexDeclaration2D;
         public static VertexBuffer VertexBufferZero;
+        public static Maze newmaze;
 
         public static Input input;
         [STAThread]
         public static void WriteNicely(string op, int c, string msg)
         {
-            Console.ForegroundColor = (ConsoleColor)c;
-            Console.Write("[" + op + "] ");
-            Console.ResetColor();
-            Console.WriteLine(msg);
+            bool debug = false;
+            if (debug)
+            {
+                Console.ForegroundColor = (ConsoleColor)c;
+                Console.Write("[" + op + "] ");
+                Console.ResetColor();
+                Console.WriteLine(msg);
+            }
         }
 
         ///////////////////////////////////////////
@@ -160,7 +172,7 @@ namespace Underground
             return Liste_binaires.Count - 1;
         }
 
-        public static int getModel(string filename, Matrix Transformation, int IDTile)
+        public static int getModel(string filename, Matrix Transformation, Point IDTile)
         {
             for (int i = 0; i < Liste_OBJ.Count; i++)
             {
@@ -169,22 +181,26 @@ namespace Underground
                     return i;
                 }
             }
+            Ingame.last_unready = true;
             Liste_OBJ.Add(new structOBJ(filename, Transformation, ObjLoader.read_obj(Liste_binaires[getBinary(filename)].data, Transformation), IDTile));
             for (int i = 0; i < Liste_OBJ[Liste_OBJ.Count - 1].data.Count; i++)
             {
-                Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Lock(0, 0, LockFlags.DoNotWait).WriteRange(Liste_OBJ[Liste_OBJ.Count - 1].data[i].Sommets);
+                Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Lock(0, 0, LockFlags.None).WriteRange(Liste_OBJ[Liste_OBJ.Count - 1].data[i].Sommets);
                 Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Unlock();
+
             }
+            Ingame.last_unready = false;
+            Collision.Initialize();
             return Liste_OBJ.Count - 1;
         }
 
-        public static void freeModel(int IDTile, bool supprimer_toutes_les_occurences)
+        public static void freeModel(Point IDTile, bool supprimer_toutes_les_occurences)
         {
             for (int i = 0; i < Liste_OBJ.Count; i++)
             {
                 if (Liste_OBJ[i].IDTile == IDTile)
                 {
-                    for (int j = 0; j < Liste_OBJ.Count; j++)
+                    for (int j = 0; j < Liste_OBJ[i].data.Count; j++)
                     {
                         Liste_OBJ[i].data[j].VertexBuffer.Dispose();
                     }
@@ -195,9 +211,11 @@ namespace Underground
             }
         }
 
-        private static void Main()
+        private static void Main(string[] args)
         {
             #region Variables
+            if (args.Length == 3 && args[0] == "-r" && int.TryParse(args[1], out resolution[0]) &&
+                int.TryParse(args[2], out resolution[1])) { }
             int menu_running = 1;
             // 0 -> jeu en cours
             // 1 -> menu de demarrage
@@ -250,7 +268,7 @@ namespace Underground
             VertexDeclaration3D = new VertexDeclaration(Program.device, Program.vertexElems3D);
             VertexDeclaration2D = new VertexDeclaration(Program.device, Program.vertexElems2D);
             VertexBufferZero = new VertexBuffer(IntPtr.Zero);
-            
+
             device.VertexDeclaration = VertexDeclaration3D;
 
             Program.device.SetRenderState(RenderState.AlphaBlendEnable, true); // graphics.GraphicsDevice.RenderState.AlphaBlendEnable = true;
@@ -258,22 +276,25 @@ namespace Underground
             Program.device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha); // graphics.GraphicsDevice.RenderState.SourceBlend = Blend.One;
             Program.device.SetRenderState(RenderState.AlphaFunc, BlendOperation.Maximum); // graphics.GraphicsDevice.RenderState.BlendFunction = BlendFunction.Add;
             Program.device.SetRenderState(RenderState.AlphaTestEnable, true);
-
+            Program.device.SetRenderState(RenderState.MinTessellationLevel, 8);
             #endregion
 
             Liste_textures = new List<structTexture>();
             Liste_binaires = new List<structBinary>();
             Liste_OBJ = new List<structOBJ>();
             Liste_textures.Add(new structTexture("null.bmp", Texture.FromFile(device, "null.bmp")));
-
+            Ingame.Slender.doit_etre_recharge = true;
             Thread ThSound = new Thread(Sound.main);
             Thread ThEvents = new Thread(Ingame.fevents);
             ThSound.Start();
             ThEvents.Start();
 
-            Menu.Initialize();
+            Menu.Initialize_Menu();
             ObjLoader.Initialize();
-
+            newmaze = new Maze(10, 10);
+            newmaze.Initecelles();
+            newmaze.Generate(newmaze.maze[0, 0]);
+            newmaze.Setaffichage();
 
             Ingame.ingame();
 

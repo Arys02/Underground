@@ -19,6 +19,7 @@ namespace Underground
         public bool Kd = false;
         public bool Ks = false;
         public bool map_Kd = false;
+        public bool map_Ns = false;
         #endregion
 
         public List<structMTL> MTLData = new List<structMTL>();
@@ -32,7 +33,7 @@ namespace Underground
             string type;
             string abc;
             float x, y, z;
-            structMTL material = new structMTL("", Color.Zero, Color.Zero, Color.Zero, "null.bmp");
+            structMTL material = new structMTL("", Color.Zero, Color.Zero, Color.Zero, "null.bmp", "null.bmp");
             while (i < mtl.Length)
             {
                 type = ObjLoader.getstring(ref i, ref mtl);
@@ -42,13 +43,12 @@ namespace Underground
                     if (on_en_a_deja_trouve_un)
                     {
                         MTLData.Add(material);
-                        material = new structMTL("", Color.Zero, Color.Zero, Color.Zero, "null.bmp");
+                        material = new structMTL("", Color.Zero, Color.Zero, Color.Zero, "null.bmp", "null.bmp");
                     }
                     else on_en_a_deja_trouve_un = true;
                     material.name = ObjLoader.getstring(ref i, ref mtl); // On recupère le nom
 
-                    Console.Write("\t");
-                    Program.WriteNicely("#", 4, "Nouveau MTL" + material.name);
+                    Program.WriteNicely("\t#", 4, "Nouveau MTL" + material.name);
                 }
                 else if (type == "Ka")
                 {
@@ -60,8 +60,7 @@ namespace Underground
                     i++; // Espace
                     z = ObjLoader.getfloat(ref i, ref mtl);
 
-                    Console.Write("\t");
-                    Program.WriteNicely("#", 4, "Nouveau Ka " + x + " " + y + " " + z);
+                    Program.WriteNicely("\t#", 4, "Nouveau Ka " + x + " " + y + " " + z);
 
                     material.Ka = new Color(new Vector4(x, y, z, 1));
                 }
@@ -75,8 +74,7 @@ namespace Underground
                     i++; // Espace
                     z = ObjLoader.getfloat(ref i, ref mtl);
 
-                    Console.Write("\t");
-                    Program.WriteNicely("#", 4, "Nouveau Kd " + x + " " + y + " " + z);
+                    Program.WriteNicely("\t#", 4, "Nouveau Kd " + x + " " + y + " " + z);
 
                     material.Kd = new Color(new Vector4(x, y, z, 1));
                 }
@@ -90,8 +88,7 @@ namespace Underground
                     i++; // Espace
                     z = ObjLoader.getfloat(ref i, ref mtl);
 
-                    Console.Write("\t");
-                    Program.WriteNicely("#", 4, "Nouveau Ks " + x + " " + y + " " + z);
+                    Program.WriteNicely("\t#", 4, "Nouveau Ks " + x + " " + y + " " + z);
 
                     material.Ks = new Color(new Vector4(x, y, z, 1));
                 }
@@ -101,22 +98,28 @@ namespace Underground
                     i++; // Espace
                     abc = ObjLoader.getstring(ref i, ref mtl);
 
-                    Console.Write("\t");
-                    Program.WriteNicely("#", 4, "Nouveau map_Kd " + path + abc);
+                    Program.WriteNicely("\t#", 4, "Nouveau map_Kd " + path + abc);
                     material.map_Kd = path + abc;
                     Program.getTexture(material.map_Kd);
                     //Program.Liste_textures.Add(new Texturestruct(material.map_Kd, Texture.FromFile(Program.device, material.map_Kd)));
                 }
+                else if (type == "map_Ns")
+                {
+                    map_Ns = true;
+                    i++; // Espace
+                    abc = ObjLoader.getstring(ref i, ref mtl);
+                    Program.WriteNicely("\t#", 4, "Nouveau map_Kd " + path + abc);
+                    material.map_Ns = path + abc;
+                    Program.getTexture(material.map_Ns);
+                }
                 else if (type == "") { }
                 else if (type[0] == '#')
                 {
-                    Console.Write("\t");
-                    Program.WriteNicely("#", 4, "Nouveau commentaire");
+                    Program.WriteNicely("\t#", 4, "Nouveau commentaire");
                 }
                 else
                 {
-                    Console.Write("\t");
-                    Program.WriteNicely("!", 2, "Type inconnu");
+                    Program.WriteNicely("\t!", 2, "Type inconnu");
                 }
                 ObjLoader.gotonextline(ref i, ref mtl);
             }
