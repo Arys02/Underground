@@ -374,7 +374,7 @@ namespace Underground
             //Program.device.SetRenderState(RenderState.CullMode, false);
             Int64 previous_time = clock.ElapsedTicks;
             Int64 previous_clignement = clock.ElapsedTicks;
-            List<BoundingBox> ListeBoundingBoxes = Collision.Initialize();
+            Collision.Initialize();
 
             Matrix oldView = macamera.view;
             Vector3 oldPos = macamera.position;

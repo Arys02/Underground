@@ -10,39 +10,35 @@ namespace Underground
 {
     class Collision
     {
+        public static IntervalKDTree<string> tree;
 
-        private static List<BoundingBox> bboxList;
-
-        //public static List<BoundingBox> Initialize(structVertex[][] VerticesFinal)
-        //{
-        //    var ListeBoundingBoxes = new List<BoundingBox>();
-        //    for (int k = 0; k <= VerticesFinal.GetUpperBound(0); k++)
-        //    {
-        //        Program.WriteNicely("#", 12, "Creation des BBoxes !");
-        //        int t1 = VerticesFinal[k].GetUpperBound(0);
-
-        //        int vecPerBox = 2;
-
-        //        for (int i = 0; i <= t1 - vecPerBox; i = i + vecPerBox)
-        //        {
-        //            var tmp_vec = new List<Vector3>();
-
-        //            for (int j = 0; j < vecPerBox; j++)
-        //            {
-        //                tmp_vec.Add((Vector3)VerticesFinal[k][i + j].Position);
-        //            }
-        //            var tmp2 = SharpDX.BoundingBox.FromPoints(tmp_vec.ToArray());
-        //            ListeBoundingBoxes.Add(tmp2);
-        //        }
-        //    }
-        //    bboxList = ListeBoundingBoxes;
-
-        //    return ListeBoundingBoxes;
-        //}
-
-        public static List<BoundingBox> Initialize()
+        /// <summary>
+        /// Créée une bounding contenant tout les points compris dans le tableau mis en paramètre.
+        /// </summary>
+        private static void PutFromPoints(Vector3[] points)
         {
-            var ListeBoundingBoxes = new List<BoundingBox>();
+            if (points == null)
+                throw new ArgumentNullException("points");
+
+            Vector3 result1 = new Vector3(float.MaxValue);
+            Vector3 result2 = new Vector3(float.MinValue);
+            for (int index = 0; index < points.Length; ++index)
+            {
+                Vector3.Min(ref result1, ref points[index], out result1);
+                Vector3.Max(ref result2, ref points[index], out result2);
+            }
+
+            //BUGFIX : car les distances entre les sommets des murs sont trop petites O_O
+            result1 -= new Vector3(0.05f);
+            result2 += new Vector3(0.05f);
+
+            tree.Put(result1.X, result1.Y, result1.Z, result2.X, result2.Y, result2.Z, "wall" + result1.X + "," + result1.Y + "," + result1.Z + "-" + result2.X + "," + result2.Y + "," + result2.Z);    
+        }
+
+
+        public static void Initialize()
+        {
+            tree = new IntervalKDTree<string>(100, 10);
 
             foreach (structOBJ obj in Program.Liste_OBJ)
             {
@@ -58,14 +54,11 @@ namespace Underground
                         {
                             tmp_vec.Add((Vector3)model.Sommets[i + j].Position);
                         }
-                        var tmp2 = SharpDX.BoundingBox.FromPoints(tmp_vec.ToArray());
-                        ListeBoundingBoxes.Add(tmp2);
+
+                        PutFromPoints(tmp_vec.ToArray());
                     }
                 }
             }
-
-            bboxList = ListeBoundingBoxes;
-            return ListeBoundingBoxes;
         }
 
         public static void AddVertex(List<Vector4> vertices)
@@ -80,8 +73,9 @@ namespace Underground
                 {
                     tmp_vec.Add((Vector3)vertices[i + j]);
                 }
-                var tmp2 = SharpDX.BoundingBox.FromPoints(tmp_vec.ToArray());
-                bboxList.Add(tmp2);
+
+                PutFromPoints(tmp_vec.ToArray());
+
             }
 
 
@@ -89,17 +83,19 @@ namespace Underground
 
         public static bool CheckCollisions(Vector3 pos)
         {
-            var cameraSphere = new BoundingSphere(-pos, 0.15f);
+            bool res = tree.GetIntersect(-pos.X - 0.15, -pos.Y - 0.15, -pos.Z - 0.15, -pos.X + 0.15, -pos.Y + 0.15, -pos.Z + 0.15);
+            
+            // Pour savoir quel mur à été touché : 
+            //HashSet<string> foundValues;
+            //foundValues = tree.GetValues(-pos.X - 0.1, -pos.Y - 0.1, -pos.Z - 0.1, -pos.X + 0.1, -pos.Y + 0.1, -pos.Z + 0.1, new HashSet<string>());
 
-            foreach (var BBox in bboxList)
-            {
-                if (BBox.Intersects(ref cameraSphere))
-                {
-                    Program.WriteNicely("!", 12, "Intersection");
-                    return true;
-                }
-            }
-            return false;
+            //foreach (var foundValue in foundValues)
+            //{
+            //    Console.WriteLine(foundValue);
+            //}
+
+            return res;
         }
+
     }
 }
