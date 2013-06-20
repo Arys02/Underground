@@ -85,8 +85,9 @@ namespace Underground
         public string map_Kd;
         public string map_Ns;
         public bool isready;
+        public Matrix Transformation;
 
-        public structModel(VertexBuffer VertexBuffer, structVertex[] Sommets, int nbfaces, string map_Kd, string map_Ns)
+        public structModel(VertexBuffer VertexBuffer, structVertex[] Sommets, int nbfaces, string map_Kd, string map_Ns, Matrix Transformation)
         {
             this.VertexBuffer = VertexBuffer;
             this.Sommets = Sommets;
@@ -94,6 +95,7 @@ namespace Underground
             this.map_Kd = map_Kd;
             this.map_Ns = map_Ns;
             this.isready = true;
+            this.Transformation = Transformation;
         }
     }
     public struct structOBJ
@@ -102,12 +104,16 @@ namespace Underground
         public Matrix Transformation;
         public List<structModel> data;
         public Point IDTile;
+        public Effect effect;
+        public bool sera_affiche;
         public structOBJ(string path, Matrix Transformation, List<structModel> data, Point IDTile)
         {
             this.IDTile = IDTile;
             this.data = data;
             this.path = path;
             this.Transformation = Transformation;
+            this.effect = Program.BaseEffect.Clone(Program.device);
+            this.sera_affiche = true;
         }
     }
     #endregion
@@ -115,11 +121,13 @@ namespace Underground
 
     internal static class Program
     {
+        public static Effect BaseEffect;
         public static Device device;
         public static RenderForm form;
         public static List<structTexture> Liste_textures;
         public static List<structBinary> Liste_binaires;
         public static List<structOBJ> Liste_OBJ;
+        public static Light[] Liste_Lights;
         public static int[] resolution = new int[2] { 1280, 700 };
         public static VertexElement[] vertexElems3D;
         public static VertexElement[] vertexElems2D;
@@ -174,39 +182,69 @@ namespace Underground
 
         public static int getModel(string filename, Matrix Transformation, Point IDTile)
         {
+            int position_dans_la_Liste = -1;
             for (int i = 0; i < Liste_OBJ.Count; i++)
             {
-                if (Liste_OBJ[i].path == filename && Liste_OBJ[i].Transformation == Transformation)
+                if (Liste_OBJ[i].path == filename)
                 {
-                    return i;
+                    if (!Liste_OBJ[i].sera_affiche)
+                    {
+                        position_dans_la_Liste = i;
+                    }
+                    if (Liste_OBJ[i].Transformation == Transformation && IDTile == Liste_OBJ[i].IDTile)
+                    {
+                        return i;
+                    }
                 }
             }
-            Ingame.last_unready = true;
-            Liste_OBJ.Add(new structOBJ(filename, Transformation, ObjLoader.read_obj(Liste_binaires[getBinary(filename)].data, Transformation), IDTile));
-            for (int i = 0; i < Liste_OBJ[Liste_OBJ.Count - 1].data.Count; i++)
+            if (position_dans_la_Liste != -1) // Si le model a été chargé mais qu'il n'est pas affiché
             {
-                Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Lock(0, 0, LockFlags.None).WriteRange(Liste_OBJ[Liste_OBJ.Count - 1].data[i].Sommets);
-                Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Unlock();
-
+                structOBJ temp = Liste_OBJ[position_dans_la_Liste];
+                temp.sera_affiche = true;
+                temp.Transformation = Transformation;
+                temp.IDTile = IDTile;
+                Liste_OBJ[position_dans_la_Liste] = temp;
+                Collision.Initialize();
+                return position_dans_la_Liste;
             }
-            Ingame.last_unready = false;
-            Collision.Initialize();
-            return Liste_OBJ.Count - 1;
+            else
+            {
+                // Sinon on charge le model
+                Liste_OBJ.Add(new structOBJ(filename, Transformation, ObjLoader.read_obj(Liste_binaires[getBinary(filename)].data, Transformation), IDTile));
+                for (int i = 0; i < Liste_OBJ[Liste_OBJ.Count - 1].data.Count; i++)
+                {
+                    Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Lock(0, 0, LockFlags.None).WriteRange(Liste_OBJ[Liste_OBJ.Count - 1].data[i].Sommets);
+                    Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Unlock();
+                }
+                Collision.Initialize();
+                return Liste_OBJ.Count - 1;
+            }
         }
 
-        public static void freeModel(Point IDTile, bool supprimer_toutes_les_occurences)
+        public static void freeModel(Point IDTile, bool supprimer_toutes_les_occurences, bool Liberer_de_la_CG)
         {
             for (int i = 0; i < Liste_OBJ.Count; i++)
             {
                 if (Liste_OBJ[i].IDTile == IDTile)
                 {
-                    for (int j = 0; j < Liste_OBJ[i].data.Count; j++)
+                    if (Liberer_de_la_CG)
                     {
-                        Liste_OBJ[i].data[j].VertexBuffer.Dispose();
+                        Liste_OBJ[i].effect.Dispose();
+                        for (int j = 0; j < Liste_OBJ[i].data.Count; j++)
+                        {
+                            Liste_OBJ[i].data[j].VertexBuffer.Dispose();
+                        }
+                        Liste_OBJ.RemoveAt(i);
+                        i--;
+                        if (!supprimer_toutes_les_occurences) return;
                     }
-                    Liste_OBJ.RemoveAt(i);
-                    i--;
-                    if (!supprimer_toutes_les_occurences) return;
+                    else
+                    {
+                        structOBJ temp = Liste_OBJ[i];
+                        temp.sera_affiche = false;
+                        Liste_OBJ[i] = temp;
+                        if (!supprimer_toutes_les_occurences) return;
+                    }
                 }
             }
         }
@@ -282,8 +320,29 @@ namespace Underground
             Liste_textures = new List<structTexture>();
             Liste_binaires = new List<structBinary>();
             Liste_OBJ = new List<structOBJ>();
+            Liste_Lights = new Light[2];
+            Liste_Lights[0].Type = LightType.Point;
+            Liste_Lights[0].Position = new Vector3(0, 0, 0);
+            Liste_Lights[0].Ambient = new Color4(0.5f, 0.5f, 0.5f, 1);
+            Liste_Lights[0].Range = 60f;
+            Liste_Lights[1].Type = LightType.Point;
+            Liste_Lights[1].Position = new Vector3(-100, -100, -100);
+            Liste_Lights[1].Ambient = new Color4(0.5f,0,0,1);
+            Liste_Lights[1].Range = 0.05f;
             Liste_textures.Add(new structTexture("null.bmp", Texture.FromFile(device, "null.bmp")));
             Ingame.Slender.doit_etre_recharge = true;
+
+            // Creation du fichier effect de référence
+            Macro macro = new Macro("nblights", 2.ToString());
+            BaseEffect = Effect.FromFile(Program.device, "MiniCube.fx", new Macro[] { macro }, null, "", ShaderFlags.None);
+            BaseEffect.Technique = BaseEffect.GetTechnique(0);
+            BaseEffect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 0f));
+            Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 100.0f);
+            BaseEffect.SetValue("Projection", proj);
+            BaseEffect.SetValue("LightDiffuseColor[0]", Liste_Lights[0].Ambient);
+            BaseEffect.SetValue("LightDiffuseColor[1]", Liste_Lights[1].Ambient);
+            BaseEffect.SetValue("LightDistanceSquared[1]", Liste_Lights[1].Range);
+
             Thread ThSound = new Thread(Sound.main);
             Thread ThEvents = new Thread(Ingame.fevents);
             ThSound.Start();

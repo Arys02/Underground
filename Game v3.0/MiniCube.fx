@@ -1,6 +1,7 @@
 float4x4 World;
 float4x4 View;
 float4x4 Projection;
+float4x4 WorldInverseTranspose;
 //const static int nblights = 1;
 
 texture DiffuseTexture;
@@ -9,11 +10,15 @@ float4 AmbientLightColor;
 
 float4 LightPosition[nblights];
 float4 LightDiffuseColor[nblights]; // intensity multiplier
+float4 lightDir[nblights];
 float LightDistanceSquared[nblights];
 float luminosity;
 
 bool Sepia = false;
-sampler2D s_2D;
+bool bump_mapping = true;
+float4x4 transformMatrix;
+float percent_Negatif = 0;
+sampler2D s_2D[2];
 
 sampler S0 = sampler_state
 {
@@ -36,7 +41,7 @@ struct VertexShaderOutput
 	float2 tex : TEXCOORD0;
     float4 Color : COLOR0;
 	float4 Normal : TEXCOORD1;
-	float4 WorldPos : TEXCOORD2;
+	float4 worldPosition : TEXCOORD2;
 };
 
 
@@ -44,40 +49,48 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
 	VertexShaderOutput output;
 
-	// "Multiplication will be done in the pre-shader - so no cost per vertex"
-	float4 posWorld = mul(input.Position, World);
-	float4x4 viewprojection = mul(View, Projection);
-	output.Position = mul(posWorld, viewprojection);
+	float4 worldPosition = mul(input.Position, World);
+	float4 viewPosition = mul(worldPosition, View);
+	output.Position = mul(mul(mul(input.Position,World), View), Projection);
+
+	output.Normal = (mul(float4(input.Normal.xyz, 0), WorldInverseTranspose));
+	output.Normal.w = 1;
+
 	output.tex = input.tex;
 
-	// Passing information on to do both specular AND diffuse calculation in pixel shader
-	output.Normal = mul(input.Normal, (float4x4)World);
-	output.WorldPos = posWorld;
-	output.Color = input.col;
+	output.worldPosition = worldPosition;
+	output.Color = input.col; //saturate(input.col * dot(output.Normal, LightPosition[0] - worldPosition));
 	return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-	float4 texel = tex2D(s_2D, input.tex);
-	float4 lightDir[nblights];
-	float4 finalLights[nblights];
 	int i;
-
-	for (i=0;i<nblights;i++)
+	float4 texel = tex2D(s_2D[0], input.tex);
+	float4 finalLight = float4(0,0,0,1);
+	float4 currentLight;
+	float coef_bump;
+	if (bump_mapping)
 	{
-		lightDir[i] = normalize(input.WorldPos - LightPosition[i]);
-		finalLights[i] = LightDiffuseColor[i] * saturate(dot(input.Normal, -lightDir[i])) *
-			LightDistanceSquared[i] / max(dot(LightPosition[i] - input.WorldPos, LightPosition[i] - input.WorldPos),1) * 0.1;
+		float4 normaltex = tex2D(s_2D[1], input.tex);
+		float4 bump = normalize(normalize(normaltex * 2.0 - 1.0));
+		bump.w = 1;
+		coef_bump = max(saturate(dot(input.Normal, bump)), 0.0);
 	}
-	for (i=1;i<nblights;i++)
+	else
+		coef_bump = 1;
+	for (i = 0; i < nblights; i++)
 	{
-		finalLights[0] += finalLights[i];
+		currentLight =
+			pow(LightDistanceSquared[i] / max(dot(LightPosition[i] - input.worldPosition, LightPosition[i] - input.worldPosition), LightDistanceSquared[i]),2)
+			* LightDiffuseColor[i]
+			* coef_bump;
+		//if (i != 1) currentLight *= saturate(dot(input.Normal, normalize(LightPosition[i] - input.worldPosition)));
+		finalLight += currentLight;
 	}
-	//finalLights[0] = min(finalLights[0],float4(0.6,0.6,0.6,1));
-	float4 finalPixel = saturate(texel.xyzw * (AmbientLightColor + finalLights[0]) * input.Color) * luminosity;
-	finalPixel.w = texel.w;
-	return min(finalPixel,saturate(texel+input.Color));
+	float4 pixel = saturate((texel * input.Color * 2 - float4(1,1,1,1)) * percent_Negatif / 2 + texel * input.Color) * saturate(AmbientLightColor + finalLight) * luminosity;
+	pixel.w = texel.w;
+	return min(pixel,texel*input.Color);
 
 }
 
@@ -89,6 +102,6 @@ technique Main {
 		AlphaTestEnable = True;
 		AlphaFunc = Greater;
 		VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader  = compile ps_2_0 PixelShaderFunction();
+        PixelShader  = compile ps_3_0 PixelShaderFunction();
 	}
 }

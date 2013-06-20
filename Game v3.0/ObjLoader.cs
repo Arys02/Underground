@@ -100,14 +100,14 @@ namespace Underground
             } while (carac_Lu != '\n' && i < obj.Length);
         }
 
-        public static List<structModel> read_obj(byte[] obj, Matrix referentiel)
+        public static List<structModel> read_obj(byte[] obj, Matrix transformation)
         {
             List<structModel> Liste_Models = new List<structModel>();
             int i = 0, nbsommets = 0, nbtextures = 0, nbnormales = 0;
             int material_used = 0;
             int precedent_pourcentage = 0;
             Program.WriteNicely("#", 2, "Ouverture du fichier " + obj[0].ToString());
-            structModel model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp", "null.bmp");
+            structModel model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp", "null.bmp", transformation);
 
             ///////////// Pour la construction des sommets /////////////
             List<Vector2> ListeCoordTextures = new List<Vector2>();
@@ -209,22 +209,22 @@ namespace Underground
                     z = getfloat(ref i, ref obj); // Coord z
                     ListeVertex.Add(new structVertex()
                     {
-                        Position = Vector4.Transform(new Vector4(
+                        Position = new Vector4(
                             ListeCoordSommets[Convert.ToInt32(x - 1)].X,
                             ListeCoordSommets[Convert.ToInt32(x - 1)].Y,
                             ListeCoordSommets[Convert.ToInt32(x - 1)].Z,
                             ListeCoordSommets[Convert.ToInt32(x - 1)].W
-                        ),referentiel),
+                        ),
                         CoordTextures = new Vector2(
                             ListeCoordTextures[Convert.ToInt32(y - 1)].X,
                             ListeCoordTextures[Convert.ToInt32(y - 1)].Y
                         ),
                         Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
-                        Normal = new Vector4(Vector3.TransformNormal(new Vector3(
+                        Normal = new Vector4(
                             ListeNormales[Convert.ToInt32(z - 1)].X,
                             ListeNormales[Convert.ToInt32(z - 1)].Y,
-                            ListeNormales[Convert.ToInt32(z - 1)].Z),
-                            referentiel),1),
+                            ListeNormales[Convert.ToInt32(z - 1)].Z,
+                            1),
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
@@ -242,22 +242,22 @@ namespace Underground
 
                     ListeVertex.Add(new structVertex()
                     {
-                        Position = Vector4.Transform(new Vector4(
-                            ListeCoordSommets[Convert.ToInt32(x-1)].X,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].Y,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].Z,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].W
-                        ),referentiel),
+                        Position = new Vector4(
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].X,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].Y,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].Z,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].W
+                        ),
                         CoordTextures = new Vector2(
                             ListeCoordTextures[Convert.ToInt32(y - 1)].X,
                             ListeCoordTextures[Convert.ToInt32(y - 1)].Y
                         ),
                         Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
-                        Normal = new Vector4(Vector3.TransformNormal(new Vector3(
+                        Normal = new Vector4(
                             ListeNormales[Convert.ToInt32(z - 1)].X,
                             ListeNormales[Convert.ToInt32(z - 1)].Y,
-                            ListeNormales[Convert.ToInt32(z - 1)].Z),
-                            referentiel), 1),
+                            ListeNormales[Convert.ToInt32(z - 1)].Z,
+                            1),
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
@@ -272,22 +272,22 @@ namespace Underground
                     z = getfloat(ref i, ref obj); // Coord z
                     ListeVertex.Add(new structVertex()
                     {
-                        Position = Vector4.Transform(new Vector4(
-                            ListeCoordSommets[Convert.ToInt32(x-1)].X,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].Y,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].Z,
-                            ListeCoordSommets[Convert.ToInt32(x-1)].W
-                        ),referentiel),
+                        Position = new Vector4(
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].X,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].Y,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].Z,
+                            ListeCoordSommets[Convert.ToInt32(x - 1)].W
+                        ),
                         CoordTextures = new Vector2(
                             ListeCoordTextures[Convert.ToInt32(y - 1)].X,
                             ListeCoordTextures[Convert.ToInt32(y - 1)].Y
                         ),
                         Color = mtlloader.MTLData[material_used].Kd.ToVector4(),
-                        Normal = new Vector4(Vector3.TransformNormal(new Vector3(
+                        Normal = new Vector4(
                             ListeNormales[Convert.ToInt32(z - 1)].X,
                             ListeNormales[Convert.ToInt32(z - 1)].Y,
-                            ListeNormales[Convert.ToInt32(z - 1)].Z),
-                            referentiel), 1),
+                            ListeNormales[Convert.ToInt32(z - 1)].Z,
+                            1),
                     });
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
@@ -333,7 +333,7 @@ namespace Underground
                             ) * 3 * model_actuel.nbfaces, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
                         ListeVertex.Clear();
                         Liste_Models.Add(model_actuel);
-                        model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp", "null.bmp");
+                        model_actuel = new structModel(Program.VertexBufferZero, new structVertex[0], 0, "null.bmp", "null.bmp", transformation);
                     }
                     for (int j = 0; j < mtlloader.MTLData.Count; j++)
                     {

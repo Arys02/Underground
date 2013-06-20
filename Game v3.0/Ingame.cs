@@ -41,8 +41,7 @@ namespace Underground
     static class Ingame
     {
         //public static List<structTile> Tuiles_a_charger = new List<structTile>();
-        public static Effect effect;
-        public static bool effect_is_loaded = false;
+        //public static bool effect_is_loaded = false;
         public static PrimitiveType PrimType = PrimitiveType.TriangleList;
         public static bool Sepia = false;
         public static bool Following_light = true;
@@ -56,7 +55,6 @@ namespace Underground
         public static bool a_progresse = false;
         public static structMobSlender Slender = new structMobSlender(true,true);
         public static int compteur_slender = 1;
-        public static bool last_unready = true;
 
 
         /*public static void getTilesToLoad(Vector3 position)
@@ -124,23 +122,18 @@ namespace Underground
         public static void recup_env()
         {
             int rayon_salles = 16;
-            //string path = @"..\..\ct0_new.obj";
-            //string path = @"Ressources\Game\Lighthouse.obj";
-            //string path = @"Ressources\Game\cube.obj";
-            //string path = @"C:\Users\b95093cf\Desktop\model.obj";
             //string pathL = @"Ressources\Game\C(L).obj";
-            //string path = @"Ressources\Game\C(T).obj";
+            //string pathX = @"Ressources\Game\C(X).obj";
+            //string pathIf = @"Ressources\Game\C(If).obj";
+            //string pathT = @"Ressources\Game\C(T).obj";
             //string path2 = @"Ressources\Game\cabine.obj";
-            string path3 = @"Ressources\Game\statue.obj";
-            //string path4 = @"Ressources\Game\untitled.obj";
-            //Program.freeModel(-137, true);
-            //Program.getModel(path4,Matrix.Translation(-macamera.position.X, -macamera.position.Y, -macamera.position.Z),-137);
+            string pathStatue = @"Ressources\Game\statue.obj";
             int slender_distancenbunite = 10;
             float slender_distanceapprocheunite = 2.1f;
             if (Slender.doit_etre_recharge)
             {
                 Slender.doit_etre_recharge = false;
-                Program.freeModel(new Point(-137, -137), true);
+                Program.freeModel(new Point(-137, -137), true, false);
                 if (Slender.seraaffiche)
                 {
                     compteur_slender = compteur_slender % 4 + 1;
@@ -155,14 +148,8 @@ namespace Underground
                                                (slender_distancenbunite - slender_distanceapprocheunite * compteur_slender) *
                                                (Math.Cos(macamera.angle.Y)))
                                              );
-
-                    if (effect_is_loaded)
-                    {
-                        effect.SetValue("LightPosition[1]", new Vector4(Slender.position.X, Slender.position.Y + 2, Slender.position.Z, 1));
-                        effect.SetValue("LightDiffuseColor[1]", Color.Red.ToVector4());
-                        effect.SetValue("LightDistanceSquared[1]", 10f);
-                    }
-                    Program.getModel(path3,
+                    Program.Liste_Lights[1].Position = new Vector3(Slender.position.X,Slender.position.Y,Slender.position.Z);
+                    Program.getModel(pathStatue,
                                      Matrix.Scaling(2f) * Matrix.RotationY(-macamera.angle.Y + (float)Math.PI) *
                                      Matrix.Translation(Slender.position), new Point(-137, -137));
                 }
@@ -208,7 +195,7 @@ namespace Underground
             {
                 if (idadecharger[i])
                 {
-                    Program.freeModel(new Point(previous_cases[i].x, previous_cases[i].y), true);
+                    Program.freeModel(new Point(previous_cases[i].x, previous_cases[i].y), true, false);
                     previous_cases.RemoveAt(i);
                     i--;
                 }
@@ -256,49 +243,6 @@ namespace Underground
                                         -(2 * rayon_salles) * cases[i].y),
                                      new Point(cases[i].x, cases[i].y));
             }
-            //}
-            //catch
-            //{
-            //    Console.WriteLine("Out of bounds");
-            //}
-
-            /*if ((-macamera.position.X <= rayon_salles && -macamera.position.X >= -rayon_salles) && (-macamera.position.Z >= -rayon_salles && -macamera.position.Z <= rayon_salles))
-            {
-                //Console.WriteLine("Zone 1");
-                Program.getModel(path2, Matrix.Scaling(0.5f) * Matrix.RotationY((float)Math.PI) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-1f, -1.8f, 28), 0);
-                Program.getModel(path, Matrix.RotationY(0 * (float)Math.PI / 2) * Matrix.Translation(0, 0, 0), 1);
-                Program.getModel(path, Matrix.RotationY(1 * (float)Math.PI / 2) * Matrix.Translation(-(2 * rayon_salles), 0, 0), 2);
-                Program.getModel(path, Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(0, 0, (2 * rayon_salles)), 3);
-                Program.freeModel(4, true);
-            }
-            else if ((-macamera.position.X <= -rayon_salles && -macamera.position.X >= -rayon_salles * 3) && (-macamera.position.Z >= -rayon_salles && -macamera.position.Z <= rayon_salles))
-            {
-                //Console.WriteLine("Zone 2");
-                Program.freeModel(0, true);
-                Program.getModel(path, Matrix.RotationY(0 * (float)Math.PI / 2) * Matrix.Translation(0, 0, 0), 1);
-                Program.getModel(path, Matrix.RotationY(1 * (float)Math.PI / 2) * Matrix.Translation(-(2 * rayon_salles), 0, 0), 2);
-                Program.freeModel(3, true);
-                Program.getModel(path, Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-(2 * rayon_salles), 0, (2 * rayon_salles)), 4);
-            }
-            else if ((-macamera.position.X <= rayon_salles && -macamera.position.X >= -rayon_salles) && (-macamera.position.Z >= rayon_salles && -macamera.position.Z <= rayon_salles * 3))
-            {
-                //Console.WriteLine("Zone 3");
-                Program.getModel(path2, Matrix.Scaling(0.5f) * Matrix.RotationY((float)Math.PI) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-1f, -1.8f, 28), 0);
-                Program.getModel(path, Matrix.RotationY(0 * (float)Math.PI / 2) * Matrix.Translation(0, 0, 0), 1);
-                Program.freeModel(2, true);
-                Program.getModel(path, Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(0, 0, (2 * rayon_salles)), 3);
-                Program.getModel(path, Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-(2 * rayon_salles), 0, (2 * rayon_salles)), 4);
-            }
-            else if ((-macamera.position.X <= -rayon_salles && -macamera.position.X >= -rayon_salles * 3) && (-macamera.position.Z >= rayon_salles && -macamera.position.Z <= rayon_salles * 3))
-            {
-                //Console.WriteLine("Zone 4");
-                Program.getModel(path2, Matrix.Scaling(0.5f) * Matrix.RotationY((float)Math.PI) * Matrix.RotationZ(1 * (float)Math.PI / 12) * Matrix.Translation(-1f, -1.8f, 28), 0);
-                Program.freeModel(1, true);
-                Program.getModel(path, Matrix.RotationY(1 * (float)Math.PI / 2) * Matrix.Translation(-(2 * rayon_salles), 0, 0), 2);
-                Program.getModel(path, Matrix.RotationY(3 * (float)Math.PI / 2) * Matrix.Translation(0, 0, (2 * rayon_salles)), 3);
-                Program.getModel(path, Matrix.RotationY(2 * (float)Math.PI / 2) * Matrix.Translation(-(2 * rayon_salles), 0, (2 * rayon_salles)), 4);
-            }
-            else Console.WriteLine("Out of bounds");*/
         }
 
         //> Color codes for WriteNicely : 
@@ -320,58 +264,14 @@ namespace Underground
         //15: White.
         static public void ingame()
         {
-            int nblights = 2;
+            //Matrix view = Matrix.LookAtLH(new Vector3(0, 0, -0.00002f), new Vector3(0, 0, 0), Vector3.UnitY);
             List<structModelFiles> ModelFiles = new List<structModelFiles>();
-            Matrix view = Matrix.LookAtLH(new Vector3(0, 0, -0.00002f), new Vector3(0, 0, 0), Vector3.UnitY);
-            Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 100.0f);
-            Matrix viewProj = Matrix.Multiply(view, proj);
-            Matrix worldViewProj = viewProj;
-            Macro macro = new Macro("nblights", nblights.ToString());
-            effect = Effect.FromFile(Program.device, "MiniCube.fx", new Macro[] { macro }, null, "", ShaderFlags.None);
-            effect_is_loaded = true;
-            EffectHandle technique = effect.GetTechnique(0);
-            EffectHandle pass = effect.GetPass(technique, 0);
+            
             macamera = new Camera();
             HUD hud = new HUD();
-            Vector3 position_Light = -macamera.position;
             Stopwatch clock = new Stopwatch();
             clock.Start();
 
-            // Lumière ambiante
-            effect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 0f));
-
-            // Light1
-            effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
-            effect.SetValue("LightDiffuseColor[0]", new Vector4(0.9f, 0.9f, 0.9f, 1));
-            effect.SetValue("LightDistanceSquared[0]", 280f);
-
-            /*// Light2
-            if (nblights > 1)
-            {
-                effect.SetValue("LightPosition[1]", new Vector4(0, 2, 2, 1));
-                effect.SetValue("LightDiffuseColor[1]", new Vector4(0.1f, 0.1f, 0.4f, 1));
-                effect.SetValue("LightDistanceSquared[1]", 10f);
-
-                // Light3
-                if (nblights > 2)
-                {
-                    effect.SetValue("LightPosition[2]", new Vector4(2, 2, 2, 1));
-                    effect.SetValue("LightDiffuseColor[2]", new Vector4(0.1f, 0.4f, 0.1f, 1));
-                    effect.SetValue("LightDistanceSquared[2]", 10f);
-                }
-            }*/
-
-
-            effect.SetValue("World", Matrix.Identity);
-            effect.SetValue("Projection", proj);
-
-            /*
-            effect.SetValue("vecLightPos",position);
-            effect.SetValue("LightRange",30.0f);
-            effect.SetValue("LightColor",new Vector4(255,255,255,255));*/
-
-            effect.Technique = technique;
-            //Program.device.SetRenderState(RenderState.CullMode, false);
             Int64 previous_time = clock.ElapsedTicks;
             Int64 previous_clignement = clock.ElapsedTicks;
             Collision.Initialize();
@@ -379,7 +279,6 @@ namespace Underground
             Matrix oldView = macamera.view;
             Vector3 oldPos = macamera.position;
             Vector3 oldAngle = macamera.angle;
-            Texture vector_map = Texture.FromFile(Program.device, @"Ressources\Game\Images\1normal_map.jpg");
             RenderLoop.Run(Program.form, () =>
             {
                 Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
@@ -393,8 +292,6 @@ namespace Underground
                 {
                     recup_env();
                     //effect.SetValue("LightPosition", new Vector4(-macamera.position.X, macamera.position.Y, -macamera.position.Z, 1));
-                    effect.Begin();
-                    effect.BeginPass(0);
                     /*if (clock.ElapsedTicks - previous_clignement > 100000000) // 1 tick != 100ns (cf diff entre Date et Stopwatch) utiliser Stopwatch.Frequency
                     {
                         Console.WriteLine(Stopwatch.Frequency);
@@ -406,7 +303,7 @@ namespace Underground
                     previous_time = clock.ElapsedTicks;
 
                     bool collide = Collision.CheckCollisions(macamera.position);
-
+                    collide = false;
                     if (collide)
                     {
                         macamera.position = oldPos;
@@ -423,23 +320,30 @@ namespace Underground
                         oldView = macamera.view;
                     }
 
-                    effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
 
                     //////////////////// ETABLISSEMENT DU FILTRE NEGATIF ////////////////////
                     float percent = Convert.ToSingle(Math.Max(0, 1 - Math.Pow(Vector3.Dot(macamera.position + Slender.position, macamera.position + Slender.position), 2) / 35000));
                     //////////////////// ETABLISSEMENT DU FILTRE NEGATIF ////////////////////
 
-                    effect.SetValue("percent_Negatif", percent);
-                    if (Following_light)
-                        position_Light = -macamera.position;
-                    effect.SetValue("LightPosition[0]", new Vector4(position_Light, 1));
-                    effect.SetValue("LightDistanceSquared[0]", Convert.ToSingle(Math.Min(380, Vector3.Dot(macamera.position + Slender.position, macamera.position + Slender.position))));
-
-                    effect.SetValue("View", macamera.view);
-                    effect.SetValue("Sepia", Sepia);
-                    effect.SetValue("luminosity", luminosity);
+                    Program.Liste_Lights[0].Position = -Ingame.macamera.position;
                     for (int k = 0; k < Program.Liste_OBJ.Count; k++)
                     {
+                        Program.Liste_OBJ[k].effect.SetValue("LightPosition[0]", new Vector4(Program.Liste_Lights[0].Position, 1));
+                        Program.Liste_OBJ[k].effect.SetValue("LightPosition[1]", new Vector4(Program.Liste_Lights[1].Position.X, Program.Liste_Lights[1].Position.Y + 2f, Program.Liste_Lights[1].Position.Z, 1));
+                        Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[0]", Convert.ToSingle(Math.Min(Program.Liste_Lights[0].Range, Math.Pow(Vector3.Dot(macamera.position + Slender.position, macamera.position + Slender.position), 0.7) / Program.Liste_Lights[0].Range * 40)));
+                        Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[1]", Program.Liste_Lights[1].Range * 100);
+                        Program.Liste_OBJ[k].effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
+                        Program.Liste_OBJ[k].effect.SetValue("percent_Negatif", percent);
+                        Program.Liste_OBJ[k].effect.SetValue("View", macamera.view);
+                        Program.Liste_OBJ[k].effect.SetValue("Sepia", Sepia);
+                        Program.Liste_OBJ[k].effect.SetValue("luminosity", luminosity);
+                        Program.Liste_OBJ[k].effect.Begin();
+                        Program.Liste_OBJ[k].effect.BeginPass(0);
+                        /*structOBJ a = Program.Liste_OBJ[k];
+                        a.Transformation *= Matrix.Translation(new Vector3(0,0,0.0001f));
+                        Program.Liste_OBJ[k] = a;*/
+                        Program.Liste_OBJ[k].effect.SetValue("World", Program.Liste_OBJ[k].Transformation);
+                        Program.Liste_OBJ[k].effect.SetValue("WorldInverseTranspose", Matrix.Transpose(Matrix.Invert(Program.Liste_OBJ[k].Transformation)));
                         for (int i = 0; i < Program.Liste_OBJ[k].data.Count; i++)
                         {
                             if (Program.Liste_OBJ[k].data[i].isready)
@@ -450,9 +354,9 @@ namespace Underground
                                 Program.device.DrawPrimitives(PrimType, 0, Program.Liste_OBJ[k].data[i].nbfaces);
                             }
                         }
+                        Program.Liste_OBJ[k].effect.EndPass();
+                        Program.Liste_OBJ[k].effect.End();
                     }
-                    effect.EndPass();
-                    effect.End();
                     hud.Display_HUD();
                 }
                 Program.device.EndScene(); // Okay
@@ -472,7 +376,6 @@ namespace Underground
                 TextureElt.texture.Dispose();
             }
             clock.Stop();
-            effect.Dispose();
         }
     }
 }
