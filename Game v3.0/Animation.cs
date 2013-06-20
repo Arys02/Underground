@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
-namespace Underground
+namespace Test2
 {
     class Animation
     {
         //Cette Liste stocke toutes les objets composants une animation. 
-        List<List<Obj>> Anim;
+        List<Object> Anim;
 
         //La on charge notre liste avec les differents Objet
         public Animation(List<string> Pathlist)
         {
-            for (int i = 0; i <= Pathlist.Count; i++ )
+            foreach(string path in Pathlist)
             {
-                Anim.Add(Obj.Obj_parser(Pathlist[i]));
+                Object Alphatest = new Object(path);
+                Anim.Add(Alphatest);
             }
-        }
+        }        
+        
+
     }
 }
