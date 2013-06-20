@@ -20,3 +20,6 @@ C:\Users\Bastien\Documents\projet\Underground\bin\Debug\SharpDX.DirectInput.xml
 C:\Users\Bastien\Documents\projet\Underground\bin\Debug\SharpDX.DirectSound.xml
 C:\Users\Bastien\Documents\projet\Underground\bin\Debug\SharpDX.XAudio2.xml
 C:\Users\Bastien\Documents\projet\Underground\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Bastien\Documents\GitHub\Underground\Game v2.0\Underground\bin\Debug\Underground.exe.config
+C:\Users\Bastien\Documents\GitHub\Underground\Game v2.0\Underground\obj\Debug\Underground.exe
+C:\Users\Bastien\Documents\GitHub\Underground\Game v2.0\Underground\obj\Debug\Underground.pdb
