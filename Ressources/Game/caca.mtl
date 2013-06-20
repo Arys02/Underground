@@ -1,0 +1,76 @@
+newmtl Cube_1SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 18.00
+newmtl Cube_2SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 18.00
+newmtl Cube_3SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 18.00
+newmtl CylinderSG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 18.00
+newmtl Cylinder_1SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 18.00
+newmtl Cylinder_2SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 18.00
+newmtl Cylinder_3SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 18.00
+newmtl Plane_3SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl Plane_4SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.20 0.20 0.20
+Ns 48.00
+newmtl Plane_4SG1
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00

@@ -1,0 +1,40 @@
+# Blender MTL File: 'world1.blend'
+# Material Count: 4
+
+newmtl Material
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.717675 0.717675 0.717675
+Ks 0.002121 0.002121 0.002121
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Images/Rock3.jpg
+
+newmtl Material_Rock2.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.717675 0.717675 0.717675
+Ks 0.002121 0.002121 0.002121
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Images/Rock2.jpg
+
+newmtl None
+Ns 0
+Ka 0.000000 0.000000 0.000000
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+map_Kd Images/Rock2.jpg
+
+newmtl None_Wood.jpg
+Ns 0
+Ka 0.000000 0.000000 0.000000
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+map_Kd Images/Wood.jpg
