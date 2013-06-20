@@ -1,0 +1,22 @@
+# Blender MTL File: 'sql.blend'
+# Material Count: 2
+
+newmtl Chaire
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.058167 0.098947
+Ks 0.157434 0.027221 0.031231
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Bastien\Documents\GitHub\Underground\Ressource\Game\Images\Chaire.jpg
+
+newmtl Os
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.593424 0.361390
+Ks 0.334324 0.334324 0.334324
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Bastien\Documents\GitHub\Underground\Ressource\Game\Images\Os.jpg
