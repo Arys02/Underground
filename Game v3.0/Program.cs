@@ -84,7 +84,6 @@ namespace Underground
         public int nbfaces;
         public string map_Kd;
         public string map_Ns;
-        public bool isready;
         public Matrix Transformation;
 
         public structModel(VertexBuffer VertexBuffer, structVertex[] Sommets, int nbfaces, string map_Kd, string map_Ns, Matrix Transformation)
@@ -94,7 +93,6 @@ namespace Underground
             this.nbfaces = nbfaces;
             this.map_Kd = map_Kd;
             this.map_Ns = map_Ns;
-            this.isready = true;
             this.Transformation = Transformation;
         }
     }
@@ -191,7 +189,7 @@ namespace Underground
                     {
                         position_dans_la_Liste = i;
                     }
-                    if (Liste_OBJ[i].Transformation == Transformation && IDTile == Liste_OBJ[i].IDTile)
+                    else if (Liste_OBJ[i].Transformation == Transformation && IDTile == Liste_OBJ[i].IDTile)
                     {
                         return i;
                     }
@@ -334,7 +332,7 @@ namespace Underground
 
             // Creation du fichier effect de référence
             Macro macro = new Macro("nblights", 2.ToString());
-            BaseEffect = Effect.FromFile(Program.device, "MiniCube.fx", new Macro[] { macro }, null, "", ShaderFlags.None);
+            BaseEffect = Effect.FromFile(Program.device, "MiniCube.fx", new Macro[] { macro }, null, "", ShaderFlags.OptimizationLevel3);
             BaseEffect.Technique = BaseEffect.GetTechnique(0);
             BaseEffect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 0f));
             Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 100.0f);

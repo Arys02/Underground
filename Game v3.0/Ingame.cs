@@ -346,7 +346,7 @@ namespace Underground
                         Program.Liste_OBJ[k].effect.SetValue("WorldInverseTranspose", Matrix.Transpose(Matrix.Invert(Program.Liste_OBJ[k].Transformation)));
                         for (int i = 0; i < Program.Liste_OBJ[k].data.Count; i++)
                         {
-                            if (Program.Liste_OBJ[k].data[i].isready)
+                            if (Program.Liste_OBJ[k].sera_affiche)
                             {
                                 Program.device.SetStreamSource(0, Program.Liste_OBJ[k].data[i].VertexBuffer, 0, Utilities.SizeOf<structVertex>());
                                 Program.device.SetTexture(0, Program.Liste_textures[Program.getTexture(Program.Liste_OBJ[k].data[i].map_Kd)].texture);
