@@ -328,7 +328,7 @@ namespace Underground
             Liste_Lights[1].Ambient = new Color4(0.5f,0,0,1);
             Liste_Lights[1].Range = 0.05f;
             Liste_textures.Add(new structTexture("null.bmp", Texture.FromFile(device, "null.bmp")));
-            Ingame.Slender.doit_etre_recharge = true;
+            //Ingame.Slender.doit_etre_recharge = true;
 
             // Creation du fichier effect de référence
             Macro macro = new Macro("nblights", 2.ToString());
@@ -351,6 +351,7 @@ namespace Underground
             newmaze = new Maze(10, 10);
             newmaze.Initecelles();
             newmaze.Generate(newmaze.maze[0, 0]);
+            newmaze.impefectGenerate();
             newmaze.Setaffichage();
 
             Ingame.ingame();

@@ -40,9 +40,9 @@ namespace Underground
         {
 
             Playsound(audio,
-                      (!Program.input.KeysDown.Contains(Camera.keyrun)
-                           ? @"Ressources\Sound\pas.wav"
-                           : @"Ressources\Sound\Cours.wav"), 5, false);
+                      (Program.input.KeysDown.Contains(Camera.keyrun) && !Ingame.isTired
+                           ? @"Ressources\Sound\Cours.wav"
+                           : @"Ressources\Sound\pas.wav"), 5, false);
             
             pas.Abort();
             pas = new Thread(bruitpas);

@@ -1,0 +1,87 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	modified:   Game v3.0/Underground/Camera.cs
+#	modified:   Game v3.0/Underground/Ingame.cs
+#	modified:   Game v3.0/Underground/Program.cs
+#	deleted:    Game v3.0/Underground/Ressource/Game/Charactere/SQUELLETTEtEST2.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/Couloir/couloirDroit.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/Couloir/couloirTournant2.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/Couloir/couloirtourant.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/CouloirMaya.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/Beton20.bmp
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/Beton20.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/Chaire.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/Os.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/Os2.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/Test.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/Water.png
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/bg.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/dev.png
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/dev2.png
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/dungeon__floor_4.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/dungeon_walls_1.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/dungeon_walls_3.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/feuilles.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/grass.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/metal.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/porte-beton-texture-en-beton_19-136906.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/porte-beton-texture-en-beton_19-136906.png
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/rock_wall.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/rocks.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/tree.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/vitre.png
+#	deleted:    Game v3.0/Underground/Ressource/Game/Images/woodfloor.bmp
+#	deleted:    Game v3.0/Underground/Ressource/Game/Lighthouse.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/cabine.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/cabine_col.tga
+#	deleted:    Game v3.0/Underground/Ressource/Game/cabine_nor.tga
+#	deleted:    Game v3.0/Underground/Ressource/Game/cabine_vitres_alpha.tga
+#	deleted:    Game v3.0/Underground/Ressource/Game/cabine_vitres_col.tga
+#	deleted:    Game v3.0/Underground/Ressource/Game/couloir_TounantverDobj.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/couloir_TounantverGobj.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/couloir_droit.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/ct0.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/ct0bis.mtl
+#	deleted:    Game v3.0/Underground/Ressource/Game/squelettetest1.mtl
+#	deleted:    Game v3.0/Underground/Ressource/HUD/ProgressBar1.png
+#	deleted:    Game v3.0/Underground/Ressource/HUD/Texture.png
+#	deleted:    Game v3.0/Underground/Ressource/HUD/Torch.png
+#	deleted:    Game v3.0/Underground/Ressource/Menu/bg.jpg
+#	deleted:    Game v3.0/Underground/Ressource/Sound/504285_SlenderMans-Playtim.mp3
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a1.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a2.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a3.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a4.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a5.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a6.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a7.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a8.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/ambiance/a9.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Breath.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Breath1.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Breath3.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Chains.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Growl1.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Horror Effects/40 Fire Engines.mp3
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Snarl1.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Wind1.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Wind2.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Wind3.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/Wind4.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/bidoch.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/bouillon.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/cri.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/fire.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/gore.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/goute.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/impact.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/bruitage/kids.wav
+#	deleted:    Game v3.0/Underground/Ressource/Sound/pas.wav
+#	modified:   Game v3.0/Underground/Sound.cs
+#
+

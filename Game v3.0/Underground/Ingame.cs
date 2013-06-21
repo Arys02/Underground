@@ -38,7 +38,8 @@ namespace Underground
             this.position = new Vector3(float.MinValue, float.MinValue, float.MinValue);
         }
     }
-    static class Ingame
+
+    internal static class Ingame
     {
         //public static List<structTile> Tuiles_a_charger = new List<structTile>();
         //public static bool effect_is_loaded = false;
@@ -50,13 +51,16 @@ namespace Underground
         public static float luminosity = 1f;
         public static int stateinflash = 0; // 0 = non débuté // -1 = en décroissance // 1 = en croissance
         public static float percent = 1;
-        public static Camera macamera;
+        public static Camera macamera = new Camera();
         public static float sinusoide = 0f;
         public static bool a_progresse = false;
-        public static structMobSlender Slender = new structMobSlender(true,true);
+        public static structMobSlender Slender = new structMobSlender(true, true);
         public static int compteur_slender = 1;
         public static int stateInRun = 0;
         public static float percentRun;
+        public static bool isTired = false;
+        public static Thread tired;
+       
 
 
         /*public static void getTilesToLoad(Vector3 position)
@@ -65,7 +69,21 @@ namespace Underground
             position.X/32
         }*/
 
-        public static void fevents()
+        public static void istiredfct()
+        {
+            isTired = true;
+            Thread.Sleep(5000);
+            isTired = false;
+        }
+
+        public static double distenceSlender()
+        {
+            return
+                Math.Sqrt(Math.Pow(-macamera.position.X - Slender.position.X, 2) +
+                          Math.Pow(-macamera.position.Y - Slender.position.Y, 2));
+        }
+
+    public static void fevents()
         {
             Random rand = new Random();
             Stopwatch clock = new Stopwatch();
@@ -76,8 +94,14 @@ namespace Underground
             int Seconde_A_Attendre = 6;
             int SecondeCapacityRun = 1;
             int repos = 7;
+            
+                   // - macamera.position     Ingame.Slender.position
+           
             while (true)
             {
+              
+                    Console.WriteLine(distenceSlender());
+
                 #region flash
                 if (stateinflash == -1)
                 {
@@ -113,14 +137,23 @@ namespace Underground
                 #endregion
                 #region run
 
-                if (Program.input.KeysDown.Contains(Camera.keyrun))
+                if (Program.input.KeysDown.Contains(Camera.keyrun) && !isTired && distenceSlender()<3)
                 {
-                    percentRun +=
-                                 ((float)(clock.ElapsedTicks - previous_time) / (float)(SecondeCapacityRun * 3500000));
+                   
+                        percentRun +=
+                            ((float) (clock.ElapsedTicks - previous_time)/(float) (SecondeCapacityRun*3500000));
                     if (percentRun > 1)
+                    {                  
                         percentRun = 1;
+                        if (tired == null || !tired.IsAlive)
+                        {
+                            tired = new Thread(istiredfct);
+                            tired.Start();
+                        }
+                    }
 
                 }
+            
                 else
                 {
                     percentRun -= ((float)(clock.ElapsedTicks - previous_time) / (float)(repos * 3500000));
@@ -128,7 +161,7 @@ namespace Underground
                         percentRun = 0;
 
                 }
-
+    
 
                 #endregion
                 #region walking

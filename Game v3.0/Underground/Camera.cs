@@ -47,16 +47,22 @@ namespace Underground
 
         public void orient_camera(long timer)
         {
+            Console.WriteLine(Ingame.isTired);
             Ingame.a_progresse = false;
             float[] VitesseRotation = new float[3] { 0.0000006f * timer, 0.0000006f * timer, 0.0000006f * timer };
-            float[] VitesseTranslation = !Program.input.KeysDown.Contains(keyrun)
+            float[] VitesseTranslation = (Program.input.KeysDown.Contains(keyrun) && !Ingame.isTired && Ingame.distenceSlender() < 3)
                                              ? new float[]
+                                                 {
+                                                     0.000003f*timer,
+                                                     0.000003f*timer,
+                                                     0.000003f*timer
+                                                 }
+                                             : new float[]
                                                  {
                                                      0.000001f*timer,
                                                      0.000001f*timer,
                                                      0.000001f*timer,
-                                                 }
-                                             : new float[] {0.000003f*timer, 0.000003f*timer, 0.000003f*timer};
+                                                 };
         
             double produit_scalaire;
 
