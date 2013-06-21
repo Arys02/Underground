@@ -76,12 +76,12 @@ namespace Underground
             isTired = false;
         }
 
-        public static double distenceSlender()
+        /*public static double distenceSlender()
         {
             return
                 Math.Sqrt(Math.Pow(-macamera.position.X - Slender.position.X, 2) +
                           Math.Pow(-macamera.position.Y - Slender.position.Y, 2));
-        }
+        }*/
 
     public static void fevents()
         {
@@ -100,7 +100,7 @@ namespace Underground
             while (true)
             {
               
-                    Console.WriteLine(distenceSlender());
+                    //Console.WriteLine(distenceSlender());
 
                 #region flash
                 if (stateinflash == -1)
@@ -137,7 +137,7 @@ namespace Underground
                 #endregion
                 #region run
 
-                if (Program.input.KeysDown.Contains(Camera.keyrun) && !isTired && distenceSlender()<3)
+                if (Program.input.KeysDown.Contains(Camera.keyrun) && !isTired /*&& distenceSlender()<3*/)
                 {
                    
                         percentRun +=

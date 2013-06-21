@@ -50,7 +50,7 @@ namespace Underground
             Console.WriteLine(Ingame.isTired);
             Ingame.a_progresse = false;
             float[] VitesseRotation = new float[3] { 0.0000006f * timer, 0.0000006f * timer, 0.0000006f * timer };
-            float[] VitesseTranslation = (Program.input.KeysDown.Contains(keyrun) && !Ingame.isTired && Ingame.distenceSlender() < 3)
+            float[] VitesseTranslation = (Program.input.KeysDown.Contains(keyrun) && !Ingame.isTired /*&& Ingame.distenceSlender() < 3*/)
                                              ? new float[]
                                                  {
                                                      0.000003f*timer,

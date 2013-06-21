@@ -42,7 +42,7 @@ namespace Underground
             Playsound(audio,
                       (Program.input.KeysDown.Contains(Camera.keyrun) && !Ingame.isTired
                            ? @"Ressources\Sound\Cours.wav"
-                           : @"Ressources\Sound\pas.wav"), 5, false);
+                           : @"Ressources\Sound\pas.wav"), 3);
             
             pas.Abort();
             pas = new Thread(bruitpas);
@@ -74,14 +74,14 @@ namespace Underground
                 {
                     case 2:
                         for (int i = 0; i < soundbruitage.Length; i++)
-                            Playsound(audio, soundbruitage[y], 2, true);
+                            Playsound(audio, soundbruitage[y], 3);
                         break;
                     case 11:
-                        Playsound(audio, soundbruitage[y], 2, true);
-                        Playsound(audio, soundbruitage[y], 2, true);
+                        Playsound(audio, soundbruitage[y], 1);
+                        Playsound(audio, soundbruitage[y], 1);
                         break;
                     default:
-                        Playsound(audio, soundbruitage[y], 2, true);
+                        Playsound(audio, soundbruitage[y], 1);
                         break;
                 }
             }
@@ -108,7 +108,7 @@ namespace Underground
                 int time = random(10000, 30000);
                 Console.WriteLine(time + " ms");
 
-                Playsound(audio, soundAmbiance[y], 1, true);
+                Playsound(audio, soundAmbiance[y], 1);
 
                 Thread.Sleep(time);
 
@@ -116,7 +116,7 @@ namespace Underground
         }
 
 
-        static void Playsound(XAudio2 device, string path, int volume, bool ambiance)
+        static void Playsound(XAudio2 device, string path, int volume/*, bool ambiance*/)
         {
 
             var stream = new SoundStream(File.OpenRead(path));
@@ -138,7 +138,7 @@ namespace Underground
 
             while (sourcevoice.State.BuffersQueued > 0  && boolwhile)
             {
-                if (ambiance || soundContinue)
+                if (/*ambiance || soundContinue*/42 == 42)
                 {
                    if (count == 50)
                     {
