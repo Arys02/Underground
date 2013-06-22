@@ -422,6 +422,8 @@ namespace Underground
                             kill = false;
                             Time.Stop();
                             Time.Reset();
+                            Thread.Sleep(1000);
+                            Menu.IsInMenu = true;
                         }
                         
                     }
