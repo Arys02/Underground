@@ -38,6 +38,8 @@ namespace Underground
         public Vector2 CoordTextures;
         public Vector4 Color;
         public Vector4 Normal;
+        public Vector4 Tangent;
+        public float bool_normal_map;
     }
     public struct structTexture
     {
@@ -281,19 +283,26 @@ namespace Underground
             input = new Input(form);
             device = new Device(direct3D, 0, DeviceType.Hardware, form.Handle, CreateFlags.HardwareVertexProcessing, Parametres);
             vertexElems3D = new[] {
-        		new VertexElement(0, 0, DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Position, 0),
-				new VertexElement(0,
+        		new VertexElement(0, // POSITION
+                    0,
+                    DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Position, 0),
+				new VertexElement(0, // TEXCOORD0
                     Convert.ToInt16(Utilities.SizeOf<Vector4>()),
                     DeclarationType.Float2, DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
-                new VertexElement(0,
+                new VertexElement(0, // COLOR0
                     Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()),
                     DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Color, 0),
-
-                // NORMAL
-                new VertexElement(0,
-                    Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()),
+                new VertexElement(0, // NORMAL0
+                    Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()+Utilities.SizeOf<Vector4>()),
                     DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Normal, 0),
-                VertexElement.VertexDeclarationEnd
+                new VertexElement(0, // TANGENT
+                    Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()+Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector4>()),
+                    DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Tangent, 0),
+                VertexElement.VertexDeclarationEnd,
+                new VertexElement(0, // booléen de bump mapping
+                    Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()+Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector4>()),
+                    DeclarationType.Float1, DeclarationMethod.Default, DeclarationUsage.TextureCoordinate, 0),
+                VertexElement.VertexDeclarationEnd,
         	};
             vertexElems2D = new[] {
                 new VertexElement(0,0,DeclarationType.Float4,DeclarationMethod.Default,DeclarationUsage.PositionTransformed,0),

@@ -15,6 +15,102 @@ namespace Underground
 {
     class ObjLoader
     {
+        public static Vector4 CalcTangentVector(Vector3[] position, Vector2[] texCoord, Vector3 normal)
+        {
+            Vector4 tangent;
+            // Une fois les 3 vertices (position / coordonnéesde texture d'un triangle) donnés, on calcule et retourne le vecteur tangent du triangle.
+            // La bitangente est cross(normal, tangent.xyz) * tangent.w
+
+            // edge1 est le vecteur allant du sommet 1 au sommet 2
+            // edge2 est le vecteur allant du sommet 2 au sommet 3
+            Vector3 edge1 = new Vector3(position[1].X - position[0].X, position[1].Y - position[0].Y, position[1].Z - position[0].Z);
+            Vector3 edge2 = new Vector3(position[2].X - position[1].X, position[2].Y - position[1].Y, position[2].Z - position[1].Z);
+
+            edge1.Normalize();
+            edge2.Normalize();
+
+            // Creation de 2 vecteur (les textures) dans l'espace tangentiel qui pointent vers la même direction qu'edge1 et edge2
+            // texEdge1 est le vecteur allant de la coordonnée de texture 1 à 2
+            // texEdge2 est le vecteur allant de la coordonnée de texture 2 à 3
+            Vector2 texEdge1 = new Vector2(texCoord[1].X - texCoord[0].X, texCoord[1].Y - texCoord[0].Y);
+            Vector2 texEdge2 = new Vector2(texCoord[2].X - texCoord[1].X, texCoord[2].Y - texCoord[1].Y);
+
+            texEdge1.Normalize();
+            texEdge2.Normalize();
+
+            // Ces 2 jeux de vecteurs correspondent à ce système:
+            //
+            //  edge1 = (texEdge1.x * tangent) + (texEdge1.y * bitangent)
+            //  edge2 = (texEdge2.x * tangent) + (texEdge2.y * bitangent)
+            //
+            // Ce qui en utilisant la notation des matrices ressemble à
+            //
+            //  [ edge1 ]     [ texEdge1.x  texEdge1.y ]  [ tangent   ]
+            //  [       ]  =  [                        ]  [           ]
+            //  [ edge2 ]     [ texEdge2.x  texEdge2.y ]  [ bitangent ]
+            //
+            // donc la solution est :
+            //
+            //  [ tangent   ]        1     [ texEdge2.y  -texEdge1.y ]  [ edge1 ]
+            //  [           ]  =  -------  [                         ]  [       ]
+            //  [ bitangent ]      det A   [-texEdge2.x   texEdge1.x ]  [ edge2 ]
+            //
+            //  où :
+            //        [ texEdge1.x  texEdge1.y ]
+            //    A = [                        ]
+            //        [ texEdge2.x  texEdge2.y ]
+            //
+            //    det A = (texEdge1.x * texEdge2.y) - (texEdge1.y * texEdge2.x)
+            //
+            // A partir de cette solution, les vecteur de base de l'espace tangentiel sont
+            //
+            //    tangent = (1 / det A) * ( texEdge2.y * edge1 - texEdge1.y * edge2)
+            //  bitangent = (1 / det A) * (-texEdge2.x * edge1 + texEdge1.x * edge2)
+            //     normal = cross(tangent, bitangent)
+
+            Vector3 bitangent;
+            float det = (texEdge1.X * texEdge2.Y) - (texEdge1.Y * texEdge2.X);
+
+            if (Math.Abs(det) < 1e-6f)    // almost equal to zero
+            {
+                tangent.X = 1.0f;
+                tangent.Y = 0.0f;
+                tangent.Z = 0.0f;
+
+                bitangent = new Vector3(0.0f, 1.0f, 0.0f);
+            }
+            else
+            {
+                det = 1.0f / det;
+
+                tangent.X = (texEdge2.Y * edge1.X - texEdge1.Y * edge2.X) * det;
+                tangent.Y = (texEdge2.Y * edge1.Y - texEdge1.Y * edge2.Y) * det;
+                tangent.Z = (texEdge2.Y * edge1.Z - texEdge1.Y * edge2.Z) * det;
+                tangent.W = 0.0f;
+        
+                bitangent = new Vector3((-texEdge2.X * edge1.X + texEdge1.X * edge2.X) * det,
+                                            (-texEdge2.X * edge1.Y + texEdge1.X * edge2.Y) * det,
+                                            (-texEdge2.X * edge1.Z + texEdge1.X * edge2.Z) * det);
+
+                tangent.Normalize();
+                bitangent.Normalize();
+            }
+
+            // Calculate the handedness of the local tangent space.
+            // The bitangent vector is the cross product between the triangle face
+            // normal vector and the calculated tangent vector. The resulting bitangent
+            // vector should be the same as the bitangent vector calculated from the
+            // set of linear equations above. If they point in different directions
+            // then we need to invert the cross product calculated bitangent vector. We
+            // store this scalar multiplier in the tangent vector's 'w' component so
+            // that the correct bitangent vector can be generated in the normal mapping
+            // shader's vertex shader.
+            Vector3 n = normal;
+            Vector3 t = new Vector3(tangent.X, tangent.Y, tangent.Z);
+            Vector3 b = Vector3.Cross(n, t);
+            tangent.W = (Vector3.Dot(b, bitangent) < 0.0f) ? -1.0f : 1.0f;
+            return tangent;
+        }
         private static MtlLoader mtlloader;
         static public void Initialize()
         {
@@ -191,6 +287,7 @@ namespace Underground
                 #region faces
                 else if (type == "f")
                 {
+                    structVertex[] face = new structVertex[3];
                     bool testing = false;
                     if (mtlloader.MTLData.Count == 0)
                     {
@@ -207,7 +304,7 @@ namespace Underground
                     y = getfloat(ref i, ref obj); // Coord y
                     i++; // slash
                     z = getfloat(ref i, ref obj); // Coord z
-                    ListeVertex.Add(new structVertex()
+                    face[0] = (new structVertex()
                     {
                         Position = new Vector4(
                             ListeCoordSommets[Convert.ToInt32(x - 1)].X,
@@ -240,7 +337,7 @@ namespace Underground
 
                     //var abcd = Vector4.Transform(new Vector4(0, 0, 1, 1), Matrix.Multiply(Matrix.RotationY(Convert.ToSingle(-Math.PI / 2)), Matrix.Translation(1, 0, 0)));
 
-                    ListeVertex.Add(new structVertex()
+                    face[1] = (new structVertex()
                     {
                         Position = new Vector4(
                             ListeCoordSommets[Convert.ToInt32(x - 1)].X,
@@ -270,7 +367,7 @@ namespace Underground
                     y = getfloat(ref i, ref obj); // Coord y
                     i++; // slash
                     z = getfloat(ref i, ref obj); // Coord z
-                    ListeVertex.Add(new structVertex()
+                    face[2] = (new structVertex()
                     {
                         Position = new Vector4(
                             ListeCoordSommets[Convert.ToInt32(x - 1)].X,
@@ -289,6 +386,40 @@ namespace Underground
                             ListeNormales[Convert.ToInt32(z - 1)].Z,
                             1),
                     });
+
+                    Vector4 Tangent = CalcTangentVector(
+                        new Vector3[] {
+                        new Vector3(face[0].Position.X, face[0].Position.Y, face[0].Position.Z),
+                        new Vector3(face[1].Position.X, face[1].Position.Y, face[1].Position.Z),
+                        new Vector3(face[2].Position.X, face[2].Position.Y, face[2].Position.Z),
+                    },
+                        new Vector2[] {
+                        new Vector2(face[0].CoordTextures.X, face[0].CoordTextures.Y),
+                        new Vector2(face[1].CoordTextures.X, face[1].CoordTextures.Y),
+                        new Vector2(face[2].CoordTextures.X, face[2].CoordTextures.Y),
+                    },
+                        new Vector3(face[0].Normal.X, face[0].Normal.Y, face[0].Normal.Z));
+
+                    face[0].Tangent = Tangent;
+                    face[1].Tangent = Tangent;
+                    face[2].Tangent = Tangent;
+                    if (mtlloader.MTLData[material_used].map_Ns != "null.bmp")
+                    {
+                        face[0].bool_normal_map = 1;
+                        face[1].bool_normal_map = 1;
+                        face[2].bool_normal_map = 1;
+                    }
+                    else
+                    {
+                        face[0].bool_normal_map = -1;
+                        face[1].bool_normal_map = -1;
+                        face[2].bool_normal_map = -1;
+                    }
+
+                    ListeVertex.Add(face[0]);
+                    ListeVertex.Add(face[1]);
+                    ListeVertex.Add(face[2]);
+
                     //abc = "Construction sommet " + Convert.ToInt32(x-1) + " " + Convert.ToInt32(y-1) + " " + Convert.ToInt32(z-1);
                     //Program.WriteNicely("#", 3, abc);
                     if (testing)

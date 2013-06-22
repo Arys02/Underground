@@ -8,7 +8,8 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Images\Beton20.jpg
+map_Kd Images\Seamless_marble_tile_texture_01.jpg
+map_Ns Images\Seamless_marble_tile_texture_01_NRM.png
 
 
 
@@ -20,7 +21,8 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Images\dungeon__floor_4.jpg
+map_Kd Images\Floor_Stone.jpg
+map_Ns Images\Floor_Stone_NRM.png
 
 
 newmtl wall
@@ -31,8 +33,7 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Images\dungeon_walls_1.jpg
-//map_Kd Images\1color_map.jpg
-map_Ns Images\1normal_map.jpg
+map_Kd Images\stone_wall_1024.jpg
+map_Ns Images\stone_wall_1024_NRM.png
 
 

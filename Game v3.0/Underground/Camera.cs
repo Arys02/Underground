@@ -34,8 +34,8 @@ namespace Underground
         
         public Keys keyavence = Keys.Z;
         public Keys keyrecule = Keys.S;
-        public Keys keyright = Keys.D;
-        public Keys keyleft = Keys.Q;
+        public Keys keyright = Keys.Right;
+        public Keys keyleft = Keys.Left;
 
         public Camera()
         {
@@ -47,21 +47,21 @@ namespace Underground
 
         public void orient_camera(long timer)
         {
-            Console.WriteLine(Ingame.isTired);
+            //Console.WriteLine(Ingame.isTired);
             Ingame.a_progresse = false;
-            float[] VitesseRotation = new float[3] { 0.0000006f * timer, 0.0000006f * timer, 0.0000006f * timer };
+            float[] VitesseRotation = new float[3] { 0.0000006f, 0.0000006f, 0.0000006f };
             float[] VitesseTranslation = (Program.input.KeysDown.Contains(keyrun) && !Ingame.isTired /*&& Ingame.distenceSlender() < 3*/)
                                              ? new float[]
                                                  {
-                                                     0.000003f*timer,
-                                                     0.000003f*timer,
-                                                     0.000003f*timer
+                                                     0.000003f,
+                                                     0.000003f,
+                                                     0.000003f
                                                  }
                                              : new float[]
                                                  {
-                                                     0.000001f*timer,
-                                                     0.000001f*timer,
-                                                     0.000001f*timer,
+                                                     0.000001f,
+                                                     0.000001f,
+                                                     0.000001f,
                                                  };
         
             double produit_scalaire;
@@ -96,14 +96,14 @@ namespace Underground
 
             if (Program.input.KeysDown.Contains(Keys.Space))
             {
-                position.Y -= VitesseTranslation[1];
+                position.Y -= VitesseTranslation[1] * timer;
                 //  Console.WriteLine("Vers le haut !");
                 camera_altere = true;
             }
 
             if (Program.input.KeysDown.Contains(Keys.ShiftKey))
             {
-                position.Y += VitesseTranslation[1];
+                position.Y += VitesseTranslation[1] * timer;
                 // Console.WriteLine("Vers le bas !");
                 camera_altere = true;
             }
@@ -113,9 +113,9 @@ namespace Underground
             if (Program.input.KeysDown.Contains(Keys.Up) || Program.input.KeysDown.Contains(keyavence))
             {
                 Ingame.a_progresse = true;
-                produit_scalaire = (Math.Cos(angle.Y)*VitesseTranslation[2]);
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * timer);
                 position.Z -= Convert.ToSingle(produit_scalaire);
-                produit_scalaire = (Math.Sin(angle.Y)*VitesseTranslation[2]);
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * timer);
                 position.X += Convert.ToSingle(produit_scalaire);
 
                 if (!Sound.pas.IsAlive)
@@ -143,9 +143,9 @@ namespace Underground
             if (Program.input.KeysDown.Contains(Keys.Down) || Program.input.KeysDown.Contains(keyrecule))
             {
                 Ingame.a_progresse = true;
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2]);
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * timer);
                 position.Z += Convert.ToSingle(produit_scalaire);
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2]);
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * timer);
                 position.X -= Convert.ToSingle(produit_scalaire);
                 if (!Sound.pas.IsAlive)
                 {
@@ -161,13 +161,13 @@ namespace Underground
 
             if (Program.input.KeysDown.Contains(keyright) || Program.input.KeysDown.Contains(Keys.Right))
             {
-                angle.Y -= VitesseRotation[1];
+                angle.Y -= VitesseRotation[1] * timer;
                 // Console.WriteLine("A tribord !");
                 camera_altere = true;
             }
             if (Program.input.KeysDown.Contains(keyleft) ||Program.input.KeysDown.Contains(Keys.Left))
             {
-                angle.Y += VitesseRotation[1];
+                angle.Y += VitesseRotation[1] * timer;
                 //  Console.WriteLine("A babord !");
                 camera_altere = true;
             }
@@ -176,9 +176,9 @@ namespace Underground
             if (Program.input.KeysDown.Contains(Keys.Q))
             {
                 Ingame.a_progresse = true;
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0]);
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0] * timer);
                 position.Z += Convert.ToSingle(produit_scalaire);
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0]);
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0] * timer);
                 position.X += Convert.ToSingle(produit_scalaire);
                 if (!Sound.pas.IsAlive)
                 {
@@ -194,9 +194,9 @@ namespace Underground
             if (Program.input.KeysDown.Contains(Keys.D))
             {
                 Ingame.a_progresse = true;
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0]);
+                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0] * timer);
                 position.Z -= Convert.ToSingle(produit_scalaire);
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0]);
+                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0] * timer);
                 position.X -= Convert.ToSingle(produit_scalaire);
                 if (!Sound.pas.IsAlive)
                 {
@@ -211,13 +211,13 @@ namespace Underground
             }
             if (Program.input.KeysDown.Contains(Keys.PageUp))
             {
-                angle.X += VitesseRotation[0];
+                angle.X += VitesseRotation[0] * timer;
                 // Console.WriteLine("Montez !");
                 camera_altere = true;
             }
             if (Program.input.KeysDown.Contains(Keys.PageDown))
             {
-                angle.X -= VitesseRotation[0];
+                angle.X -= VitesseRotation[0] * timer;
                 // Console.WriteLine("Coulez !");
                 camera_altere = true;
             }
@@ -225,8 +225,8 @@ namespace Underground
             #region souris
             if (Program.input.MousePoint != previous_mousepoint)
             {
-                angle.Y -= (Program.input.MousePoint.X - previous_mousepoint.X) * VitesseRotation[0];
-                angle.X -= (Program.input.MousePoint.Y - previous_mousepoint.Y) * VitesseRotation[1];
+                angle.Y -= (Program.input.MousePoint.X - previous_mousepoint.X) * VitesseRotation[0] * 3000;
+                angle.X -= (Program.input.MousePoint.Y - previous_mousepoint.Y) * VitesseRotation[1] * 3000;
                 //Console.WriteLine(Program.input.MousePoint.X + " " + Program.input.MousePoint.Y);
                 //Cursor.Position = new Point(Program.form.DesktopBounds.Width / 2 + Program.form.DesktopBounds.X, Program.form.DesktopBounds.Height / 2 + Program.form.DesktopBounds.Y);
                 previous_mousepoint = new Point(Program.input.MousePoint.X, Program.input.MousePoint.Y);

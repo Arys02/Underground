@@ -60,14 +60,6 @@ namespace Underground
         public static float percentRun;
         public static bool isTired = false;
         public static Thread tired;
-       
-
-
-        /*public static void getTilesToLoad(Vector3 position)
-        {
-            Tuiles_a_charger
-            position.X/32
-        }*/
 
         public static void istiredfct()
         {
@@ -279,7 +271,7 @@ namespace Underground
                                         -(2 * rayon_salles) * cases[i].y),
                                      new Point(cases[i].x, cases[i].y));
                 else if (cases[i].type == 4)
-                    Program.getModel(@"Ressources\Game\C(Io).obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 1))
+                    Program.getModel(@"Ressources\Game\caca2.obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 1))
                                      * Matrix.Translation(
                                         -(2 * rayon_salles) * cases[i].x,
                                         0,
@@ -389,16 +381,12 @@ namespace Underground
                         Program.Liste_OBJ[k].effect.SetValue("LightPosition[1]", new Vector4(Program.Liste_Lights[1].Position.X, Program.Liste_Lights[1].Position.Y + 2f, Program.Liste_Lights[1].Position.Z, 1));
                         Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[0]", Convert.ToSingle(Math.Min(Program.Liste_Lights[0].Range, Math.Pow(Vector3.Dot(macamera.position + Slender.position, macamera.position + Slender.position), 0.7) / Program.Liste_Lights[0].Range * 40)));
                         Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[1]", Program.Liste_Lights[1].Range * 100);
-                        Program.Liste_OBJ[k].effect.SetValue("CameraPos", new Vector4(macamera.position, 1));
                         Program.Liste_OBJ[k].effect.SetValue("percent_Negatif", percent);
                         Program.Liste_OBJ[k].effect.SetValue("View", macamera.view);
                         Program.Liste_OBJ[k].effect.SetValue("Sepia", Sepia);
                         Program.Liste_OBJ[k].effect.SetValue("luminosity", luminosity);
                         Program.Liste_OBJ[k].effect.Begin();
                         Program.Liste_OBJ[k].effect.BeginPass(0);
-                        /*structOBJ a = Program.Liste_OBJ[k];
-                        a.Transformation *= Matrix.Translation(new Vector3(0,0,0.0001f));
-                        Program.Liste_OBJ[k] = a;*/
                         Program.Liste_OBJ[k].effect.SetValue("World", Program.Liste_OBJ[k].Transformation);
                         Program.Liste_OBJ[k].effect.SetValue("WorldInverseTranspose", Matrix.Transpose(Matrix.Invert(Program.Liste_OBJ[k].Transformation)));
                         for (int i = 0; i < Program.Liste_OBJ[k].data.Count; i++)
