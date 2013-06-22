@@ -311,7 +311,7 @@ namespace Underground
 
                         Program.device.Dispose();
                         Program.form.Dispose();
-                        Menu.Dispose();
+                        Menu.Dispose();                        
 
                         Process.GetCurrentProcess().Kill();
                         break;

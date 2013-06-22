@@ -393,27 +393,27 @@ namespace Underground
                             {
                                 stateinflash = -1;
                             }
-
+                            
                         }
-                        else if ((Time.ElapsedMilliseconds > 1500)&&(Time.ElapsedMilliseconds < 4750))
+                        else if ((Time.ElapsedMilliseconds > 1500)&&(Time.ElapsedMilliseconds < 4650))
                         {
                             macamera.angle.Z   -=  (0.00000006f * Time.ElapsedMilliseconds);
                             //macamera.position.Z -= (0.0000006f * Time.ElapsedMilliseconds);
                             macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
                         }
 
-                        else if ((Time.ElapsedMilliseconds > 4750) && (Time.ElapsedMilliseconds < 5000))
+                        else if ((Time.ElapsedMilliseconds > 4650) && (Time.ElapsedMilliseconds < 4700))
                         {
                             macamera.angle.Z -= (0.0000006f * Time.ElapsedMilliseconds);                            
                             macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
                         }
 
-                        else if ((Time.ElapsedMilliseconds > 5000) && (Time.ElapsedMilliseconds < 6000))
+                        else if ((Time.ElapsedMilliseconds > 4700) && (Time.ElapsedMilliseconds < 5200))
                         {                            
                             macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
                         }
 
-                        else if (Time.ElapsedMilliseconds == 6000)
+                        else if (Time.ElapsedMilliseconds == 5200)
                         {
                             if (stateinflash == 0)
                             {
