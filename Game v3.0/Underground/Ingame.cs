@@ -61,6 +61,10 @@ namespace Underground
         public static bool isTired = false;
         public static Thread tired;
 
+        public static bool kill = false;        
+        public static Stopwatch Time = new Stopwatch();
+        
+
         public static void istiredfct()
         {
             isTired = true;
@@ -108,13 +112,26 @@ namespace Underground
                 }
                 else if (stateinflash == 1)
                 {
-                    luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / Ticks_Clignement);
-                    if (luminosity > 1)
+                    if (kill == false)
                     {
-                        luminosity = 1;
-                        stateinflash = 0;
-                        previous_flash = clock.ElapsedTicks;
+                        luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / Ticks_Clignement);
+                        if (luminosity > 1)
+                        {
+                            luminosity = 1;
+                            stateinflash = 0;
+                            previous_flash = clock.ElapsedTicks;
+                        }
                     }
+                    else 
+                    {                        
+                        luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / (Ticks_Clignement * 4));
+                        if (luminosity > 1)
+                        {
+                            luminosity = 1;
+                            stateinflash = 0;                                                      
+                            previous_flash = clock.ElapsedTicks;                            
+                        }                        
+                    }                    
                 }
                 else
                 {
@@ -124,7 +141,7 @@ namespace Underground
                     {
                         Console.WriteLine("Flash !");
                         stateinflash = -1;
-                    }
+                    }                    
                 }
                 #endregion
                 #region run
@@ -159,7 +176,7 @@ namespace Underground
                 #region walking
                 if (a_progresse)
                 {
-                    sinusoide += (0.0000025f * (clock.ElapsedTicks - previous_time));
+                    sinusoide += (0.000005f * (clock.ElapsedTicks - previous_time));
                     sinusoide %= (float)(Math.PI * 2);
                 }
                 #endregion
@@ -205,7 +222,7 @@ namespace Underground
                 else
                 {
                     compteur_slender = 1;
-                }
+                }                
             }
 
             /// RECHERCHE S'IL Y A DES SALLES QUI DOIVENT ETRE CHARGEES PUIS RECHARGEES DE SUITE APRES ///
@@ -348,7 +365,68 @@ namespace Underground
                     }*/
                     oldAngle = macamera.angle;
                     macamera.orient_camera(clock.ElapsedTicks - previous_time);
+                    
+                    //--------------------------------------------------------
+                    // Died
+                    //--------------------------------------------------------
+                    if (kill == false)
+                    {
+                        if (Program.input.KeysDown.Contains(Keys.K))
+                        {
+                            kill = true;
+                        }
+                    }
 
+                    if (kill == true)
+                    {
+                        Time.Start();
+
+                        if (Time.ElapsedMilliseconds < 500)
+                        {
+                            macamera.position.Y += (0.000006f * Time.ElapsedMilliseconds);
+                        }
+
+                        else if (Time.ElapsedMilliseconds == 500)
+                        {
+
+                            if (stateinflash == 0)
+                            {
+                                stateinflash = -1;
+                            }
+
+                        }
+                        else if ((Time.ElapsedMilliseconds > 1500)&&(Time.ElapsedMilliseconds < 4750))
+                        {
+                            macamera.angle.Z   -=  (0.00000006f * Time.ElapsedMilliseconds);
+                            //macamera.position.Z -= (0.0000006f * Time.ElapsedMilliseconds);
+                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
+                        }
+
+                        else if ((Time.ElapsedMilliseconds > 4750) && (Time.ElapsedMilliseconds < 5000))
+                        {
+                            macamera.angle.Z -= (0.0000006f * Time.ElapsedMilliseconds);                            
+                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
+                        }
+
+                        else if ((Time.ElapsedMilliseconds > 5000) && (Time.ElapsedMilliseconds < 6000))
+                        {                            
+                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
+                        }
+
+                        else if (Time.ElapsedMilliseconds == 6000)
+                        {
+                            if (stateinflash == 0)
+                            {
+                                stateinflash = -1;
+                            }
+                            kill = false;
+                            Time.Stop();
+                            Time.Reset();
+                        }
+                        
+                    }
+                   
+                    //--------------------------------------------------------
                     previous_time = clock.ElapsedTicks;
 
                     bool collide = Collision.CheckCollisions(macamera.position);

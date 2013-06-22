@@ -43,7 +43,7 @@ namespace Underground
                     Matrix.RotationAxis(new Vector3(0, 1, 0), angle.Y) *
                     Matrix.RotationAxis(new Vector3(1, 0, 0), angle.X) *
                     Matrix.RotationAxis(new Vector3(0, 0, 1), angle.Z);
-        }
+        }        
 
         public void orient_camera(long timer)
         {
@@ -191,6 +191,8 @@ namespace Underground
                 // Console.WriteLine("Left");
                 camera_altere = true;
             }
+
+
             if (Program.input.KeysDown.Contains(Keys.D))
             {
                 Ingame.a_progresse = true;
@@ -257,6 +259,6 @@ namespace Underground
                                 Matrix.RotationAxis(new Vector3(0, 0, 1), angle.Z);
                 //camera_altere = false;
             }
-        }
+        }        
     }
 }
