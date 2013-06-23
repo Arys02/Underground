@@ -85,10 +85,11 @@ namespace Underground
 
         public static void fevents()
         {
+            Int64 previous_flash;
             Random rand = new Random();
             Stopwatch clock = new Stopwatch();
             clock.Start();
-            Int64 previous_flash = clock.ElapsedTicks;
+            previous_flash = clock.ElapsedTicks;
             Int64[] previous_time = new Int64[3];
             previous_time[0] = clock.ElapsedTicks;
             previous_time[1] = clock.ElapsedTicks;
@@ -101,7 +102,10 @@ namespace Underground
 
             while (true)
             {
-
+                if (first_loop)
+                {
+                    previous_flash = clock.ElapsedTicks;
+                }
                 //Console.WriteLine(distenceSlender());
 
                 #region flash
@@ -387,6 +391,42 @@ namespace Underground
             Matrix oldView = macamera.view;
             Vector3 oldPos = macamera.position;
             Vector3 oldAngle = macamera.angle;
+
+            // Préchargement des salles
+            RoomsBuilder RoomsBuilder = new RoomsBuilder();
+
+            // MAXIMUM (impossible à otimiser)
+            RoomsBuilder.buildIfRoom(400, new Case(0, Case.CaseType.If, new Point(-1, -1)));
+            RoomsBuilder.buildIfRoom(400, new Case(0, Case.CaseType.If, new Point(-1, -1)));
+            RoomsBuilder.buildIfRoom(400, new Case(0, Case.CaseType.If, new Point(-1, -1)));
+
+            // MAXIMUM
+            RoomsBuilder.buildLRoom(400, new Case(0, Case.CaseType.L, new Point(-1, -1)));
+            RoomsBuilder.buildLRoom(400, new Case(0, Case.CaseType.L, new Point(-1, -1)));
+            RoomsBuilder.buildLRoom(400, new Case(0, Case.CaseType.L, new Point(-1, -1)));
+            RoomsBuilder.buildLRoom(400, new Case(0, Case.CaseType.L, new Point(-1, -1)));
+
+            // pas de maximum
+            RoomsBuilder.buildIoRoom(400, new Case(0, Case.CaseType.Io, new Point(-1, -1)));
+            RoomsBuilder.buildIoRoom(400, new Case(0, Case.CaseType.Io, new Point(-1, -1)));
+            RoomsBuilder.buildIoRoom(400, new Case(0, Case.CaseType.Io, new Point(-1, -1)));
+            RoomsBuilder.buildIoRoom(400, new Case(0, Case.CaseType.Io, new Point(-1, -1)));
+
+            // pas de maximum
+            RoomsBuilder.buildTRoom(400, new Case(0, Case.CaseType.T, new Point(-1, -1)));
+            RoomsBuilder.buildTRoom(400, new Case(0, Case.CaseType.T, new Point(-1, -1)));
+            RoomsBuilder.buildTRoom(400, new Case(0, Case.CaseType.T, new Point(-1, -1)));
+            RoomsBuilder.buildTRoom(400, new Case(0, Case.CaseType.T, new Point(-1, -1)));
+            RoomsBuilder.buildTRoom(400, new Case(0, Case.CaseType.T, new Point(-1, -1)));
+
+            // pas de maximum
+            RoomsBuilder.buildXRoom(400, new Case(0, Case.CaseType.X, new Point(-1, -1)));
+            RoomsBuilder.buildXRoom(400, new Case(0, Case.CaseType.X, new Point(-1, -1)));
+
+            // On cache les salles préchargées
+            Program.freeModel(new Point(-1, -1), true, false);
+
+            // On lance la boucle de rendu
             RenderLoop.Run(Program.form, () =>
             {
                 Program.device.BeginScene();

@@ -341,7 +341,7 @@ namespace Underground
 
             // Creation du fichier effect de référence
             Macro macro = new Macro("nblights", 2.ToString());
-            BaseEffect = Effect.FromFile(Program.device, "MiniCube.fx", new Macro[] { macro }, null, "", ShaderFlags.OptimizationLevel3);
+            BaseEffect = Effect.FromFile(Program.device, "Underground.fx", new Macro[] { macro }, null, "", ShaderFlags.OptimizationLevel3);
             BaseEffect.Technique = BaseEffect.GetTechnique(0);
             BaseEffect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 0f));
             Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 7000.0f);

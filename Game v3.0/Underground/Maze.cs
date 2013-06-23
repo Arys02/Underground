@@ -31,6 +31,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Drawing;
 
 
 public class Case
@@ -59,6 +60,23 @@ public class Case
         listrandom = new List<Case>();
         see = new List<Case>();
         isvisited = false;
+    }
+
+    public enum CaseType : int
+    {
+        X  = 1,
+        T  = 2,
+        L  = 3,
+        Io = 4,
+        If = 5,
+    }
+
+    public Case(int rot, CaseType type, Point Point)
+    {
+        this.rot = rot;
+        this.type = (int)type;
+        this.x = Point.X;
+        this.y = Point.Y;
     }
 
     public void addvoisins(Case C)
