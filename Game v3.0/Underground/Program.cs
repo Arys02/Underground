@@ -331,11 +331,11 @@ namespace Underground
             Liste_Lights[0].Type = LightType.Point;
             Liste_Lights[0].Position = new Vector3(0, 0, 0);
             Liste_Lights[0].Ambient = new Color4(0.5f, 0.5f, 0.5f, 1);
-            Liste_Lights[0].Range = 60f;
+            Liste_Lights[0].Range = 30f * 70;
             Liste_Lights[1].Type = LightType.Point;
             Liste_Lights[1].Position = new Vector3(-100, -100, -100);
             Liste_Lights[1].Ambient = new Color4(0.5f,0,0,1);
-            Liste_Lights[1].Range = 0.05f;
+            Liste_Lights[1].Range = 5f * 70;
             Liste_textures.Add(new structTexture("null.bmp", Texture.FromFile(device, "null.bmp")));
             //Ingame.Slender.doit_etre_recharge = true;
 
@@ -344,7 +344,7 @@ namespace Underground
             BaseEffect = Effect.FromFile(Program.device, "MiniCube.fx", new Macro[] { macro }, null, "", ShaderFlags.OptimizationLevel3);
             BaseEffect.Technique = BaseEffect.GetTechnique(0);
             BaseEffect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 0f));
-            Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 100.0f);
+            Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Program.form.ClientSize.Width / (float)Program.form.ClientSize.Height, 0.1f, 7000.0f);
             BaseEffect.SetValue("Projection", proj);
             BaseEffect.SetValue("LightDiffuseColor[0]", Liste_Lights[0].Ambient);
             BaseEffect.SetValue("LightDiffuseColor[1]", Liste_Lights[1].Ambient);

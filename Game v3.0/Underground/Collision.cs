@@ -38,6 +38,7 @@ namespace Underground
 
         public static void Initialize()
         {
+            return;
             tree = new IntervalKDTree<string>(100, 10);
 
             foreach (structOBJ obj in Program.Liste_OBJ)
@@ -83,7 +84,7 @@ namespace Underground
 
         public static bool CheckCollisions(Vector3 pos)
         {
-            bool res = tree.GetIntersect(-pos.X - 0.15, -pos.Y - 0.15, -pos.Z - 0.15, -pos.X + 0.15, -pos.Y + 0.15, -pos.Z + 0.15);
+            bool res = tree.GetIntersect(-pos.X - 0.15 * 70, -pos.Y - 0.15 * 70, -pos.Z - 0.15 * 70, -pos.X + 0.15 * 70, -pos.Y + 0.15 * 70, -pos.Z + 0.15 * 70);
             
             // Pour savoir quel mur à été touché : 
             //HashSet<string> foundValues;

@@ -1,0 +1,26 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+newmtl Goutiere
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+map_Kd Images\col.jpg
+map_Ns Images\col_NRM.png
+illum 2
+
+
+newmtl Mur
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+map_Kd Images\mur.jpg
+map_Ns Images\mur.png
+illum 2
+
+

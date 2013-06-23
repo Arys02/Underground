@@ -51,6 +51,7 @@ namespace Underground
         public static float luminosity = 1f;
         public static int stateinflash = 0; // 0 = non débuté // -1 = en décroissance // 1 = en croissance
         public static float percent = 1;
+        public static float[] parasitesCamera = new float[2];
         public static Camera macamera = new Camera();
         public static float sinusoide = 0f;
         public static bool a_progresse = false;
@@ -59,11 +60,14 @@ namespace Underground
         public static int stateInRun = 0;
         public static float percentRun;
         public static bool isTired = false;
+        private static float lightDistanceSquared0calcul = 0;
+        private static float lightDistanceSquared1calcul = 0;
+        private static float percent_negatif = 0;
+        private static bool first_loop = true;
         public static Thread tired;
 
-        public static bool kill = false;        
+        public static bool kill = false;
         public static Stopwatch Time = new Stopwatch();
-        
 
         public static void istiredfct()
         {
@@ -72,36 +76,38 @@ namespace Underground
             isTired = false;
         }
 
-        /*public static double distenceSlender()
+        public static double distanceSlender()
         {
             return
                 Math.Sqrt(Math.Pow(-macamera.position.X - Slender.position.X, 2) +
-                          Math.Pow(-macamera.position.Y - Slender.position.Y, 2));
-        }*/
+                          Math.Pow(-macamera.position.Z - Slender.position.Z, 2));
+        }
 
-    public static void fevents()
+        public static void fevents()
         {
             Random rand = new Random();
             Stopwatch clock = new Stopwatch();
             clock.Start();
             Int64 previous_flash = clock.ElapsedTicks;
-            Int64 previous_time = clock.ElapsedTicks;
+            Int64[] previous_time = new Int64[3];
+            previous_time[0] = clock.ElapsedTicks;
+            previous_time[1] = clock.ElapsedTicks;
+            previous_time[2] = clock.ElapsedTicks;
             double Ticks_Clignement = 200000;
             int Seconde_A_Attendre = 6;
             int SecondeCapacityRun = 1;
             int repos = 7;
-            
-                   // - macamera.position     Ingame.Slender.position
-           
+            // - macamera.position     Ingame.Slender.position
+
             while (true)
             {
-              
-                    //Console.WriteLine(distenceSlender());
+
+                //Console.WriteLine(distenceSlender());
 
                 #region flash
                 if (stateinflash == -1)
                 {
-                    luminosity -= Convert.ToSingle((clock.ElapsedTicks - previous_time) / Ticks_Clignement);
+                    luminosity -= Convert.ToSingle((clock.ElapsedTicks - previous_time[0]) / Ticks_Clignement);
                     if (luminosity < 0)
                     {
                         luminosity = 0;
@@ -114,7 +120,7 @@ namespace Underground
                 {
                     if (kill == false)
                     {
-                        luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / Ticks_Clignement);
+                        luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time[0]) / Ticks_Clignement);
                         if (luminosity > 1)
                         {
                             luminosity = 1;
@@ -122,16 +128,16 @@ namespace Underground
                             previous_flash = clock.ElapsedTicks;
                         }
                     }
-                    else 
-                    {                        
-                        luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time) / (Ticks_Clignement * 4));
+                    else
+                    {
+                        luminosity += Convert.ToSingle((clock.ElapsedTicks - previous_time[0]) / (Ticks_Clignement * 4));
                         if (luminosity > 1)
                         {
                             luminosity = 1;
-                            stateinflash = 0;                                                      
-                            previous_flash = clock.ElapsedTicks;                            
-                        }                        
-                    }                    
+                            stateinflash = 0;
+                            previous_flash = clock.ElapsedTicks;
+                        }
+                    }
                 }
                 else
                 {
@@ -141,18 +147,19 @@ namespace Underground
                     {
                         Console.WriteLine("Flash !");
                         stateinflash = -1;
-                    }                    
+                    }
                 }
+                previous_time[0] = clock.ElapsedTicks;
                 #endregion
                 #region run
 
                 if (Program.input.KeysDown.Contains(Camera.keyrun) && !isTired /*&& distenceSlender()<3*/)
                 {
-                   
-                        percentRun +=
-                            ((float) (clock.ElapsedTicks - previous_time)/(float) (SecondeCapacityRun*3500000));
+
+                    percentRun +=
+                        ((float)(clock.ElapsedTicks - previous_time[1]) / (float)(SecondeCapacityRun * 3500000));
                     if (percentRun > 1)
-                    {                  
+                    {
                         percentRun = 1;
                         if (tired == null || !tired.IsAlive)
                         {
@@ -162,40 +169,52 @@ namespace Underground
                     }
 
                 }
-            
+
                 else
                 {
-                    percentRun -= ((float)(clock.ElapsedTicks - previous_time) / (float)(repos * 3500000));
+                    percentRun -= ((float)(clock.ElapsedTicks - previous_time[1]) / (float)(repos * 3500000));
                     if (percentRun < 0)
                         percentRun = 0;
 
                 }
-    
 
+                previous_time[1] = clock.ElapsedTicks;
                 #endregion
                 #region walking
                 if (a_progresse)
                 {
-                    sinusoide += (0.000005f * (clock.ElapsedTicks - previous_time));
+                    sinusoide += (0.0000025f * (clock.ElapsedTicks - previous_time[2]));
                     sinusoide %= (float)(Math.PI * 2);
                 }
+                previous_time[2] = clock.ElapsedTicks;
                 #endregion
-                previous_time = clock.ElapsedTicks;
+                lightDistanceSquared0calcul = Convert.ToSingle(Math.Min(Program.Liste_Lights[0].Range, Math.Pow(distanceSlender() / 10, 2) / 20000 * Program.Liste_Lights[0].Range));
+                lightDistanceSquared1calcul = Convert.ToSingle(Math.Max(Program.Liste_Lights[1].Range - Math.Pow(lightDistanceSquared0calcul, 0.7), 0));
+                parasitesCamera[0] = Convert.ToSingle((rand.Next(50) - 25f) / 70 / Math.Pow(distanceSlender() / 70, 3));
+                parasitesCamera[1] = Convert.ToSingle((rand.Next(50) - 25f) / 70 / Math.Pow(distanceSlender() / 70, 3));
+                Thread.Sleep(30);
+
+                //////////////////// ETABLISSEMENT DU FILTRE NEGATIF ////////////////////
+                percent_negatif = Convert.ToSingle(Math.Max(0, 1 - Math.Pow(distanceSlender() / 10, 2) / 35000));
+                //////////////////// ETABLISSEMENT DU FILTRE NEGATIF ////////////////////
             }
         }
+
+
 
         private static List<Case> previous_cases = new List<Case>();
         public static void recup_env()
         {
-            int rayon_salles = 16;
+            int rayon_salles = 600;
+            RoomsBuilder RoomsBuilder = new RoomsBuilder();
             //string pathL = @"Ressources\Game\C(L).obj";
             //string pathX = @"Ressources\Game\C(X).obj";
             //string pathIf = @"Ressources\Game\C(If).obj";
             //string pathT = @"Ressources\Game\C(T).obj";
             //string path2 = @"Ressources\Game\cabine.obj";
             string pathStatue = @"Ressources\Game\statue.obj";
-            int slender_distancenbunite = 10;
-            float slender_distanceapprocheunite = 2.1f;
+            int slender_distancenbunite = 10 * 70;
+            float slender_distanceapprocheunite = 2.1f * 70;
             if (Slender.doit_etre_recharge)
             {
                 Slender.doit_etre_recharge = false;
@@ -214,15 +233,20 @@ namespace Underground
                                                (slender_distancenbunite - slender_distanceapprocheunite * compteur_slender) *
                                                (Math.Cos(macamera.angle.Y)))
                                              );
-                    Program.Liste_Lights[1].Position = new Vector3(Slender.position.X,Slender.position.Y,Slender.position.Z);
+                    if (first_loop)
+                    {
+                        first_loop = false;
+                        Slender.position = new Vector3(30000, 30000, 30000);
+                    }
+                    Program.Liste_Lights[1].Position = new Vector3(Slender.position.X, Slender.position.Y + 100, Slender.position.Z);
                     Program.getModel(pathStatue,
-                                     Matrix.Scaling(2f) * Matrix.RotationY(-macamera.angle.Y + (float)Math.PI) *
+                                     Matrix.Scaling(2f * 75) * Matrix.RotationY(-macamera.angle.Y + (float)Math.PI) *
                                      Matrix.Translation(Slender.position), new Point(-137, -137));
                 }
                 else
                 {
                     compteur_slender = 1;
-                }                
+                }
             }
 
             /// RECHERCHE S'IL Y A DES SALLES QUI DOIVENT ETRE CHARGEES PUIS RECHARGEES DE SUITE APRES ///
@@ -231,6 +255,10 @@ namespace Underground
             // Recupere la liste des cases vues
             int a = ((int)macamera.position.X + rayon_salles) / (2 * rayon_salles);
             int b = ((int)macamera.position.Z + rayon_salles) / (2 * rayon_salles);
+            a = a < 0 ? 0 : a;
+            a = a >= Program.newmaze.maze.GetLength(0) ? Program.newmaze.maze.GetLength(0) - 1 : a;
+            b = b < 0 ? 0 : b;
+            b = b >= Program.newmaze.maze.GetLength(1) ? Program.newmaze.maze.GetLength(1) - 1 : b;
             //Console.WriteLine("Zone [{0},{1}] [{2},{3}]", a, b, macamera.position.X, macamera.position.Z);
             List<Case> cases = new List<Case>(Program.newmaze.maze[a, b].see);
 
@@ -269,45 +297,59 @@ namespace Underground
 
             // sauvegarde des cases
             previous_cases.AddRange(cases);
-
             // Charges les nouvelles cases
             for (int i = 0; i < cases.Count; i++)
             {
-                if (cases[i].type == 3)
-                    Program.getModel(@"Ressources\Game\C(L).obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1))
+                if (cases[i].type == 3) // L
+                {
+                    RoomsBuilder.buildLRoom(rayon_salles, cases[i]);
+                    /*Program.getModel(@"Ressources\Game\C(L).obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1))
                                      * Matrix.Translation(
                                         -(2 * rayon_salles) * cases[i].x,
                                         0,
                                         -(2 * rayon_salles) * cases[i].y),
-                                     new Point(cases[i].x, cases[i].y));
-                else if (cases[i].type == 2)
-                    Program.getModel(@"Ressources\Game\C(T).obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 1))
+                                     new Point(cases[i].x, cases[i].y));*/
+                }
+                else if (cases[i].type == 2) // T
+                {
+                    RoomsBuilder.buildTRoom(rayon_salles, cases[i]);
+                    /*Program.getModel(@"Ressources\Game\C(T).obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 1))
                                      * Matrix.Translation(
                                         -(2 * rayon_salles) * cases[i].x,
                                         0,
                                         -(2 * rayon_salles) * cases[i].y),
-                                     new Point(cases[i].x, cases[i].y));
-                else if (cases[i].type == 4)
-                    Program.getModel(@"Ressources\Game\caca2.obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 1))
+                                     new Point(cases[i].x, cases[i].y));*/
+                }
+                else if (cases[i].type == 4) // Io
+                {
+                    RoomsBuilder.buildIoRoom(rayon_salles, cases[i]);
+                    /*Program.getModel(@"Ressources\Game\caca2.obj", Matrix.Scaling(30) * Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 1))
                                      * Matrix.Translation(
                                         -(2 * rayon_salles) * cases[i].x,
                                         0,
                                         -(2 * rayon_salles) * cases[i].y),
-                                     new Point(cases[i].x, cases[i].y));
-                else if (cases[i].type == 5)
-                    Program.getModel(@"Ressources\Game\C(If).obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 2))
+                                     new Point(cases[i].x, cases[i].y));*/
+                }
+                else if (cases[i].type == 5) // If
+                {
+                    RoomsBuilder.buildIfRoom(rayon_salles, cases[i]);
+                    /*Program.getModel(@"Ressources\Game\C(If).obj", Matrix.Scaling(30) * Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1 + 2))
                                      * Matrix.Translation(
                                         -(2 * rayon_salles) * cases[i].x,
                                         0,
                                         -(2 * rayon_salles) * cases[i].y),
-                                     new Point(cases[i].x, cases[i].y));
-                else if (cases[i].type == 1)
-                    Program.getModel(@"Ressources\Game\C(X).obj", Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1))
+                                     new Point(cases[i].x, cases[i].y));*/
+                }
+                else if (cases[i].type == 1) // X
+                {
+                    RoomsBuilder.buildXRoom(rayon_salles, cases[i]);
+                    /*Program.getModel(@"Ressources\Game\C(X).obj", Matrix.Scaling(30) * Matrix.RotationY((float)Math.PI / 2 * (cases[i].rot - 1))
                                      * Matrix.Translation(
                                         -(2 * rayon_salles) * cases[i].x,
                                         0,
                                         -(2 * rayon_salles) * cases[i].y),
-                                     new Point(cases[i].x, cases[i].y));
+                                     new Point(cases[i].x, cases[i].y));*/
+                }
             }
         }
 
@@ -332,7 +374,7 @@ namespace Underground
         {
             //Matrix view = Matrix.LookAtLH(new Vector3(0, 0, -0.00002f), new Vector3(0, 0, 0), Vector3.UnitY);
             List<structModelFiles> ModelFiles = new List<structModelFiles>();
-            
+
             macamera = new Camera();
             HUD hud = new HUD();
             Stopwatch clock = new Stopwatch();
@@ -347,15 +389,17 @@ namespace Underground
             Vector3 oldAngle = macamera.angle;
             RenderLoop.Run(Program.form, () =>
             {
-                Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
                 Program.device.BeginScene();
 
                 if (Menu.IsInMenu)
                 {
+                    Cursor.Show();
+                    Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
                     Menu.InMenu();
                 }
                 else
                 {
+                    Cursor.Hide();
                     recup_env();
                     //effect.SetValue("LightPosition", new Vector4(-macamera.position.X, macamera.position.Y, -macamera.position.Z, 1));
                     /*if (clock.ElapsedTicks - previous_clignement > 100000000) // 1 tick != 100ns (cf diff entre Date et Stopwatch) utiliser Stopwatch.Frequency
@@ -364,8 +408,10 @@ namespace Underground
                         previous_clignement = clock.ElapsedTicks;
                     }*/
                     oldAngle = macamera.angle;
-                    macamera.orient_camera(clock.ElapsedTicks - previous_time);
-                    
+                    Int64 timer = clock.ElapsedTicks - previous_time;
+                    previous_time = clock.ElapsedTicks;
+                    macamera.orient_camera(timer);
+
                     //--------------------------------------------------------
                     // Died
                     //--------------------------------------------------------
@@ -383,7 +429,7 @@ namespace Underground
 
                         if (Time.ElapsedMilliseconds < 500)
                         {
-                            macamera.position.Y += (0.000006f * Time.ElapsedMilliseconds);
+                            macamera.position.Y += (0.000006f * Time.ElapsedMilliseconds) * 70;
                         }
 
                         else if (Time.ElapsedMilliseconds == 500)
@@ -393,24 +439,24 @@ namespace Underground
                             {
                                 stateinflash = -1;
                             }
-                            
+
                         }
-                        else if ((Time.ElapsedMilliseconds > 1500)&&(Time.ElapsedMilliseconds < 4650))
+                        else if ((Time.ElapsedMilliseconds > 1500) && (Time.ElapsedMilliseconds < 4650))
                         {
-                            macamera.angle.Z   -=  (0.00000006f * Time.ElapsedMilliseconds);
+                            macamera.angle.Z -= (0.00000006f * Time.ElapsedMilliseconds);
                             //macamera.position.Z -= (0.0000006f * Time.ElapsedMilliseconds);
-                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
+                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds) * 70;
                         }
 
                         else if ((Time.ElapsedMilliseconds > 4650) && (Time.ElapsedMilliseconds < 4700))
                         {
-                            macamera.angle.Z -= (0.0000006f * Time.ElapsedMilliseconds);                            
-                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
+                            macamera.angle.Z -= (0.0000006f * Time.ElapsedMilliseconds);
+                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds) * 70;
                         }
 
                         else if ((Time.ElapsedMilliseconds > 4700) && (Time.ElapsedMilliseconds < 5200))
-                        {                            
-                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds);
+                        {
+                            macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds) * 70;
                         }
 
                         else if (Time.ElapsedMilliseconds == 5200)
@@ -425,22 +471,20 @@ namespace Underground
                             Thread.Sleep(1000);
                             Menu.IsInMenu = true;
                         }
-                        
                     }
-                   
                     //--------------------------------------------------------
                     previous_time = clock.ElapsedTicks;
 
-                    bool collide = Collision.CheckCollisions(macamera.position);
+                    bool collide;// = Collision.CheckCollisions(macamera.position);
                     collide = false;
                     if (collide)
                     {
                         macamera.position = oldPos;
                         oldView =
-                            Matrix.Translation(oldPos) *
-                            Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y) *
-                            Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X) *
-                            Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z);
+                            Matrix.Translation(oldPos.X, oldPos.Y + (float)Math.Sin(Ingame.sinusoide) / 45f * 70, oldPos.Z) *
+                            Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y + Ingame.parasitesCamera[0]) *
+                                Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X + Ingame.parasitesCamera[1]) *
+                                Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z);
                         macamera.view = oldView;
                     }
                     else
@@ -449,19 +493,15 @@ namespace Underground
                         oldView = macamera.view;
                     }
 
-
-                    //////////////////// ETABLISSEMENT DU FILTRE NEGATIF ////////////////////
-                    float percent = Convert.ToSingle(Math.Max(0, 1 - Math.Pow(Vector3.Dot(macamera.position + Slender.position, macamera.position + Slender.position), 2) / 35000));
-                    //////////////////// ETABLISSEMENT DU FILTRE NEGATIF ////////////////////
-
                     Program.Liste_Lights[0].Position = -Ingame.macamera.position;
+                    Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
                     for (int k = 0; k < Program.Liste_OBJ.Count; k++)
                     {
                         Program.Liste_OBJ[k].effect.SetValue("LightPosition[0]", new Vector4(Program.Liste_Lights[0].Position, 1));
                         Program.Liste_OBJ[k].effect.SetValue("LightPosition[1]", new Vector4(Program.Liste_Lights[1].Position.X, Program.Liste_Lights[1].Position.Y + 2f, Program.Liste_Lights[1].Position.Z, 1));
-                        Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[0]", Convert.ToSingle(Math.Min(Program.Liste_Lights[0].Range, Math.Pow(Vector3.Dot(macamera.position + Slender.position, macamera.position + Slender.position), 0.7) / Program.Liste_Lights[0].Range * 40)));
-                        Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[1]", Program.Liste_Lights[1].Range * 100);
-                        Program.Liste_OBJ[k].effect.SetValue("percent_Negatif", percent);
+                        Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[0]", lightDistanceSquared0calcul);
+                        Program.Liste_OBJ[k].effect.SetValue("LightDistanceSquared[1]", lightDistanceSquared1calcul);
+                        Program.Liste_OBJ[k].effect.SetValue("percent_Negatif", percent_negatif);
                         Program.Liste_OBJ[k].effect.SetValue("View", macamera.view);
                         Program.Liste_OBJ[k].effect.SetValue("Sepia", Sepia);
                         Program.Liste_OBJ[k].effect.SetValue("luminosity", luminosity);
@@ -487,6 +527,7 @@ namespace Underground
                 Program.device.EndScene(); // Okay
                 Program.device.Present();
             });
+            Cursor.Show();
             Menu.Dispose();
             hud.Dispose();
             for (int k = 0; k < Program.Liste_OBJ.Count; k++)

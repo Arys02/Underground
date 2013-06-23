@@ -15,9 +15,9 @@ float luminosity;
 /***********************    FILTERS     ***********************/
 bool Sepia = false;
 bool bump_mapping = true;
+float percent_Negatif = 0;
 
 /***********************    Textures     ***********************/
-float percent_Negatif = 0;
 texture colorMapTexture;
 sampler2D colorMap = sampler_state {
     Texture = (colorMapTexture);
@@ -107,8 +107,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		color += LightDiffuseColor[i] * nDotL * atten + input.Color * power * atten; // diffuse , specular
 	}
 	color =
-		color // éclairage
-		* saturate((texel * input.Color  * 2 - float4(1,1,1,1)) * 1 / 2 + texel * input.Color) // négatif
+		saturate(color) // éclairage
+		* ((float4(1,1,1,1) - 2 * texel * input.Color) * percent_Negatif + texel * input.Color)
 		* luminosity; // blink
 	color.w = texel.w;
 	return color;

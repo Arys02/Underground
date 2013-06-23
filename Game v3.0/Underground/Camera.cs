@@ -24,10 +24,10 @@ namespace Underground
       //  public Vector3 position = new Vector3(2.0f, 0, -2.0f);
       //  private static Vector3 old_pos = new Vector3(2.0f, 0, -2.0f);
 
-        public Vector3 position = new Vector3(0f, -2f, 0);
+        public Vector3 position = new Vector3(0f, -200f, 0);
         public Vector3 angle = new Vector3(0, 0, 0);
         private bool camera_altere = true;
-        private Point previous_mousepoint = Program.input.MousePoint;
+        private Point previous_mousepoint = Cursor.Position;
         public Matrix view = new Matrix();
         
         public static Keys keyrun = Keys.O;
@@ -43,8 +43,7 @@ namespace Underground
                     Matrix.RotationAxis(new Vector3(0, 1, 0), angle.Y) *
                     Matrix.RotationAxis(new Vector3(1, 0, 0), angle.X) *
                     Matrix.RotationAxis(new Vector3(0, 0, 1), angle.Z);
-        }        
-
+        }
         public void orient_camera(long timer)
         {
             //Console.WriteLine(Ingame.isTired);
@@ -53,15 +52,15 @@ namespace Underground
             float[] VitesseTranslation = (Program.input.KeysDown.Contains(keyrun) && !Ingame.isTired /*&& Ingame.distenceSlender() < 3*/)
                                              ? new float[]
                                                  {
-                                                     0.000003f,
-                                                     0.000003f,
-                                                     0.000003f
+                                                     0.000003f * 75,
+                                                     0.000003f * 75,
+                                                     0.000003f * 75
                                                  }
                                              : new float[]
                                                  {
-                                                     0.000001f,
-                                                     0.000001f,
-                                                     0.000001f,
+                                                     0.000001f * 75,
+                                                     0.000001f * 75,
+                                                     0.000001f * 75,
                                                  };
         
             double produit_scalaire;
@@ -191,8 +190,6 @@ namespace Underground
                 // Console.WriteLine("Left");
                 camera_altere = true;
             }
-
-
             if (Program.input.KeysDown.Contains(Keys.D))
             {
                 Ingame.a_progresse = true;
@@ -225,13 +222,13 @@ namespace Underground
             }
             #endregion
             #region souris
-            if (Program.input.MousePoint != previous_mousepoint)
+            if (Cursor.Position != previous_mousepoint)
             {
-                angle.Y -= (Program.input.MousePoint.X - previous_mousepoint.X) * VitesseRotation[0] * 3000;
-                angle.X -= (Program.input.MousePoint.Y - previous_mousepoint.Y) * VitesseRotation[1] * 3000;
+                angle.Y -= (Cursor.Position.X - previous_mousepoint.X) * VitesseRotation[0] * 5000;
+                angle.X -= (Cursor.Position.Y - previous_mousepoint.Y) * VitesseRotation[1] * 5000;
                 //Console.WriteLine(Program.input.MousePoint.X + " " + Program.input.MousePoint.Y);
-                //Cursor.Position = new Point(Program.form.DesktopBounds.Width / 2 + Program.form.DesktopBounds.X, Program.form.DesktopBounds.Height / 2 + Program.form.DesktopBounds.Y);
-                previous_mousepoint = new Point(Program.input.MousePoint.X, Program.input.MousePoint.Y);
+                Cursor.Position = new Point(Program.form.DesktopBounds.Width / 2 + Program.form.DesktopBounds.X, Program.form.DesktopBounds.Height / 2 + Program.form.DesktopBounds.Y);
+                previous_mousepoint = new Point(Cursor.Position.X, Cursor.Position.Y);
                 //Cursor.Hide();
             }
             #endregion
@@ -253,12 +250,12 @@ namespace Underground
 
             if (camera_altere)
             {
-                view = Matrix.Translation(position.X, position.Y + (float)Math.Sin(Ingame.sinusoide)/55f, position.Z) *
-                                Matrix.RotationAxis(new Vector3(0, 1, 0), angle.Y) *
-                                Matrix.RotationAxis(new Vector3(1, 0, 0), angle.X) *
+                view = Matrix.Translation(position.X, position.Y + (float)Math.Sin(Ingame.sinusoide) / 45f * 70, position.Z) *
+                                Matrix.RotationAxis(new Vector3(0, 1, 0), angle.Y + Ingame.parasitesCamera[0]) *
+                                Matrix.RotationAxis(new Vector3(1, 0, 0), angle.X + Ingame.parasitesCamera[1]) *
                                 Matrix.RotationAxis(new Vector3(0, 0, 1), angle.Z);
                 //camera_altere = false;
             }
-        }        
+        }
     }
 }

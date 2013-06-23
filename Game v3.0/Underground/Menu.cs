@@ -263,8 +263,8 @@ namespace Underground
                 Program.device.SetStreamSource(0, VertexBufferMenu, 0, Utilities.SizeOf<structVertex>());
 
                 if (Elt.EltType == EltType.Button &&
-                       Program.input.MousePoint.X > Elt.Position.X && Program.input.MousePoint.X < Elt.Position.X + Elt.Taille.X &&
-                       Program.input.MousePoint.Y > Elt.Position.Y && Program.input.MousePoint.Y < Elt.Position.Y + Elt.Taille.Y)
+                       Cursor.Position.X - Program.form.DesktopBounds.X > Elt.Position.X && Cursor.Position.X - Program.form.DesktopBounds.X < Elt.Position.X + Elt.Taille.X &&
+                       Cursor.Position.Y - Program.form.DesktopBounds.Y > Elt.Position.Y && Cursor.Position.Y - Program.form.DesktopBounds.Y < Elt.Position.Y + Elt.Taille.Y)
                 {
                     Program.device.SetTexture(0, Program.Liste_textures[Program.getTexture(@"Ressources\HUD\button_hover.png")].texture);
                     hoveringButton = Elt.Text;
@@ -311,7 +311,7 @@ namespace Underground
 
                         Program.device.Dispose();
                         Program.form.Dispose();
-                        Menu.Dispose();                        
+                        Menu.Dispose();
 
                         Process.GetCurrentProcess().Kill();
                         break;
