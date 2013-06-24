@@ -455,6 +455,7 @@ namespace Underground
                     //--------------------------------------------------------
                     // Died
                     //--------------------------------------------------------
+                    #region died
                     if (kill == false)
                     {
                         if (Program.input.KeysDown.Contains(Keys.K))
@@ -512,6 +513,7 @@ namespace Underground
                             Menu.IsInMenu = true;
                         }
                     }
+                    #endregion
                     //--------------------------------------------------------
                     previous_time = clock.ElapsedTicks;
 
