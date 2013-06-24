@@ -50,7 +50,7 @@ namespace Underground
             Liste_Elt.Add(new EltInfo(Vector2.Zero, new Vector2(Program.resolution[0],Program.resolution[1]), @"Ressources\HUD\Torch.png", EltType.Default));
             Liste_Elt.Add(new EltInfo(new Vector2(0, Program.resolution[1] - 200), new Vector2(400, 200), @"Ressources\HUD\Texture.png", EltType.Default));
             Liste_Elt.Add(new EltInfo(new Vector2(42, Program.resolution[1] - 102), new Vector2(300, 30), @"Ressources\HUD\ProgressBar1.png", EltType.EyeBar));
-            Liste_Elt.Add(new EltInfo(new Vector2(0, Program.resolution[1] - 300), new Vector2(400, 200), @"Ressources\HUD\Texture.png", EltType.Default ));
+            Liste_Elt.Add(new EltInfo(new Vector2(0, Program.resolution[1] - 300), new Vector2(400, 200), @"Ressources\HUD\Texture2.png", EltType.Default ));
             Liste_Elt.Add(new EltInfo(new Vector2(42, Program.resolution[1] - 202), new Vector2(300, 30), @"Ressources\HUD\ProgressBar1.png", EltType.RunBar));
         }
 
