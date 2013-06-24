@@ -517,8 +517,8 @@ namespace Underground
                     //--------------------------------------------------------
                     previous_time = clock.ElapsedTicks;
 
-                    bool collide;// = Collision.CheckCollisions(macamera.position);
-                    collide = false;
+                    bool collide = Collision.CheckCollisions(macamera.position);
+                    //collide = false;
                     if (collide)
                     {
                         macamera.position = oldPos;

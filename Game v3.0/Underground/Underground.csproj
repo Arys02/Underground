@@ -59,24 +59,20 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SharpDX, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Bin\Signed-net40\SharpDX.dll</HintPath>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\..\..\..\Projet\Sharp242\Bin\Signed-net40\SharpDX.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.Direct3D9, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Bin\Signed-net40\SharpDX.Direct3D9.dll</HintPath>
+    <Reference Include="SharpDX.Direct3D9">
+      <HintPath>..\..\..\..\..\Projet\Sharp242\Bin\Signed-net40\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.DirectInput, Version=2.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Bin\Signed-net40\SharpDX.DirectInput.dll</HintPath>
+    <Reference Include="SharpDX.DirectInput">
+      <HintPath>..\..\..\..\..\Projet\Sharp242\Bin\Signed-net40\SharpDX.DirectInput.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.DirectSound, Version=2.4.2.0, Culture=neutral, PublicKeyToken=627a3d6d1956f55a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Bin\Signed-net40\SharpDX.DirectSound.dll</HintPath>
+    <Reference Include="SharpDX.DirectSound">
+      <HintPath>..\..\..\..\..\Projet\Sharp242\Bin\Signed-net40\SharpDX.DirectSound.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
-      <HintPath>..\..\..\Bin\Signed-net20\SharpDX.XAudio2.dll</HintPath>
+      <HintPath>..\..\..\..\..\Projet\Sharp242\Bin\Signed-net40\SharpDX.XAudio2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

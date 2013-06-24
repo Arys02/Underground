@@ -29,8 +29,8 @@ namespace Underground
             }
 
             //BUGFIX : car les distances entre les sommets des murs sont trop petites O_O
-            result1 -= new Vector3(0.05f);
-            result2 += new Vector3(0.05f);
+            //result1 -= new Vector3(0.05f);
+            //result2 += new Vector3(0.05f);
 
             tree.Put(result1.X, result1.Y, result1.Z, result2.X, result2.Y, result2.Z, "wall" + result1.X + "," + result1.Y + "," + result1.Z + "-" + result2.X + "," + result2.Y + "," + result2.Z);    
         }
@@ -38,48 +38,52 @@ namespace Underground
 
         public static void Initialize()
         {
-            return;
-            tree = new IntervalKDTree<string>(100, 10);
+            tree = new IntervalKDTree<string>(70000, 700);
 
             foreach (structOBJ obj in Program.Liste_OBJ)
             {
-                foreach (structModel model in obj.data)
+                if (obj.sera_affiche)
                 {
-                    var vecPerBox = 2;
-
-                    for (int i = 0; i <= model.Sommets.GetUpperBound(0) - vecPerBox; i = i + vecPerBox)
+                    foreach (structModel model in obj.data)
                     {
-                        var tmp_vec = new List<Vector3>();
+                        var vecPerBox = 2;
 
-                        for (int j = 0; j < vecPerBox; j++)
+                        for (int i = 0; i <= model.Sommets.GetUpperBound(0) - vecPerBox; i = i + vecPerBox)
                         {
-                            tmp_vec.Add((Vector3)model.Sommets[i + j].Position);
-                        }
+                            var tmp_vec = new List<Vector3>();
 
-                        PutFromPoints(tmp_vec.ToArray());
+                            for (int j = 0; j < vecPerBox; j++)
+                            {
+                                tmp_vec.Add(
+                                    (Vector3) Vector4.Transform(model.Sommets[i + j].Position, obj.Transformation));
+                            }
+
+                            PutFromPoints(tmp_vec.ToArray());
+                        }
                     }
                 }
             }
         }
 
-        public static void AddVertex(List<Vector4> vertices)
+        public static void AddVertex(structOBJ obj)
         {
             var vecPerBox = 2;
 
-            for (int i = 0; i <= vertices.Count - vecPerBox; i = i + vecPerBox)
+            foreach (structModel model in obj.data)
             {
-                var tmp_vec = new List<Vector3>();
-
-                for (int j = 0; j < vecPerBox; j++)
+                for (int i = 0; i <= model.Sommets.GetUpperBound(0) - vecPerBox; i = i + vecPerBox)
                 {
-                    tmp_vec.Add((Vector3)vertices[i + j]);
+                    var tmp_vec = new List<Vector3>();
+
+                    for (int j = 0; j < vecPerBox; j++)
+                    {
+                        tmp_vec.Add(
+                            (Vector3)Vector4.Transform(model.Sommets[i + j].Position, obj.Transformation));
+                    }
+
+                    PutFromPoints(tmp_vec.ToArray());
                 }
-
-                PutFromPoints(tmp_vec.ToArray());
-
             }
-
-
         }
 
         public static bool CheckCollisions(Vector3 pos)

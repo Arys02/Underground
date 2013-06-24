@@ -204,7 +204,8 @@ namespace Underground
                 temp.Transformation = Transformation;
                 temp.IDTile = IDTile;
                 Liste_OBJ[position_dans_la_Liste] = temp;
-                Collision.Initialize();
+                //Collision.Initialize();
+                Collision.AddVertex(Liste_OBJ[position_dans_la_Liste]);
                 return position_dans_la_Liste;
             }
             else
@@ -216,7 +217,8 @@ namespace Underground
                     Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Lock(0, 0, LockFlags.None).WriteRange(Liste_OBJ[Liste_OBJ.Count - 1].data[i].Sommets);
                     Liste_OBJ[Liste_OBJ.Count - 1].data[i].VertexBuffer.Unlock();
                 }
-                Collision.Initialize();
+                //Collision.Initialize();
+                Collision.AddVertex(Liste_OBJ[Liste_OBJ.Count - 1]);
                 return Liste_OBJ.Count - 1;
             }
         }
