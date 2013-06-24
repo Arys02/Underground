@@ -251,6 +251,9 @@ namespace Underground
             }
         }
 
+        public static DxPlay m_play;
+        public static Panel panel1;
+
         private static void Main(string[] args)
         {
             #region Variables
@@ -266,6 +269,19 @@ namespace Underground
             form = new RenderForm("Game - Soutenance 3");
             form.Width = resolution[0];
             form.Height = resolution[1];
+
+            // Intro
+            panel1 = new Panel();
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(resolution[0], resolution[1]);
+            panel1.TabIndex = 1;
+            form.Controls.Add(panel1);
+
+            m_play = new DxPlay(panel1, @"Ressources\Video\UndergroundPS.avi");
+
+            // Fonction à éxécuter après
+            m_play.StopPlay += new DxPlay.DxPlayEvent(MediaPlayer.Fin_intro);
+
             Direct3D direct3D = new Direct3D();
             PresentParameters Parametres = new PresentParameters(
                 form.Width,

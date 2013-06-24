@@ -431,7 +431,11 @@ namespace Underground
             {
                 Program.device.BeginScene();
 
-                if (Menu.IsInMenu)
+                if (!MediaPlayer.intro_finished)
+                {
+                    MediaPlayer.Intro();
+                }
+                else if (Menu.IsInMenu)
                 {
                     Cursor.Show();
                     Program.device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);

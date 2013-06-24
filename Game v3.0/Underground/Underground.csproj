@@ -59,6 +59,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DirectShowLib-2005">
+      <HintPath>..\..\..\..\..\Projet\DirectShowLib-2005.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX">
       <HintPath>..\..\..\..\..\Projet\Sharp242\Bin\Signed-net40\SharpDX.dll</HintPath>
     </Reference>
@@ -82,11 +85,13 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Collision.cs" />
+    <Compile Include="DxPlay.cs" />
     <Compile Include="HUD.cs" />
     <Compile Include="Ingame.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="IntervalKDTree.cs" />
     <Compile Include="Maze.cs" />
+    <Compile Include="MediaPlayer.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="MtlLoader.cs" />
     <Compile Include="ObjLoader.cs" />
