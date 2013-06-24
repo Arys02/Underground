@@ -207,18 +207,29 @@ namespace Underground
 
 
         private static List<Case> previous_cases = new List<Case>();
+        public static int rayon_salles = 600;
+        public static void ab_stay_in_bounds(ref int a, ref int b)
+        {
+            a = a < 0 ? 0 : a;
+            a = a >= Program.newmaze.maze.GetLength(0) ? Program.newmaze.maze.GetLength(0) - 1 : a;
+            b = b < 0 ? 0 : b;
+            b = b >= Program.newmaze.maze.GetLength(1) ? Program.newmaze.maze.GetLength(1) - 1 : b;
+        }
+
         public static void recup_env()
         {
-            int rayon_salles = 600;
+            // Transformation des coordonnées dans l'espaces aux coordonnées du laby de Charles
+            int a = ((int)macamera.position.X + rayon_salles) / (2 * rayon_salles);
+            int b = ((int)macamera.position.Z + rayon_salles) / (2 * rayon_salles);
+            ab_stay_in_bounds(ref a, ref b);
             RoomsBuilder RoomsBuilder = new RoomsBuilder();
+            PlaceMonster PlaceMonster = new PlaceMonster();
             //string pathL = @"Ressources\Game\C(L).obj";
             //string pathX = @"Ressources\Game\C(X).obj";
             //string pathIf = @"Ressources\Game\C(If).obj";
             //string pathT = @"Ressources\Game\C(T).obj";
             //string path2 = @"Ressources\Game\cabine.obj";
             string pathStatue = @"Ressources\Game\statue.obj";
-            int slender_distancenbunite = 10 * 70;
-            float slender_distanceapprocheunite = 2.1f * 70;
             if (Slender.doit_etre_recharge)
             {
                 Slender.doit_etre_recharge = false;
@@ -226,17 +237,8 @@ namespace Underground
                 if (Slender.seraaffiche)
                 {
                     compteur_slender = compteur_slender % 4 + 1;
-                    Slender.position = new Vector3(
-                                             -(float)
-                                              (macamera.position.X +
-                                               (slender_distancenbunite - slender_distanceapprocheunite * compteur_slender) *
-                                               Math.Sin(macamera.angle.Y)),
-                                             0,
-                                             -(float)
-                                              (macamera.position.Z -
-                                               (slender_distancenbunite - slender_distanceapprocheunite * compteur_slender) *
-                                               (Math.Cos(macamera.angle.Y)))
-                                             );
+                    float ang;
+                    Slender.position = PlaceMonster.GetPositionMonster(out ang);
                     if (first_loop)
                     {
                         first_loop = false;
@@ -244,7 +246,7 @@ namespace Underground
                     }
                     Program.Liste_Lights[1].Position = new Vector3(Slender.position.X, Slender.position.Y + 100, Slender.position.Z);
                     Program.getModel(pathStatue,
-                                     Matrix.Scaling(2f * 75) * Matrix.RotationY(-macamera.angle.Y + (float)Math.PI) *
+                                     Matrix.Scaling(2f * 75) * Matrix.RotationY(ang) *
                                      Matrix.Translation(Slender.position), new Point(-137, -137));
                 }
                 else
@@ -257,12 +259,6 @@ namespace Underground
             //try
             //{
             // Recupere la liste des cases vues
-            int a = ((int)macamera.position.X + rayon_salles) / (2 * rayon_salles);
-            int b = ((int)macamera.position.Z + rayon_salles) / (2 * rayon_salles);
-            a = a < 0 ? 0 : a;
-            a = a >= Program.newmaze.maze.GetLength(0) ? Program.newmaze.maze.GetLength(0) - 1 : a;
-            b = b < 0 ? 0 : b;
-            b = b >= Program.newmaze.maze.GetLength(1) ? Program.newmaze.maze.GetLength(1) - 1 : b;
             //Console.WriteLine("Zone [{0},{1}] [{2},{3}]", a, b, macamera.position.X, macamera.position.Z);
             List<Case> cases = new List<Case>(Program.newmaze.maze[a, b].see);
 
