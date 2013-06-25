@@ -172,7 +172,7 @@ namespace Underground
                 (positionMob.X /*+
                 (slender_distancenbunite - slender_distanceapprocheunite * Ingame.compteur_slender) *
                 Math.Sin(angle)*/),
-                0,
+                150,
                 -(float)
                 (positionMob.Z /*-
                 (slender_distancenbunite - slender_distanceapprocheunite * Ingame.compteur_slender) *

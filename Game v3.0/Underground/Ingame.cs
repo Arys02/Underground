@@ -229,7 +229,8 @@ namespace Underground
             //string pathIf = @"Ressources\Game\C(If).obj";
             //string pathT = @"Ressources\Game\C(T).obj";
             //string path2 = @"Ressources\Game\cabine.obj";
-            string pathStatue = @"Ressources\Game\statue.obj";
+            //string pathStatue = @"Ressources\Game\statue.obj";
+            string pathStatue = @"Ressources\Game\sql5_000049.obj";
             if (Slender.doit_etre_recharge)
             {
                 Slender.doit_etre_recharge = false;
@@ -246,7 +247,7 @@ namespace Underground
                     }
                     Program.Liste_Lights[1].Position = new Vector3(Slender.position.X, Slender.position.Y + 100, Slender.position.Z);
                     Program.getModel(pathStatue,
-                                     Matrix.Scaling(2f * 75) * Matrix.RotationY(ang) *
+                                     Matrix.Scaling(2f * 10/*75*/) * Matrix.RotationY(ang) *
                                      Matrix.Translation(Slender.position), new Point(-137, -137));
                 }
                 else

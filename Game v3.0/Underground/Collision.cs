@@ -29,8 +29,8 @@ namespace Underground
             }
 
             //BUGFIX : car les distances entre les sommets des murs sont trop petites O_O
-            //result1 -= new Vector3(0.05f);
-            //result2 += new Vector3(0.05f);
+            result1 -= new Vector3(0.05f);
+            result2 += new Vector3(0.05f);
 
             tree.Put(result1.X, result1.Y, result1.Z, result2.X, result2.Y, result2.Z, "wall" + result1.X + "," + result1.Y + "," + result1.Z + "-" + result2.X + "," + result2.Y + "," + result2.Z);    
         }

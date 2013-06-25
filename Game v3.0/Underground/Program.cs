@@ -278,6 +278,7 @@ namespace Underground
             form.Controls.Add(panel1);
 
             m_play = new DxPlay(panel1, @"Ressources\Video\UndergroundPS.avi");
+            //m_play = new DxPlay(panel1, @"Ressources\Video\underintro_001.avi");
 
             // Fonction à éxécuter après
             m_play.StopPlay += new DxPlay.DxPlayEvent(MediaPlayer.Fin_intro);
