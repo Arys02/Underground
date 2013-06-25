@@ -16,7 +16,7 @@ namespace Underground
 {
     class RoomsBuilder
     {
-        static string obj = "mur7";
+        static string obj = "mur11";
 
         public void buildLRoom(int rayon_salles, Case Case)
         {

@@ -229,8 +229,8 @@ namespace Underground
             //string pathIf = @"Ressources\Game\C(If).obj";
             //string pathT = @"Ressources\Game\C(T).obj";
             //string path2 = @"Ressources\Game\cabine.obj";
-            //string pathStatue = @"Ressources\Game\statue.obj";
-            string pathStatue = @"Ressources\Game\sql5_000049.obj";
+            string pathStatue = @"Ressources\Game\statue.obj";
+            //string pathStatue = @"Ressources\Game\sql5_000049.obj";
             if (Slender.doit_etre_recharge)
             {
                 Slender.doit_etre_recharge = false;
