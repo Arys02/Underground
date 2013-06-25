@@ -67,6 +67,8 @@ namespace Underground
 
             #region clavier
             /************ Utile pour faire des tests ************/
+            if(Ingame.kill == false)
+            {
             if (Program.input.KeysDown.Contains(Keys.Escape))
             {
                 Menu.IsInMenu = true;
@@ -220,6 +222,7 @@ namespace Underground
                 // Console.WriteLine("Coulez !");
                 camera_altere = true;
             }
+        }
             #endregion
             #region souris
             if (Cursor.Position != previous_mousepoint)

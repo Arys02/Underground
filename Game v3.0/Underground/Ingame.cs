@@ -247,7 +247,7 @@ namespace Underground
                     }
                     Program.Liste_Lights[1].Position = new Vector3(Slender.position.X, Slender.position.Y + 100, Slender.position.Z);
                     Program.getModel(pathStatue,
-                                     Matrix.Scaling(2f * 10/*75*/) * Matrix.RotationY(ang) *
+                                     Matrix.Scaling(2f * 75/*10*/) * Matrix.RotationY(ang) *
                                      Matrix.Translation(Slender.position), new Point(-137, -137));
                 }
                 else
@@ -459,9 +459,15 @@ namespace Underground
                     #region died
                     if (kill == false)
                     {
-                        if (Program.input.KeysDown.Contains(Keys.K))
+                        if (((Slender.position.X - macamera.position.X) <= 0.05) || ((Slender.position.X + macamera.position.X) <= 0.05))
                         {
-                            kill = true;
+                            if (((Slender.position.Y - macamera.position.Y) <= 0.05) || ((Slender.position.Y + macamera.position.Y) <= 0.05))
+                            {
+                                if (((Slender.position.Z - macamera.position.Z) <= 0.05) || ((Slender.position.Z + macamera.position.Z) <= 0.05))
+                                {
+                                    kill = true;
+                                }
+                            }
                         }
                     }
 
@@ -486,7 +492,7 @@ namespace Underground
                         else if ((Time.ElapsedMilliseconds > 1500) && (Time.ElapsedMilliseconds < 4650))
                         {
                             macamera.angle.Z -= (0.00000006f * Time.ElapsedMilliseconds);
-                            //macamera.position.Z -= (0.0000006f * Time.ElapsedMilliseconds);
+                            macamera.angle.Y += 0.00000006f * Time.ElapsedMilliseconds;
                             macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds) * 70;
                         }
 
@@ -501,7 +507,7 @@ namespace Underground
                             macamera.position.Y += (0.00000006f * Time.ElapsedMilliseconds) * 70;
                         }
 
-                        else if (Time.ElapsedMilliseconds == 5200)
+                        else if (Time.ElapsedMilliseconds >= 5200)
                         {
                             if (stateinflash == 0)
                             {
