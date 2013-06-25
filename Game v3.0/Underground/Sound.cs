@@ -14,7 +14,8 @@ namespace Underground
     {
         static XAudio2 audio = new XAudio2();
         public static Thread pas = new Thread(bruitpas);
-        public static MasteringVoice mastervoice = new MasteringVoice(audio, 3);
+        public static Thread dead = new Thread(Dethsong);
+        public static MasteringVoice mastervoice = new MasteringVoice(audio, 3);        
         public static SubmixVoice Voice = new SubmixVoice(audio, 1);
         public static Random Random = new Random();
         public static bool soundContinue = true;
@@ -32,6 +33,11 @@ namespace Underground
             Thread ambiance = new Thread(PlayEvenement);
             ambiance.Start();
             ambiance2.Start();
+            if (Ingame.kill == true)
+            {
+                ambiance.Abort();
+                ambiance2.Abort();
+            }
             
 
         }
@@ -46,6 +52,16 @@ namespace Underground
             
             pas.Abort();
             pas = new Thread(bruitpas);
+        }
+
+         public static void Dethsong()
+        {
+
+            Playsound(audio,
+                      (@"Ressources\Sound\Lilium_op.wav"), 1);
+            
+            dead.Abort();
+            dead = new Thread(Dethsong);
         }
 
         public static void PlayEvenement()

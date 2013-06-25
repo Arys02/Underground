@@ -459,13 +459,22 @@ namespace Underground
                     #region died
                     if (kill == false)
                     {
-                        if (((Slender.position.X - macamera.position.X) <= 0.05) || ((Slender.position.X + macamera.position.X) <= 0.05))
+                        if (((Slender.position.X - macamera.position.X) <= 0.01) || ((Slender.position.X + macamera.position.X) <= 0.01))
                         {
-                            if (((Slender.position.Y - macamera.position.Y) <= 0.05) || ((Slender.position.Y + macamera.position.Y) <= 0.05))
+                            if (((Slender.position.Y - macamera.position.Y) <= 0.01) || ((Slender.position.Y + macamera.position.Y) <= 0.01))
                             {
-                                if (((Slender.position.Z - macamera.position.Z) <= 0.05) || ((Slender.position.Z + macamera.position.Z) <= 0.05))
+                                if (((Slender.position.Z - macamera.position.Z) <= 0.01) || ((Slender.position.Z + macamera.position.Z) <= 0.01))
                                 {
-                                    kill = true;
+                                    kill = true;                                    
+                                    if (!Sound.dead.IsAlive)
+                                    {
+                                        if (Sound.dead.ThreadState == System.Threading.ThreadState.Stopped)
+                                        {
+                                            Sound.soundContinue = true;
+                                            Sound.dead = new Thread(Sound.bruitpas);
+                                        }
+                                        Sound.dead.Start();
+                                    }
                                 }
                             }
                         }
@@ -474,6 +483,7 @@ namespace Underground
                     if (kill == true)
                     {
                         Time.Start();
+                        
 
                         if (Time.ElapsedMilliseconds < 500)
                         {
@@ -518,6 +528,7 @@ namespace Underground
                             Time.Reset();
                             Thread.Sleep(1000);
                             Menu.IsInMenu = true;
+                            Sound.dead.Abort();
                         }
                     }
                     #endregion

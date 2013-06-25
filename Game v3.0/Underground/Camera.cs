@@ -67,115 +67,117 @@ namespace Underground
 
             #region clavier
             /************ Utile pour faire des tests ************/
-            if(Ingame.kill == false)
-            {
+            
             if (Program.input.KeysDown.Contains(Keys.Escape))
             {
                 Menu.IsInMenu = true;
             }
-            if (Program.input.KeysDown.Contains(Keys.A))
-            {
-                if (Ingame.stateinflash == 0) Ingame.stateinflash = -1;
-            }
-            if (Program.input.KeysDown.Contains(Keys.R)) // Reset
-            {
-                angle = new Vector3(0, 0, 0);
-                camera_altere = true;
-            }
-            if (Program.input.KeysDown.Contains(Keys.F)) Ingame.Slender.seraaffiche = true;
-            if (Program.input.KeysDown.Contains(Keys.G)) Ingame.Slender.seraaffiche = false;
-            if (Program.input.KeysDown.Contains(Keys.F1)) Ingame.PrimType = PrimitiveType.TriangleList;
-            if (Program.input.KeysDown.Contains(Keys.F2)) Ingame.PrimType = PrimitiveType.LineList;
-            if (Program.input.KeysDown.Contains(Keys.F3)) Ingame.PrimType = PrimitiveType.PointList;
-            if (Program.input.KeysDown.Contains(Keys.F4)) Ingame.Sepia = false;
-            if (Program.input.KeysDown.Contains(Keys.F5)) Ingame.Sepia = true;
-            if (Program.input.KeysDown.Contains(Keys.F6)) Ingame.Following_light = true;
-            if (Program.input.KeysDown.Contains(Keys.F7)) Ingame.Following_light = false;
-            if (Program.input.KeysDown.Contains(Keys.F8)) Ingame.maximum_disallowed = true;
-            if (Program.input.KeysDown.Contains(Keys.F9)) Ingame.maximum_disallowed = false;
-            /************ END ************/
 
-            if (Program.input.KeysDown.Contains(Keys.Space))
+            if (Ingame.kill == false)
             {
-                position.Y -= VitesseTranslation[1] * timer;
-                //  Console.WriteLine("Vers le haut !");
-                camera_altere = true;
-            }
-
-            if (Program.input.KeysDown.Contains(Keys.ShiftKey))
-            {
-                position.Y += VitesseTranslation[1] * timer;
-                // Console.WriteLine("Vers le bas !");
-                camera_altere = true;
-            }
-
-            //view = Matrix.LookAtLH(position, new Vector3(0, 0, 0), Vector3.UnitY);
-
-            if (Program.input.KeysDown.Contains(Keys.Up) || Program.input.KeysDown.Contains(keyavence))
-            {
-                Ingame.a_progresse = true;
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * timer);
-                position.Z -= Convert.ToSingle(produit_scalaire);
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * timer);
-                position.X += Convert.ToSingle(produit_scalaire);
-
-                if (!Sound.pas.IsAlive)
+                if (Program.input.KeysDown.Contains(Keys.A))
                 {
-                    if (Sound.pas.ThreadState == System.Threading.ThreadState.Stopped)
-                    {
-                        Sound.soundContinue = true;
-                        Sound.pas = new Thread(Sound.bruitpas);
-                    }
-                    Sound.pas.Start();
+                    if (Ingame.stateinflash == 0) Ingame.stateinflash = -1;
                 }
-                // Console.WriteLine("En avant !");
-                camera_altere = true;
-            }
-            else
-            {
-                Sound.soundContinue = false;
-               // Console.WriteLine("prout");
-            }
+                if (Program.input.KeysDown.Contains(Keys.R)) // Reset
+                {   
+                    angle = new Vector3(0, 0, 0);
+                    camera_altere = true;
+                }
+                if (Program.input.KeysDown.Contains(Keys.F)) Ingame.Slender.seraaffiche = true;
+                if (Program.input.KeysDown.Contains(Keys.G)) Ingame.Slender.seraaffiche = false;
+                if (Program.input.KeysDown.Contains(Keys.F1)) Ingame.PrimType = PrimitiveType.TriangleList;
+                if (Program.input.KeysDown.Contains(Keys.F2)) Ingame.PrimType = PrimitiveType.LineList;
+                if (Program.input.KeysDown.Contains(Keys.F3)) Ingame.PrimType = PrimitiveType.PointList;
+                if (Program.input.KeysDown.Contains(Keys.F4)) Ingame.Sepia = false;
+                if (Program.input.KeysDown.Contains(Keys.F5)) Ingame.Sepia = true;
+                if (Program.input.KeysDown.Contains(Keys.F6)) Ingame.Following_light = true;
+                if (Program.input.KeysDown.Contains(Keys.F7)) Ingame.Following_light = false;
+                if (Program.input.KeysDown.Contains(Keys.F8)) Ingame.maximum_disallowed = true;
+                if (Program.input.KeysDown.Contains(Keys.F9)) Ingame.maximum_disallowed = false;
+                /************ END ************/
+
+                if (Program.input.KeysDown.Contains(Keys.Space))
+                {
+                    position.Y -= VitesseTranslation[1] * timer;
+                    //  Console.WriteLine("Vers le haut !");
+                    camera_altere = true;
+                }
+
+                if (Program.input.KeysDown.Contains(Keys.ShiftKey))
+                {
+                    position.Y += VitesseTranslation[1] * timer;
+                    // Console.WriteLine("Vers le bas !");
+                    camera_altere = true;
+                }
+
+                //view = Matrix.LookAtLH(position, new Vector3(0, 0, 0), Vector3.UnitY);
+
+                if (Program.input.KeysDown.Contains(Keys.Up) || Program.input.KeysDown.Contains(keyavence))
+                {
+                    Ingame.a_progresse = true;
+                    produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * timer);
+                    position.Z -= Convert.ToSingle(produit_scalaire);
+                    produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * timer);
+                    position.X += Convert.ToSingle(produit_scalaire);
+
+                    if (!Sound.pas.IsAlive)
+                    {
+                        if (Sound.pas.ThreadState == System.Threading.ThreadState.Stopped)
+                        {
+                            Sound.soundContinue = true;
+                            Sound.pas = new Thread(Sound.bruitpas);
+                        }   
+                        Sound.pas.Start();
+                    }
+                    // Console.WriteLine("En avant !");
+                    camera_altere = true;
+                }
+                else
+                {
+                    Sound.soundContinue = false;
+                    // Console.WriteLine("prout");
+                }   
                 
             
-                //Sound.pas = new Thread(Sound.bruitpas);
-                //Sound.pas.Interrupt();
+                    //Sound.pas = new Thread(Sound.bruitpas);
+                    //Sound.pas.Interrupt();
             
-            if (Program.input.KeysDown.Contains(Keys.Down) || Program.input.KeysDown.Contains(keyrecule))
-            {
-                Ingame.a_progresse = true;
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * timer);
-                position.Z += Convert.ToSingle(produit_scalaire);
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * timer);
-                position.X -= Convert.ToSingle(produit_scalaire);
-                if (!Sound.pas.IsAlive)
+                if (Program.input.KeysDown.Contains(Keys.Down) || Program.input.KeysDown.Contains(keyrecule))
                 {
-                    if (Sound.pas.ThreadState == System.Threading.ThreadState.Stopped)
-                        Sound.pas = new Thread(Sound.bruitpas);
+                    Ingame.a_progresse = true;
+                    produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[2] * timer);
+                    position.Z += Convert.ToSingle(produit_scalaire);
+                    produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[2] * timer);
+                    position.X -= Convert.ToSingle(produit_scalaire);
+                    if (!Sound.pas.IsAlive)
+                    {
+                        if (Sound.pas.ThreadState == System.Threading.ThreadState.Stopped)
+                            Sound.pas = new Thread(Sound.bruitpas);
 
-                    Sound.pas.Start();
+                        Sound.pas.Start();
 
+                    }
+                    // Console.WriteLine("En arrière !");
+                    camera_altere = true;
                 }
-                // Console.WriteLine("En arrière !");
-                camera_altere = true;
-            }
 
-            if (Program.input.KeysDown.Contains(keyright) || Program.input.KeysDown.Contains(Keys.Right))
-            {
-                angle.Y -= VitesseRotation[1] * timer;
-                // Console.WriteLine("A tribord !");
-                camera_altere = true;
-            }
-            if (Program.input.KeysDown.Contains(keyleft) ||Program.input.KeysDown.Contains(Keys.Left))
-            {
-                angle.Y += VitesseRotation[1] * timer;
-                //  Console.WriteLine("A babord !");
-                camera_altere = true;
-            }
-            /************ END ************/
+                if (Program.input.KeysDown.Contains(keyright) || Program.input.KeysDown.Contains(Keys.Right))
+                {
+                    angle.Y -= VitesseRotation[1] * timer;
+                    // Console.WriteLine("A tribord !");
+                    camera_altere = true;
+                }
+                if (Program.input.KeysDown.Contains(keyleft) ||Program.input.KeysDown.Contains(Keys.Left))
+                {
+                    angle.Y += VitesseRotation[1] * timer;
+                    //  Console.WriteLine("A babord !");
+                    camera_altere = true;
+                }
+                /************ END ************/
 
-            if (Program.input.KeysDown.Contains(Keys.Q))
-            {
+                if (Program.input.KeysDown.Contains(Keys.Q))
+                {
                 Ingame.a_progresse = true;
                 produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0] * timer);
                 position.Z += Convert.ToSingle(produit_scalaire);
@@ -188,51 +190,54 @@ namespace Underground
 
                     Sound.pas.Start();
 
+                    }
+                    // Console.WriteLine("Left");
+                    camera_altere = true;
                 }
-                // Console.WriteLine("Left");
-                camera_altere = true;
-            }
-            if (Program.input.KeysDown.Contains(Keys.D))
-            {
-                Ingame.a_progresse = true;
-                produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0] * timer);
-                position.Z -= Convert.ToSingle(produit_scalaire);
-                produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0] * timer);
-                position.X -= Convert.ToSingle(produit_scalaire);
-                if (!Sound.pas.IsAlive)
+                if (Program.input.KeysDown.Contains(Keys.D))
                 {
-                    if (Sound.pas.ThreadState == System.Threading.ThreadState.Stopped)
-                        Sound.pas = new Thread(Sound.bruitpas);
+                    Ingame.a_progresse = true;
+                    produit_scalaire = (Math.Sin(angle.Y) * VitesseTranslation[0] * timer);
+                    position.Z -= Convert.ToSingle(produit_scalaire);
+                    produit_scalaire = (Math.Cos(angle.Y) * VitesseTranslation[0] * timer);
+                    position.X -= Convert.ToSingle(produit_scalaire);
+                    if (!Sound.pas.IsAlive)
+                    {
+                        if (Sound.pas.ThreadState == System.Threading.ThreadState.Stopped)
+                            Sound.pas = new Thread(Sound.bruitpas);
 
-                    Sound.pas.Start();
+                        Sound.pas.Start();
 
+                    }
+                    // Console.WriteLine("Right");
+                    camera_altere = true;
                 }
-                // Console.WriteLine("Right");
-                camera_altere = true;
+                if (Program.input.KeysDown.Contains(Keys.PageUp))
+                {
+                    angle.X += VitesseRotation[0] * timer;
+                    // Console.WriteLine("Montez !");
+                    camera_altere = true;
+                }
+                if (Program.input.KeysDown.Contains(Keys.PageDown))
+                {
+                    angle.X -= VitesseRotation[0] * timer;
+                    // Console.WriteLine("Coulez !");
+                    camera_altere = true;
+                }
             }
-            if (Program.input.KeysDown.Contains(Keys.PageUp))
-            {
-                angle.X += VitesseRotation[0] * timer;
-                // Console.WriteLine("Montez !");
-                camera_altere = true;
-            }
-            if (Program.input.KeysDown.Contains(Keys.PageDown))
-            {
-                angle.X -= VitesseRotation[0] * timer;
-                // Console.WriteLine("Coulez !");
-                camera_altere = true;
-            }
-        }
             #endregion
             #region souris
-            if (Cursor.Position != previous_mousepoint)
+            if (Ingame.kill == false)
             {
-                angle.Y -= (Cursor.Position.X - previous_mousepoint.X) * VitesseRotation[0] * 5000;
-                angle.X -= (Cursor.Position.Y - previous_mousepoint.Y) * VitesseRotation[1] * 5000;
-                //Console.WriteLine(Program.input.MousePoint.X + " " + Program.input.MousePoint.Y);
-                Cursor.Position = new Point(Program.form.DesktopBounds.Width / 2 + Program.form.DesktopBounds.X, Program.form.DesktopBounds.Height / 2 + Program.form.DesktopBounds.Y);
-                previous_mousepoint = new Point(Cursor.Position.X, Cursor.Position.Y);
-                //Cursor.Hide();
+                if (Cursor.Position != previous_mousepoint)
+                {
+                    angle.Y -= (Cursor.Position.X - previous_mousepoint.X) * VitesseRotation[0] * 5000;
+                    angle.X -= (Cursor.Position.Y - previous_mousepoint.Y) * VitesseRotation[1] * 5000;
+                    //Console.WriteLine(Program.input.MousePoint.X + " " + Program.input.MousePoint.Y);
+                    Cursor.Position = new Point(Program.form.DesktopBounds.Width / 2 + Program.form.DesktopBounds.X, Program.form.DesktopBounds.Height / 2 + Program.form.DesktopBounds.Y);
+                    previous_mousepoint = new Point(Cursor.Position.X, Cursor.Position.Y);
+                    //Cursor.Hide();
+                }
             }
             #endregion
 
