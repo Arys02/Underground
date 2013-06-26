@@ -459,11 +459,11 @@ namespace Underground
                     #region died
                     if (kill == false)
                     {
-                        if (((Slender.position.X - macamera.position.X) <= 0.01) || ((Slender.position.X + macamera.position.X) <= 0.01))
+                        if (((Slender.position.X - macamera.position.X) <= 0.005) || ((Slender.position.X + macamera.position.X) <= 0.005))
                         {
-                            if (((Slender.position.Y - macamera.position.Y) <= 0.01) || ((Slender.position.Y + macamera.position.Y) <= 0.01))
+                            if (((Slender.position.Y - macamera.position.Y) <= 0.005) || ((Slender.position.Y + macamera.position.Y) <= 0.005))
                             {
-                                if (((Slender.position.Z - macamera.position.Z) <= 0.01) || ((Slender.position.Z + macamera.position.Z) <= 0.01))
+                                if (((Slender.position.Z - macamera.position.Z) <= 0.005) || ((Slender.position.Z + macamera.position.Z) <= 0.005))
                                 {
                                     kill = true;                                    
                                     if (!Sound.dead.IsAlive)
@@ -523,12 +523,13 @@ namespace Underground
                             {
                                 stateinflash = -1;
                             }
-                            kill = false;
+                            //kill = false;
                             Time.Stop();
                             Time.Reset();
                             Thread.Sleep(1000);
-                            Menu.IsInMenu = true;
                             Sound.dead.Abort();
+                            Menu.IsInMenu = true;
+                            
                         }
                     }
                     #endregion
@@ -539,13 +540,15 @@ namespace Underground
                     //collide = false;
                     if (collide)
                     {
-                        macamera.position = oldPos;
-                        oldView =
-                            Matrix.Translation(oldPos.X, oldPos.Y + (float)Math.Sin(Ingame.sinusoide) / 45f * 70, oldPos.Z) *
-                            Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y + Ingame.parasitesCamera[0]) *
-                                Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X + Ingame.parasitesCamera[1]) *
-                                Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z);
-                        macamera.view = oldView;
+                        
+                            macamera.position = oldPos;
+                            oldView =
+                                Matrix.Translation(oldPos.X, oldPos.Y + (float)Math.Sin(Ingame.sinusoide) / 45f * 70, oldPos.Z) *
+                                Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y + Ingame.parasitesCamera[0]) *
+                                    Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X + Ingame.parasitesCamera[1]) *
+                                    Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z);
+                            macamera.view = oldView;
+                        
                     }
                     else
                     {

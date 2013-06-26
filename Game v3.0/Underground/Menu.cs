@@ -40,6 +40,7 @@ namespace Underground
                                  _menuTabSettings,
                                  _menuTabExtra,
                                  _pauseTab,
+                                 _pauseTab2,
                                  _tabTmp;
 
         private static EltInfo[] _switchTo;
@@ -199,14 +200,25 @@ namespace Underground
                                 new Vector2(120, 50), @"Ressources\HUD\button.png", EltType.Button, "Back")
                 };
 
-
-            _pauseTab = new EltInfo[]
+            
+                _pauseTab = new EltInfo[]
                 {
                     new EltInfo(new Vector2(0, 3*Program.resolution[1]/5), 
                                 new Vector2(Program.resolution[0], 2*Program.resolution[1]/5),
                                 @"Ressources\Menu\smoke2.png", EltType.Default, String.Empty),
                     new EltInfo(new Vector2(Program.resolution[0]/2 - 120, Program.resolution[1]/2 - 100),
                                 new Vector2(240, 50), @"Ressources\HUD\button.png", EltType.Button, "Resume"),
+                    new EltInfo(new Vector2(Program.resolution[0]/2 - 120, Program.resolution[1]/2 + 100),
+                                new Vector2(240, 50), @"Ressources\HUD\button.png", EltType.Button, "Exit")
+                };
+            
+                _pauseTab2 = new EltInfo[]
+                {
+                    new EltInfo(new Vector2(0, 3*Program.resolution[1]/5), 
+                                new Vector2(Program.resolution[0], 2*Program.resolution[1]/5),
+                                @"Ressources\Menu\smoke2.png", EltType.Default, String.Empty),
+                    new EltInfo(new Vector2(Program.resolution[0]/2 - 120, Program.resolution[1]/2 - 100),
+                                new Vector2(240, 50), @"Ressources\HUD\button.png", EltType.Button, "Menu"),
                     new EltInfo(new Vector2(Program.resolution[0]/2 - 120, Program.resolution[1]/2 + 100),
                                 new Vector2(240, 50), @"Ressources\HUD\button.png", EltType.Button, "Exit")
                 };
@@ -237,8 +249,16 @@ namespace Underground
 
             if (IsInGame)
             {
-                _switchTo = _pauseTab;
-                _tabTmp = _pauseTab;
+                if (Ingame.kill == false)
+                {
+                    _switchTo = _pauseTab;
+                    _tabTmp = _pauseTab;
+                }
+                else
+                {
+                    _switchTo = _pauseTab2;
+                    _tabTmp = _pauseTab2;
+                }
             }
 
             Switcher();
@@ -332,6 +352,16 @@ namespace Underground
                         IsInMenu = false;
                         IsInGame = true;
                         break;
+
+                    case "Menu":                        
+                        
+                        Process.Start(Application.ExecutablePath, "");
+
+                        Program.device.Dispose();
+                        Program.form.Dispose();
+                        Menu.Dispose();                      
+                        break;
+
                     case "Exit":
                         Program.device.Dispose();
                         Program.form.Dispose();
@@ -342,6 +372,7 @@ namespace Underground
             }
             Program.device.VertexDeclaration = Program.VertexDeclaration3D;
         }
+
         static public void Dispose()
         {
             Program.Liste_textures[Program.getTexture(@"Ressources\Game\Images\bg.jpg")].texture.Dispose();
