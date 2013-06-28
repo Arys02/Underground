@@ -499,8 +499,8 @@ namespace Underground
                 if (precedent_pourcentage != Convert.ToInt32(Convert.ToSingle(i) / Convert.ToSingle(obj.Length) * 100))
                 {
                     precedent_pourcentage = Convert.ToInt32(Convert.ToSingle(i) / Convert.ToSingle(obj.Length) * 100);
-                    Console.WriteLine("\t{0} % lu", precedent_pourcentage);
-                    Console.CursorTop--;
+                    //Console.WriteLine("\t{0} % lu", precedent_pourcentage);
+                    //Console.CursorTop--;
                 }
                 gotonextline(ref i, ref obj);
                 //i++;

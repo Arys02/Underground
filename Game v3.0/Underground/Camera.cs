@@ -46,7 +46,7 @@ namespace Underground
         }
         public void orient_camera(long timer)
         {
-            //Console.WriteLine(Ingame.isTired);
+            ////Console.WriteLine(Ingame.isTired);
             Ingame.a_progresse = false;
             float[] VitesseRotation = new float[3] { 0.0000006f, 0.0000006f, 0.0000006f };
             float[] VitesseTranslation = (Program.input.KeysDown.Contains(keyrun) && !Ingame.isTired /*&& Ingame.distenceSlender() < 3*/)
@@ -100,14 +100,14 @@ namespace Underground
                 if (Program.input.KeysDown.Contains(Keys.Space))
                 {
                     position.Y -= VitesseTranslation[1] * timer;
-                    //  Console.WriteLine("Vers le haut !");
+                    //  //Console.WriteLine("Vers le haut !");
                     camera_altere = true;
                 }
 
                 if (Program.input.KeysDown.Contains(Keys.ShiftKey))
                 {
                     position.Y += VitesseTranslation[1] * timer;
-                    // Console.WriteLine("Vers le bas !");
+                    // //Console.WriteLine("Vers le bas !");
                     camera_altere = true;
                 }
 
@@ -130,13 +130,13 @@ namespace Underground
                         }   
                         Sound.pas.Start();
                     }
-                    // Console.WriteLine("En avant !");
+                    // //Console.WriteLine("En avant !");
                     camera_altere = true;
                 }
                 else
                 {
                     Sound.soundContinue = false;
-                    // Console.WriteLine("prout");
+                    // //Console.WriteLine("prout");
                 }   
                 
             
@@ -158,20 +158,20 @@ namespace Underground
                         Sound.pas.Start();
 
                     }
-                    // Console.WriteLine("En arrière !");
+                    // //Console.WriteLine("En arrière !");
                     camera_altere = true;
                 }
 
                 if (Program.input.KeysDown.Contains(keyright) || Program.input.KeysDown.Contains(Keys.Right))
                 {
                     angle.Y -= VitesseRotation[1] * timer;
-                    // Console.WriteLine("A tribord !");
+                    // //Console.WriteLine("A tribord !");
                     camera_altere = true;
                 }
                 if (Program.input.KeysDown.Contains(keyleft) ||Program.input.KeysDown.Contains(Keys.Left))
                 {
                     angle.Y += VitesseRotation[1] * timer;
-                    //  Console.WriteLine("A babord !");
+                    //  //Console.WriteLine("A babord !");
                     camera_altere = true;
                 }
                 /************ END ************/
@@ -191,7 +191,7 @@ namespace Underground
                     Sound.pas.Start();
 
                     }
-                    // Console.WriteLine("Left");
+                    // //Console.WriteLine("Left");
                     camera_altere = true;
                 }
                 if (Program.input.KeysDown.Contains(Keys.D))
@@ -209,19 +209,19 @@ namespace Underground
                         Sound.pas.Start();
 
                     }
-                    // Console.WriteLine("Right");
+                    // //Console.WriteLine("Right");
                     camera_altere = true;
                 }
                 if (Program.input.KeysDown.Contains(Keys.PageUp))
                 {
                     angle.X += VitesseRotation[0] * timer;
-                    // Console.WriteLine("Montez !");
+                    // //Console.WriteLine("Montez !");
                     camera_altere = true;
                 }
                 if (Program.input.KeysDown.Contains(Keys.PageDown))
                 {
                     angle.X -= VitesseRotation[0] * timer;
-                    // Console.WriteLine("Coulez !");
+                    // //Console.WriteLine("Coulez !");
                     camera_altere = true;
                 }
             }
@@ -233,7 +233,7 @@ namespace Underground
                 {
                     angle.Y -= (Cursor.Position.X - previous_mousepoint.X) * VitesseRotation[0] * 5000;
                     angle.X -= (Cursor.Position.Y - previous_mousepoint.Y) * VitesseRotation[1] * 5000;
-                    //Console.WriteLine(Program.input.MousePoint.X + " " + Program.input.MousePoint.Y);
+                    ////Console.WriteLine(Program.input.MousePoint.X + " " + Program.input.MousePoint.Y);
                     Cursor.Position = new Point(Program.form.DesktopBounds.Width / 2 + Program.form.DesktopBounds.X, Program.form.DesktopBounds.Height / 2 + Program.form.DesktopBounds.Y);
                     previous_mousepoint = new Point(Cursor.Position.X, Cursor.Position.Y);
                     //Cursor.Hide();

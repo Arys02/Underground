@@ -68,7 +68,7 @@ namespace Underground
                 }
                 else
                 {
-                    Console.WriteLine("wtf ?");
+                    //Console.WriteLine("wtf ?");
                 }
             }
             #endregion
@@ -97,7 +97,7 @@ namespace Underground
                 }
                 else
                 {
-                    Console.WriteLine("wtf ?");
+                    //Console.WriteLine("wtf ?");
                 }
             }
             #endregion
@@ -126,7 +126,7 @@ namespace Underground
                 }
                 else
                 {
-                    Console.WriteLine("wtf ?");
+                    //Console.WriteLine("wtf ?");
                 }
             }
             #endregion
@@ -155,7 +155,7 @@ namespace Underground
                 }
                 else
                 {
-                    Console.WriteLine("wtf ?");
+                    //Console.WriteLine("wtf ?");
                 }
             }
             #endregion
@@ -164,7 +164,7 @@ namespace Underground
             positionMob.Y = 0;
             positionMob.Z = b2 * Ingame.rayon_salles * 2;
 
-            Console.WriteLine("{0} {1}", Ingame.macamera.position.X, Ingame.macamera.position.Z);
+            //Console.WriteLine("{0} {1}", Ingame.macamera.position.X, Ingame.macamera.position.Z);
 
 
             Vector3 resultat = new Vector3(

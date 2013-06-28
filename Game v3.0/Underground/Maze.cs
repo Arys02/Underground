@@ -395,7 +395,7 @@ public void Generate(Case C)
 
     public void Setaffichage()
     {
-        //Console.WriteLine("0   1   2   3   4   5   6  7  8  9");
+        ////Console.WriteLine("0   1   2   3   4   5   6  7  8  9");
         for (int i = 0; i < maze.GetLength(0); i++)
         {
             for (int j = 0; j < maze.GetLength(1); j++)
@@ -403,12 +403,12 @@ public void Generate(Case C)
                 maze[i, j].affiche = testaffiche[maze[i, j].g, maze[i, j].d, maze[i, j].b, maze[i, j].h];
                 cellessee(i,j);
 
-                Console.Write(maze[i, j].affiche);// +" | ");
+                //Console.Write(maze[i, j].affiche);// +" | ");
 
                 Export();
             }
-            Console.WriteLine(i);
-            //Console.WriteLine("---------------------------------------");
+            //Console.WriteLine(i);
+            ////Console.WriteLine("---------------------------------------");
         }/*
         for (int i = 0; i < maze.GetLength(0); i++)
         {
@@ -417,15 +417,15 @@ public void Generate(Case C)
                 maze[i, j].affiche = testaffiche[maze[i, j].g, maze[i, j].d, maze[i, j].b, maze[i, j].h];
                 //cellessee(i,j);
                 Export();
-                Console.Write(exportetab[i,j] + "|");
+                //Console.Write(exportetab[i,j] + "|");
 
             }
-            Console.WriteLine();
+            //Console.WriteLine();
         }
        */
         /*foreach (var celles in maze[7,3].see)
                 {
-                    Console.WriteLine("[ "+celles.x+","+celles.y+" ]");
+                    //Console.WriteLine("[ "+celles.x+","+celles.y+" ]");
                 }*/
     }
    

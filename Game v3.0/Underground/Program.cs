@@ -143,10 +143,10 @@ namespace Underground
             bool debug = false;
             if (debug)
             {
-                Console.ForegroundColor = (ConsoleColor)c;
-                Console.Write("[" + op + "] ");
-                Console.ResetColor();
-                Console.WriteLine(msg);
+                //Console.ForegroundColor = (ConsoleColor)c;
+                //Console.Write("[" + op + "] ");
+                //Console.ResetColor();
+                //Console.WriteLine(msg);
             }
         }
 
@@ -242,6 +242,10 @@ namespace Underground
                     }
                     else
                     {
+                        if (IDTile == new Point(-137, -137))
+                        {
+                            Collision.Initialize();
+                        }
                         structOBJ temp = Liste_OBJ[i];
                         temp.sera_affiche = false;
                         Liste_OBJ[i] = temp;
@@ -266,7 +270,7 @@ namespace Underground
             #endregion
 
             #region Fenêtre
-            form = new RenderForm("Game - Soutenance 3");
+            form = new RenderForm("Underground - Horror game");
             form.Width = resolution[0];
             form.Height = resolution[1];
 

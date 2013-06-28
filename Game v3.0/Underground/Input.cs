@@ -91,7 +91,7 @@ namespace Underground
             ClearKeyCache();
             KeysReleased.Add(key);
             KeysDown.Remove(key);
-            //Console.WriteLine(key);
+            ////Console.WriteLine(key);
         }
 
         public void ClearKeyCache()

@@ -84,7 +84,7 @@ namespace Underground
             {
                 int y = Random.Next(0, soundbruitage.Length);
                 int time = Random.Next(50000, 120000);
-                Console.WriteLine(soundbruitage[y] + " : " + y + " time : " + time);
+                //Console.WriteLine(soundbruitage[y] + " : " + y + " time : " + time);
                 Thread.Sleep(time);
                 switch (y)
                 {
@@ -120,9 +120,9 @@ namespace Underground
             {
 
                 int y = random(0, 5);
-                Console.WriteLine("son no : " + soundAmbiance[y]);
+                //Console.WriteLine("son no : " + soundAmbiance[y]);
                 int time = random(10000, 30000);
-                Console.WriteLine(time + " ms");
+                //Console.WriteLine(time + " ms");
 
                 Playsound(audio, soundAmbiance[y], 1);
 
@@ -158,7 +158,7 @@ namespace Underground
                 {
                    if (count == 50)
                     {
-                        Console.Out.Flush();
+                        //Console.Out.Flush();
                         count = 0;
                     }
 

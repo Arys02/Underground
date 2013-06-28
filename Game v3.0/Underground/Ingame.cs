@@ -65,6 +65,7 @@ namespace Underground
         private static float percent_negatif = 0;
         private static bool first_loop = true;
         public static Thread tired;
+        private static double distanceSlender_var = 30000;
 
         public static bool kill = false;
         public static Stopwatch Time = new Stopwatch();
@@ -106,7 +107,7 @@ namespace Underground
                 {
                     previous_flash = clock.ElapsedTicks;
                 }
-                //Console.WriteLine(distenceSlender());
+                ////Console.WriteLine(distenceSlender());
 
                 #region flash
                 if (stateinflash == -1)
@@ -149,7 +150,7 @@ namespace Underground
                     if (percent < 0) percent = 0;
                     if (clock.ElapsedTicks > previous_flash + Seconde_A_Attendre * 3500000)
                     {
-                        Console.WriteLine("Flash !");
+                        //Console.WriteLine("Flash !");
                         stateinflash = -1;
                     }
                 }
@@ -196,6 +197,7 @@ namespace Underground
                 lightDistanceSquared1calcul = Convert.ToSingle(Math.Max(Program.Liste_Lights[1].Range - Math.Pow(lightDistanceSquared0calcul, 0.7), 0));
                 parasitesCamera[0] = Convert.ToSingle((rand.Next(50) - 25f) / 70 / Math.Pow(distanceSlender() / 70, 3));
                 parasitesCamera[1] = Convert.ToSingle((rand.Next(50) - 25f) / 70 / Math.Pow(distanceSlender() / 70, 3));
+                distanceSlender_var = distanceSlender();
                 Thread.Sleep(30);
 
                 //////////////////// ETABLISSEMENT DU FILTRE NEGATIF ////////////////////
@@ -260,7 +262,7 @@ namespace Underground
             //try
             //{
             // Recupere la liste des cases vues
-            //Console.WriteLine("Zone [{0},{1}] [{2},{3}]", a, b, macamera.position.X, macamera.position.Z);
+            ////Console.WriteLine("Zone [{0},{1}] [{2},{3}]", a, b, macamera.position.X, macamera.position.Z);
             List<Case> cases = new List<Case>(Program.newmaze.maze[a, b].see);
 
             // Init
@@ -445,7 +447,7 @@ namespace Underground
                     //effect.SetValue("LightPosition", new Vector4(-macamera.position.X, macamera.position.Y, -macamera.position.Z, 1));
                     /*if (clock.ElapsedTicks - previous_clignement > 100000000) // 1 tick != 100ns (cf diff entre Date et Stopwatch) utiliser Stopwatch.Frequency
                     {
-                        Console.WriteLine(Stopwatch.Frequency);
+                        //Console.WriteLine(Stopwatch.Frequency);
                         previous_clignement = clock.ElapsedTicks;
                     }*/
                     oldAngle = macamera.angle;
@@ -459,23 +461,17 @@ namespace Underground
                     #region died
                     if (kill == false)
                     {
-                        if (((Slender.position.X - macamera.position.X) <= 0.005) || ((Slender.position.X + macamera.position.X) <= 0.005))
+                        if (distanceSlender_var <= 100)
                         {
-                            if (((Slender.position.Y - macamera.position.Y) <= 0.005) || ((Slender.position.Y + macamera.position.Y) <= 0.005))
+                            kill = true;
+                            if (!Sound.dead.IsAlive)
                             {
-                                if (((Slender.position.Z - macamera.position.Z) <= 0.005) || ((Slender.position.Z + macamera.position.Z) <= 0.005))
+                                if (Sound.dead.ThreadState == System.Threading.ThreadState.Stopped)
                                 {
-                                    kill = true;                                    
-                                    if (!Sound.dead.IsAlive)
-                                    {
-                                        if (Sound.dead.ThreadState == System.Threading.ThreadState.Stopped)
-                                        {
-                                            Sound.soundContinue = true;
-                                            Sound.dead = new Thread(Sound.bruitpas);
-                                        }
-                                        Sound.dead.Start();
-                                    }
+                                    Sound.soundContinue = true;
+                                    Sound.dead = new Thread(Sound.bruitpas);
                                 }
+                                Sound.dead.Start();
                             }
                         }
                     }
@@ -483,7 +479,7 @@ namespace Underground
                     if (kill == true)
                     {
                         Time.Start();
-                        
+
 
                         if (Time.ElapsedMilliseconds < 500)
                         {
@@ -529,7 +525,7 @@ namespace Underground
                             Thread.Sleep(1000);
                             Sound.dead.Abort();
                             Menu.IsInMenu = true;
-                            
+
                         }
                     }
                     #endregion
@@ -540,15 +536,15 @@ namespace Underground
                     //collide = false;
                     if (collide)
                     {
-                        
-                            macamera.position = oldPos;
-                            oldView =
-                                Matrix.Translation(oldPos.X, oldPos.Y + (float)Math.Sin(Ingame.sinusoide) / 45f * 70, oldPos.Z) *
-                                Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y + Ingame.parasitesCamera[0]) *
-                                    Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X + Ingame.parasitesCamera[1]) *
-                                    Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z);
-                            macamera.view = oldView;
-                        
+
+                        macamera.position = oldPos;
+                        oldView =
+                            Matrix.Translation(oldPos.X, oldPos.Y + (float)Math.Sin(Ingame.sinusoide) / 45f * 70, oldPos.Z) *
+                            Matrix.RotationAxis(new Vector3(0, 1, 0), macamera.angle.Y + Ingame.parasitesCamera[0]) *
+                                Matrix.RotationAxis(new Vector3(1, 0, 0), macamera.angle.X + Ingame.parasitesCamera[1]) *
+                                Matrix.RotationAxis(new Vector3(0, 0, 1), macamera.angle.Z);
+                        macamera.view = oldView;
+
                     }
                     else
                     {

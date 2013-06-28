@@ -218,7 +218,7 @@ namespace Underground
                                 new Vector2(Program.resolution[0], 2*Program.resolution[1]/5),
                                 @"Ressources\Menu\smoke2.png", EltType.Default, String.Empty),
                     new EltInfo(new Vector2(Program.resolution[0]/2 - 120, Program.resolution[1]/2 - 100),
-                                new Vector2(240, 50), @"Ressources\HUD\button.png", EltType.Button, "Menu"),
+                                new Vector2(240, 50), @"Ressources\HUD\button.png", EltType.Button, "Play again"),
                     new EltInfo(new Vector2(Program.resolution[0]/2 - 120, Program.resolution[1]/2 + 100),
                                 new Vector2(240, 50), @"Ressources\HUD\button.png", EltType.Button, "Exit")
                 };
@@ -353,13 +353,14 @@ namespace Underground
                         IsInGame = true;
                         break;
 
-                    case "Menu":                        
-                        
+                    case "Play again":
                         Process.Start(Application.ExecutablePath, "");
 
                         Program.device.Dispose();
                         Program.form.Dispose();
-                        Menu.Dispose();                      
+                        Menu.Dispose();
+
+                        Process.GetCurrentProcess().Kill();
                         break;
 
                     case "Exit":
