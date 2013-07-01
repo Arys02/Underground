@@ -37,10 +37,10 @@ namespace LOL_l.Importer
     class SubObject
     {
         private DataStream DataStream;
-        private Effect Effect;
+        private Effect effect;
         private VertexDeclaration vertexElems3D;
         private EffectHandle Technique, Pass;
-        private Debug Debug = new Debug();
+        private Debug debug = new Debug();
         private ObjectState State = ObjectState.Not_prepared;
 
         public VertexBuffer VertexBuffer;
@@ -63,9 +63,9 @@ namespace LOL_l.Importer
             {
                 if (State != ObjectState.Ready)
                 {
-                    this.Effect = ResManager.Basic_Effect.Clone(device);
-                    this.Technique = this.Effect.GetTechnique(0);
-                    this.Pass = this.Effect.GetPass(this.Technique, 0);
+                    this.effect = ResManager.Basic_Effect.Clone(device);
+                    this.Technique = this.effect.GetTechnique(0);
+                    this.Pass = this.effect.GetPass(this.Technique, 0);
                     VertexBuffer = new VertexBuffer(device, Utilities.SizeOf<structVertex>() * Vertices.Length, Usage.WriteOnly, VertexFormat.None, Pool.Managed);
                     DataStream = VertexBuffer.Lock(0, 0, LockFlags.None);
                     DataStream.WriteRange(Vertices);
@@ -92,12 +92,12 @@ namespace LOL_l.Importer
                 }
                 else
                 {
-                    Debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION DUPLICATION DU MODEL", 0);
+                    debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION DUPLICATION DU MODEL", 0);
                 }
             }
             else
             {
-                Debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION, VOUS TENTEZ D'AFFICHER UN MESH N'EXISTANT PLUS", 0);
+                debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION, VOUS TENTEZ D'AFFICHER UN MESH N'EXISTANT PLUS", 0);
             }
         }
         public void FreeSubObject()
@@ -107,46 +107,55 @@ namespace LOL_l.Importer
                 DataStream.Dispose();
                 VertexBuffer.Dispose();
                 vertexElems3D.Dispose();
-                Effect.Dispose();
+                effect.Dispose();
                 Pass.Dispose();
                 Technique.Dispose();
                 State = ObjectState.Disposed;
             }
             else
             {
-                Debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION LIBERATION INSENSEE", 0);
+                debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION LIBERATION INSENSEE", 0);
             }
         }
-        public void Draw(ref Device device, Matrix Transformation, Matrix View, Matrix Proj)
+        public void Draw(ref Device device, ref Matrix Transformation, ref Matrix View, ref Matrix Proj, ref Light[] Lights, ref float luminosity, ref float percent_negatif)
         {
             if (State != ObjectState.Not_prepared)
             {
                 if (State != ObjectState.Disposed)
                 {
-                    this.Effect.Technique = Technique;
-                    this.Effect.Begin();
-                    this.Effect.BeginPass(0);
-                    //this.Effect.SetValue("worldViewProj", worldViewProj);
-                    this.Effect.SetValue("worldViewProj", SubTransformation * Transformation * View * Proj);
+                    float lightDistanceSquared0calcul = 500;
+                    float lightDistanceSquared1calcul = 0;
+
+                    this.effect.SetValue("LightPosition[0]", new Vector4(Lights[0].Position, 1));
+                    this.effect.SetValue("LightPosition[1]", new Vector4(Lights[1].Position.X, Lights[1].Position.Y + 2f, Lights[1].Position.Z, 1));
+                    this.effect.SetValue("LightDistanceSquared[0]", lightDistanceSquared0calcul);
+                    this.effect.SetValue("LightDistanceSquared[1]", lightDistanceSquared1calcul);
+                    this.effect.SetValue("percent_Negatif", percent_negatif);
+                    this.effect.SetValue("View", View);
+                    this.effect.SetValue("luminosity", luminosity);
+                    this.effect.Technique = Technique;
+                    this.effect.Begin();
+                    this.effect.BeginPass(0);
+                    this.effect.SetValue("World", SubTransformation * Transformation);
+                    this.effect.SetValue("WorldInverseTranspose", Matrix.Transpose(Matrix.Invert(SubTransformation * Transformation)));
                     device.SetStreamSource(0, VertexBuffer, 0, Utilities.SizeOf<structVertex>());
                     device.VertexDeclaration = this.vertexElems3D;
                     device.SetTexture(0, ResManager.ListTextures[ResManager.getTexture(materialSet.map_Kd, ref device, false)].Texture);
                     device.SetTexture(1, ResManager.ListTextures[ResManager.getTexture(materialSet.map_Ns, ref device, true)].Texture);
                     device.DrawPrimitives(PrimitiveType.TriangleList, 0, Vertices.Length / 3);
-                    this.Effect.EndPass();
-                    this.Effect.End();
+                    this.effect.EndPass();
+                    this.effect.End();
                 }
                 else
                 {
-                    Debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION, VOUS TENTEZ D'AFFICHER UN MESH N'EXISTANT PLUS", 0);
+                    debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION, VOUS TENTEZ D'AFFICHER UN MESH N'EXISTANT PLUS", 0);
                 }
             }
             else
             {
-                Debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION, VOUS TENTEZ D'AFFICHER UN MESH PAS PREPARE", 0);
+                debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION, VOUS TENTEZ D'AFFICHER UN MESH PAS PREPARE", 0);
             }
         }
-
     }
     class OBJLoader
     {
@@ -162,7 +171,7 @@ namespace LOL_l.Importer
             float x = 1, y = 1, z = 1;
             string type, chaine_Lu;
             ToolBox ToolBox = new ToolBox();
-            Debug Debug = new Debug();
+            Debug debug = new Debug();
             List<Vector2> ListeCoordTextures = new List<Vector2>();
             List<Vector4> ListeCoordSommets = new List<Vector4>();
             List<Vector4> ListeNormales = new List<Vector4>();
@@ -181,7 +190,7 @@ namespace LOL_l.Importer
                     z = ToolBox.getfloat(ref i, ref FileOBJ);
 
                     ListeCoordSommets.Add(new Vector4(x, y, z, 1));
-                    Debug.WriteNicely("#", ConsoleColor.Gray, "Nouveau sommet " + x + " " + y + " " + z, 4);
+                    debug.WriteNicely("#", ConsoleColor.Gray, "Nouveau sommet " + x + " " + y + " " + z, 4);
                 }
                 #endregion
                 #region Texture coordinate (OK)
@@ -193,7 +202,7 @@ namespace LOL_l.Importer
                     y = ToolBox.getfloat(ref i, ref FileOBJ);
 
                     ListeCoordTextures.Add(new Vector2(x, y));
-                    Debug.WriteNicely("#", ConsoleColor.Gray, "Nouvelle coordonnée de texture " + x + " " + y + " ", 4);
+                    debug.WriteNicely("#", ConsoleColor.Gray, "Nouvelle coordonnée de texture " + x + " " + y + " ", 4);
                 }
                 #endregion
                 #region Normale (OK)
@@ -207,7 +216,7 @@ namespace LOL_l.Importer
                     z = ToolBox.getfloat(ref i, ref FileOBJ);
 
                     ListeNormales.Add(new Vector4(x, y, z, 1));
-                    Debug.WriteNicely("#", ConsoleColor.Gray, "Nouvelle normale " + x + " " + y + " " + z, 4);
+                    debug.WriteNicely("#", ConsoleColor.Gray, "Nouvelle normale " + x + " " + y + " " + z, 4);
                 }
                 #endregion
                 #region Face (OK)
@@ -240,7 +249,7 @@ namespace LOL_l.Importer
                         Vertices3[j].Tangent = Tangent;
                         ListeVertex.Add(Vertices3[j]);
                     }
-                    Debug.WriteNicely("#", ConsoleColor.DarkBlue, "Nouvelle face", 3);
+                    debug.WriteNicely("#", ConsoleColor.DarkBlue, "Nouvelle face", 3);
                 }
                 #endregion
                 #region Object (OK)
@@ -248,7 +257,7 @@ namespace LOL_l.Importer
                 {
                     i++;
                     chaine_Lu = ToolBox.getstring(ref i, ref FileOBJ);
-                    Debug.WriteNicely("#", ConsoleColor.Green, "Nouvel objet : " + chaine_Lu, 3);
+                    debug.WriteNicely("#", ConsoleColor.Green, "Nouvel objet : " + chaine_Lu, 3);
                     if (ListeVertex.Count != 0)
                     {
                         ListSubObject.Add(new SubObject(Matrix.Identity, currentMaterialSet, ListeVertex.ToArray()));
@@ -261,7 +270,7 @@ namespace LOL_l.Importer
                 {
                     i++;
                     chaine_Lu = ToolBox.getstring(ref i, ref FileOBJ);
-                    Debug.WriteNicely("#", ConsoleColor.Green, "Nouveau groupe : " + chaine_Lu, 3);
+                    debug.WriteNicely("#", ConsoleColor.Green, "Nouveau groupe : " + chaine_Lu, 3);
                 }
                 #endregion
                 #region MTLLib (OK)
@@ -269,7 +278,7 @@ namespace LOL_l.Importer
                 {
                     i++;
                     chaine_Lu = ToolBox.getstring(ref i, ref FileOBJ);
-                    Debug.WriteNicely("#", ConsoleColor.Green, "Nouveau fichier .MTL : " + chaine_Lu, 2);
+                    debug.WriteNicely("#", ConsoleColor.Green, "Nouveau fichier .MTL : " + chaine_Lu, 2);
                     currentMaterial = new MTLLoader(chaine_Lu);
                     currentMaterialSet = currentMaterial.getMaterialSet("");
                 }
@@ -284,7 +293,7 @@ namespace LOL_l.Importer
                     }
                     i++;
                     chaine_Lu = ToolBox.getstring(ref i, ref FileOBJ);
-                    Debug.WriteNicely("#", ConsoleColor.Green, "Nouveau Set : " + chaine_Lu, 2);
+                    debug.WriteNicely("#", ConsoleColor.Green, "Nouveau Set : " + chaine_Lu, 2);
                     currentMaterialSet = currentMaterial.getMaterialSet(chaine_Lu);
                 }
                 #endregion
@@ -299,13 +308,13 @@ namespace LOL_l.Importer
                 #region Commentaire (OK)
                 else if (type[0] == '#')
                 {
-                    Debug.WriteNicely("#", ConsoleColor.Green, "Commentaire", 3);
+                    debug.WriteNicely("#", ConsoleColor.Green, "Commentaire", 3);
                 }
                 #endregion
                 #region Unknown (OK)
                 else
                 {
-                    Debug.WriteNicely("!", ConsoleColor.Red, "Type inconnu", 3);
+                    debug.WriteNicely("!", ConsoleColor.Red, "Type inconnu", 3);
                 }
                 #endregion
                 ToolBox.gotonextline(ref i, ref FileOBJ);
@@ -338,11 +347,11 @@ namespace LOL_l.Importer
                 SubObject.sera_affiche = false;
             }
         }
-        public void Draw(ref Device device, Matrix View, Matrix Proj)
+        public void Draw(ref Device device, Matrix View, Matrix Proj, ref Light[] Lights, float luminosity, float percent_negatif)
         {
             foreach (SubObject SubObject in ListSubObject)
             {
-                SubObject.Draw(ref device, Transformation, View, Proj);
+                SubObject.Draw(ref device, ref Transformation, ref View, ref Proj, ref Lights, ref luminosity, ref percent_negatif);
             }
         }
     }

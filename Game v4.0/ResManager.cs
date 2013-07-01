@@ -38,9 +38,17 @@ namespace LOL_l
         public static List<structBinary> ListBinaries = new List<structBinary>();
         public static Effect Basic_Effect;
 
-        public static void Initialize(ref Device device)
+        public static void Initialize(ref Device device, ref RenderForm form, ref Light[] Lights)
         {
-            Basic_Effect = Effect.FromFile(device, "Effect.fx", ShaderFlags.None);
+            Macro macro = new Macro("nblights", 2.ToString());
+            Basic_Effect = Effect.FromFile(device, "Effect.fx", new Macro[] { macro }, null, "", ShaderFlags.OptimizationLevel3);
+            Basic_Effect.Technique = Basic_Effect.GetTechnique(0);
+            Basic_Effect.SetValue("AmbientLightColor", new Vector4(0f, 0f, 0f, 0f));
+            Matrix proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 7000.0f);
+            Basic_Effect.SetValue("Projection", proj);
+            Basic_Effect.SetValue("LightDiffuseColor[0]", Lights[0].Ambient);
+            Basic_Effect.SetValue("LightDiffuseColor[1]", Lights[1].Ambient);
+            Basic_Effect.SetValue("LightDistanceSquared[1]", Lights[1].Range);
         }
         public static void Dispose()
         {
@@ -50,7 +58,6 @@ namespace LOL_l
                 texture.Texture.Dispose();
             }
         }
-
         public static int getTexture(string filename, ref Device device, bool it_is_bumpTexture)
         {
             if (filename == "")

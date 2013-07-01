@@ -37,12 +37,12 @@ namespace LOL_l.Importer
 
         public structNewMTL getMaterialSet(string name)
         {
-            Debug Debug = new Debug();
+            Debug debug = new Debug();
             for (int i = 1; i < ArrayMaterialSet.Length; i++)
             {
                 if (ArrayMaterialSet[i].name == name) return ArrayMaterialSet[i];
             }
-            Debug.WriteNicely("#", ConsoleColor.Red, "Set non trouvé " + name, 0);
+            debug.WriteNicely("#", ConsoleColor.Red, "Set non trouvé " + name, 0);
             return ArrayMaterialSet[0]; // Si on a pas trouvé, on reenvoi le set par défaut
         }
 
@@ -64,7 +64,7 @@ namespace LOL_l.Importer
             List<structNewMTL> ListMaterialSet = new List<structNewMTL>();
             structNewMTL materialSet = new structNewMTL("", "", "", Color.Black, Color.White, Color.White, 1);
             ToolBox ToolBox = new ToolBox();
-            Debug Debug = new Debug();
+            Debug debug = new Debug();
 
             // Boucle du parser
             while (i < fileMTL.Length)
@@ -78,7 +78,7 @@ namespace LOL_l.Importer
                     chaine_Lu = ToolBox.getstring(ref i, ref fileMTL);
                     materialSet.name = chaine_Lu;
 
-                    Debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau set " + chaine_Lu, 3);
+                    debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau set " + chaine_Lu, 3);
                 }
                 else if (type == "Ka")
                 {
@@ -89,7 +89,7 @@ namespace LOL_l.Importer
                     i++; // Espace
                     z = ToolBox.getfloat(ref i, ref fileMTL);
 
-                    Debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau Ka " + x.ToString() + " " + y.ToString() + " " + z.ToString(), 3);
+                    debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau Ka " + x.ToString() + " " + y.ToString() + " " + z.ToString(), 3);
                     materialSet.Ka = new Color(x, y, z, 1);
                 }
                 else if (type == "Kd")
@@ -102,7 +102,7 @@ namespace LOL_l.Importer
                     z = ToolBox.getfloat(ref i, ref fileMTL);
                     materialSet.Kd = new Color(x, y, z, 1);
 
-                    Debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau Kd " + x.ToString() + " " + y.ToString() + " " + z.ToString(), 3);
+                    debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau Kd " + x.ToString() + " " + y.ToString() + " " + z.ToString(), 3);
                 }
                 else if (type == "Ks")
                 {
@@ -114,7 +114,7 @@ namespace LOL_l.Importer
                     z = ToolBox.getfloat(ref i, ref fileMTL);
                     materialSet.Ks = new Color(x, y, z, 1);
 
-                    Debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau Ks " + x.ToString() + " " + y.ToString() + " " + z.ToString(), 3);
+                    debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau Ks " + x.ToString() + " " + y.ToString() + " " + z.ToString(), 3);
                 }
                 else if (type == "map_Kd")
                 {
@@ -122,7 +122,7 @@ namespace LOL_l.Importer
                     chaine_Lu = ToolBox.getstring(ref i, ref fileMTL);
                     materialSet.map_Kd = chaine_Lu;
 
-                    Debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau map_Kd " + chaine_Lu, 3);
+                    debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau map_Kd " + chaine_Lu, 3);
                 }
                 else if (type == "map_Ns")
                 {
@@ -130,16 +130,16 @@ namespace LOL_l.Importer
                     chaine_Lu = ToolBox.getstring(ref i, ref fileMTL);
                     materialSet.map_Ns = chaine_Lu;
 
-                    Debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau map_Ns " + chaine_Lu, 3);
+                    debug.WriteNicely("#", ConsoleColor.DarkGreen, "nouveau map_Ns " + chaine_Lu, 3);
                 }
                 else if (type == "") { }
                 else if (type[0] == '#')
                 {
-                    Debug.WriteNicely("#", ConsoleColor.Green, "Commentaire", 3);
+                    debug.WriteNicely("#", ConsoleColor.Green, "Commentaire", 3);
                 }
                 else
                 {
-                    Debug.WriteNicely("#", ConsoleColor.Red, "Type inconnu", 2);
+                    debug.WriteNicely("#", ConsoleColor.Red, "Type inconnu", 2);
                 }
                 ToolBox.gotonextline(ref i, ref fileMTL);
             }
