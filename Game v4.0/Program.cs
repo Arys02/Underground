@@ -31,9 +31,6 @@ namespace LOL_l
             var clock = new Stopwatch();
             clock.Start();
 
-
-            Statue.Prepare(ref device);
-            Statue.Free();
             Statue.Prepare(ref device);
             
             RenderLoop.Run(form, () =>

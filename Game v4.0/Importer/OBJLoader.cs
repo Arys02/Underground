@@ -59,9 +59,9 @@ namespace LOL_l.Importer
         }
         public void PrepareSubObject(ref Device device)
         {
-            if (State == ObjectState.Disposed)
+            if (State != ObjectState.Disposed)
             {
-                if (State == ObjectState.Not_prepared)
+                if (State != ObjectState.Ready)
                 {
                     this.Effect = ResManager.Basic_Effect.Clone(device);
                     this.Technique = this.Effect.GetTechnique(0);
