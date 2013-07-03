@@ -13,7 +13,7 @@ float LightDistanceSquared[nblights];
 float luminosity;
 
 /***********************    FILTERS     ***********************/
-bool Sepia = false;
+//bool Sepia = false;
 bool bump_mapping = true;
 float percent_Negatif = 0;
 
@@ -43,7 +43,6 @@ struct VertexShaderInput
 	float4 col : COLOR0;  
     float4 Normal : NORMAL0;
 	float4 Tangent : TANGENT;
-	float bool_normal_map : TEXCOORD1;
 };
 struct VertexShaderOutput
 {
@@ -54,7 +53,6 @@ struct VertexShaderOutput
 	float3 worldPosition : TEXCOORD2;
 	float3 t : TEXCOORD3;
 	float3 b : TEXCOORD4;
-	float bool_normal_map : TEXCOORD5;
 };
 
 
@@ -72,7 +70,6 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	output.tex = input.tex;
 	output.t = t;
 	output.b = b;
-	output.bool_normal_map = input.bool_normal_map;
 	output.worldPosition = worldPosition.xyz;
 	output.Color = input.col;
 	return output;
@@ -86,13 +83,11 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float atten, nDotL, nDotH, power;
 	float4 color = float4(0,0,0,0);
 	float4 texel = tex2D(colorMap, input.tex);
+	//return texel;
 	float3 lightDir, l, h;
 	float3 v = mul(normalize(LightPosition[0] - input.worldPosition), TangentBinomialNormalMatrix); // LightPosition[0] représente ici la position du joueur
 	float3 n;
-	if (input.bool_normal_map>=0)
-		n = normalize(tex2D(normalMap, input.tex).rgb * 2.0f - 1.0f);
-	else
-		n = normalize(tex2D(normalMap, float2(0,0)).rgb * 2.0f - 1.0f);
+	n = normalize(tex2D(normalMap, input.tex).rgb * 2.0f - 1.0f);
 	int i;
 
 	for (i = 0; i < nblights; i++)
@@ -112,33 +107,6 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		* luminosity; // blink
 	color.w = texel.w;
 	return color;
-	/*int i;
-	float4 texel = tex2D(s_2D[0], input.tex);
-
-	float4 finalLight = float4(0,0,0,1);
-	float4 currentLight;
-	float coef_bump;
-	if (bump_mapping)
-	{
-		float4 normaltex = tex2D(s_2D[1], input.tex);
-		float4 bump = normalize(normalize(normaltex * 2.0 - 1.0));
-		bump.w = 1;
-		coef_bump = max(saturate(dot(input.Normal, bump)), 0.0);
-	}
-	else
-		coef_bump = 1;
-	for (i = 0; i < nblights; i++)
-	{
-		currentLight =
-			pow(LightDistanceSquared[i] / max(dot(LightPosition[i] - input.worldPosition, LightPosition[i] - input.worldPosition), LightDistanceSquared[i]),2)
-			* LightDiffuseColor[i]
-			* pow(coef_bump,200);
-		//if (i != 1) currentLight *= saturate(dot(input.Normal, normalize(LightPosition[i] - input.worldPosition)));
-		finalLight += currentLight;
-	}
-	float4 pixel = saturate((texel * input.Color * 2 - float4(1,1,1,1)) * percent_Negatif / 2 + texel * input.Color) * saturate(AmbientLightColor + finalLight) * luminosity;
-	pixel.w = texel.w;
-	return min(pixel,texel*input.Color);*/
 
 }
 

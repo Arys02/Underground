@@ -8,6 +8,7 @@ using SharpDX;
 using SharpDX.Direct3D9;
 using SharpDX.XAudio2;
 using SharpDX.Windows;
+using LightClass = LOL_l.Ingame.LightClass;
 
 namespace LOL_l.Importer
 {
@@ -75,16 +76,16 @@ namespace LOL_l.Importer
                             0,
                             DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Position, 0),
 				        new VertexElement(0, // TEXCOORD0
-                            Convert.ToInt16(Utilities.SizeOf<Vector3>()),
+                            Convert.ToInt16(Utilities.SizeOf<Vector4>()),
                             DeclarationType.Float2, DeclarationMethod.Default,DeclarationUsage.TextureCoordinate,0),
                         new VertexElement(0, // COLOR0
-                            Convert.ToInt16(Utilities.SizeOf<Vector3>()+Utilities.SizeOf<Vector2>()),
+                            Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()),
                             DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Color, 0),
                         new VertexElement(0, // NORMAL0
-                            Convert.ToInt16(Utilities.SizeOf<Vector3>()+Utilities.SizeOf<Vector2>()+Utilities.SizeOf<Vector4>()),
+                            Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()+Utilities.SizeOf<Vector4>()),
                             DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Normal, 0),
                         new VertexElement(0, // TANGENT
-                            Convert.ToInt16(Utilities.SizeOf<Vector3>()+Utilities.SizeOf<Vector2>()+Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector3>()),
+                            Convert.ToInt16(Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector2>()+Utilities.SizeOf<Vector4>()+Utilities.SizeOf<Vector3>()),
                             DeclarationType.Float4, DeclarationMethod.Default, DeclarationUsage.Tangent, 0),
                         VertexElement.VertexDeclarationEnd,
         	        });
@@ -117,21 +118,21 @@ namespace LOL_l.Importer
                 debug.WriteNicely("!", ConsoleColor.DarkRed, "ATTENTION LIBERATION INSENSEE", 0);
             }
         }
-        public void Draw(ref Device device, ref Matrix Transformation, ref Matrix View, ref Matrix Proj, ref Light[] Lights, ref float luminosity, ref float percent_negatif)
+        public void Draw(ref Device device, ref Matrix Transformation, ref Matrix View, ref Matrix Proj, ref List<LightClass> Lights, ref float luminosity, ref float percent_negatif)
         {
             if (State != ObjectState.Not_prepared)
             {
                 if (State != ObjectState.Disposed)
                 {
-                    float lightDistanceSquared0calcul = 500;
-                    float lightDistanceSquared1calcul = 0;
-
-                    this.effect.SetValue("LightPosition[0]", new Vector4(Lights[0].Position, 1));
-                    this.effect.SetValue("LightPosition[1]", new Vector4(Lights[1].Position.X, Lights[1].Position.Y + 2f, Lights[1].Position.Z, 1));
-                    this.effect.SetValue("LightDistanceSquared[0]", lightDistanceSquared0calcul);
-                    this.effect.SetValue("LightDistanceSquared[1]", lightDistanceSquared1calcul);
+                    for (int i = 0; i < Lights.Count; i++)
+                    {
+                        this.effect.SetValue("LightPosition[" + i.ToString() + "]", new Vector4(Lights[i].Position, 1));
+                        this.effect.SetValue("LightDistanceSquared[" + i.ToString() + "]", Lights[i].Range);
+                        this.effect.SetValue("LightDiffuseColor[" + i.ToString() + "]", Lights[i].Diffuse.ToVector4());
+                    }
                     this.effect.SetValue("percent_Negatif", percent_negatif);
                     this.effect.SetValue("View", View);
+                    this.effect.SetValue("Projection", Proj);
                     this.effect.SetValue("luminosity", luminosity);
                     this.effect.Technique = Technique;
                     this.effect.Begin();
@@ -140,6 +141,7 @@ namespace LOL_l.Importer
                     this.effect.SetValue("WorldInverseTranspose", Matrix.Transpose(Matrix.Invert(SubTransformation * Transformation)));
                     device.SetStreamSource(0, VertexBuffer, 0, Utilities.SizeOf<structVertex>());
                     device.VertexDeclaration = this.vertexElems3D;
+                    var aaa = ResManager.getTexture(materialSet.map_Kd, ref device, false);
                     device.SetTexture(0, ResManager.ListTextures[ResManager.getTexture(materialSet.map_Kd, ref device, false)].Texture);
                     device.SetTexture(1, ResManager.ListTextures[ResManager.getTexture(materialSet.map_Ns, ref device, true)].Texture);
                     device.DrawPrimitives(PrimitiveType.TriangleList, 0, Vertices.Length / 3);
@@ -347,7 +349,7 @@ namespace LOL_l.Importer
                 SubObject.sera_affiche = false;
             }
         }
-        public void Draw(ref Device device, Matrix View, Matrix Proj, ref Light[] Lights, float luminosity, float percent_negatif)
+        public void Draw(ref Device device, Matrix View, Matrix Proj, ref List<LightClass> Lights, float luminosity, float percent_negatif)
         {
             foreach (SubObject SubObject in ListSubObject)
             {
